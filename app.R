@@ -10,23 +10,27 @@
 ##Packages ----
 ############################.
 library(dplyr) #data manipulation
+library(data.table) #for fast deading of csvs
 library(googleVis) #charts
 library(shiny)
+library(shinythemes) #for styling theme
 library(DT) #data table
 library (zoo) #for dates
 library(leaflet) # mapping package
 library (rgdal) #reading shapefiles
 library(reshape2) #for melting and dcast
+library(stringr) #manipulation strings
 library(htmltools)
 
 ############################.
 ##Data ----
 ############################.
+data_type <- c("Outpatients", "Inpatients/Day cases")
 
 ##############################################.             
 ##############Map ipdc data ----   
 ##############################################.     
-data_mapipdc <- readRDS("./ipdc_map.rds")  #to be used once rates are in
+data_mapipdc <- readRDS("./data/ipdc_map.rds")  #to be used once rates are in
 
 #To select most recent quarter, fiddly solution there might be something easier
 last_quarter <- unique(data_mapipdc %>% subset(quarter_date==max(quarter_date)) %>%
@@ -41,19 +45,61 @@ hb_bound<-readOGR("./shapefiles","HB_simpl") #Reading file with health board sha
 ##############################################.             
 ##############Cross-boundary data ----   
 ##############################################.     
-data_cbfip <- readRDS("./ipdc_crossbf.rds") %>% 
-  subset(substr(quartername, 5, 6) != "17") %>% #to be removed in future
+#Ip data
+# data <- as_tibble(fread("./data/QAcute_Dec17_IPDC_cbf.csv", stringsAsFactors=TRUE)) %>% 
+#   subset(!(hbtreat_name %in% c("Non-NHS Provider")) #only Health boards
+#          & !(hbres_name %in% c("Other")) #only Health boards
+#          & boundary_ind == 1) %>%  #only including flows out of the HB
+#   select(-c(boundary_ind, hbtreat_currentdate, hbres_currentdate, episodes)) %>%
+#   rename(count=stays) %>% 
+#   droplevels() #dropping missing factor levels 
+# 
+# #The Sankey diagram dislike duplicates - so set unique labels for from/to
+# data$hbtreat_name <- paste0(data$hbtreat_name,' ')
+# 
+# #Taking out the NHS part from the names
+# data$hbtreat_name <- data$hbtreat_name  %>% str_replace("NHS ", "")
+# data$hbres_name <- data$hbres_name  %>% str_replace("NHS ", "")
+# 
+# saveRDS(data, "./data/ipdc_crossbf.rds")
+
+data_cbfip <- readRDS("./data/ipdc_crossbf.rds") %>% 
   droplevels()
 
-data_cbfip$quartername2 <- data_cbfip$quartername #This variable is created to be displayed in the table correctly
-data_cbfip$quartername <- as.yearmon(data_cbfip$quartername, "%b-%y")
+#Me trying to modify correctly the dates.
+# data_cbfip$quarter_name2 <- data_cbfip$quarter_name #This variable is created to be displayed in the table correctly
+# data_cbfip$quarter_date2 <- as.yearmon(data_cbfip$quarter_date, "%b-%y")
+# 
+# data_cbfip[sort(order(data_cbfip$quarter_date)[])]
 
+#Op data
+# data_cbfop <- as_tibble(fread("./data/QAcute_Dec17_outpats_cbf.csv", 
+#                               stringsAsFactors=TRUE)) %>% 
+#     subset(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) #only Health boards
+#            & !(hbres_name %in% c("Other")) #only Health boards
+#            & boundary_ind == 1) %>%  #only including flows out of the HB
+#     select(-c(boundary_ind, hbtreat_currentdate, hbres_currentdate)) %>% 
+#     rename(count=attendances) %>% 
+#     droplevels() 
+# 
+# #The Sankey diagram dislike duplicates - so set unique labels for from/to
+# data_cbfop$hbtreat_name <- paste0(data_cbfop$hbtreat_name,' ')
+# 
+# #Taking out the NHS part from the names
+# data_cbfop$hbtreat_name <- data_cbfop$hbtreat_name  %>% str_replace("NHS ", "")
+# data_cbfop$hbres_name <- data_cbfop$hbres_name  %>% str_replace("NHS ", "")
+# 
+# saveRDS(data_cbfop, "./data/op_crossbf.rds")
 
+data_cbfop <- readRDS("./data/op_crossbf.rds") %>% 
+  droplevels()
+
+###################Tests----
 geo_types <- c("Scotland", "Health Board of treatment", "Health Board of residence", 
                "Council", "Hospital")
 geo_names <- c("Scotland", "Fife", "Glasgow", "Royal Infirmary")
 quarter_data <- c("Dec-16", "Dec-17")
-data_type <- c("Outpatients", "Inpatients")
+
 chart_type <- c("Flow between Health boards", "Regional differences - map",
                 "Time trend", "Age and sex composition")
 
@@ -84,6 +130,7 @@ opts <- paste0("{
 
 # Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
+                        shinythemes::themeSelector(), #to change theme
    titlePanel("Data explorer"),    # Application title
    navbarPage("", # Navigation bar
               
@@ -109,8 +156,7 @@ tabPanel("Time trend", icon = icon("area-chart"), style="float: top; height: 95%
                 selectInput("charttype_expl", label = "Chart type", choices = chart_type)
          ),
          column(4,
-                selectInput("quarter_expl", label = "Quarter ending", choices = quarter_data),
-                downloadButton('download_flow', 'Download data', style="margin: 25px 10px 25px 10px ")  #For downloading the data
+                selectInput("quarter_expl", label = "Quarter ending", choices = quarter_data)
          ),
          textOutput("text")
 ),
@@ -119,19 +165,7 @@ tabPanel("Time trend", icon = icon("area-chart"), style="float: top; height: 95%
 ##############################################.     
 tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
-         column(4,
-                selectInput("geotype_expl", label = "Geography type", choices = geo_types),
-                selectInput("geoname_expl", label = "Geography name", choices = geo_names)
-         ),
-         column(4,
-                selectInput("datatype_expl", label = "Data type", choices = data_type),
-                selectInput("charttype_expl", label = "Chart type", choices = chart_type)
-         ),
-         column(4,
-                selectInput("quarter_expl", label = "Quarter ending", choices = quarter_data),
-                downloadButton('download_flow', 'Download data', style="margin: 25px 10px 25px 10px ")  #For downloading the data
-         ),
-         textOutput("text")
+         p("Welcome to the data explorer of the hospital acute care statistics")
 ),
 ##############################################.             
 ##############Map tab ----   
@@ -143,14 +177,16 @@ tabPanel("Map", icon = icon("globe"), style="float: top; height: 95%; width: 95%
               admitted to hospital or treated as day cases. This map allows to explore this regional
               differences in total and relative volume of hospital acute care activity in Scotland."),
          div(style="float:right; height: 80%; width: 30%; max-width: 200px; background-color:#ffffff; border: 0px solid #ffffff;",
-          selectInput("measure_map", label = "Select category:", 
+             selectInput("datatype_map", label = "Select type of patients:", choices = data_type),
+             selectInput("measure_map", label = "Select category:", 
                       choices=unique(data_mapipdc$measure), width= "95%"),
           selectInput("value_map", label = "Select measure:", 
                 choices=c("Episodes", "Crude rate"), width= "95%"),
           selectInput("quarter_map", label = "Select quarter:", 
                       choices =(unique(data_mapipdc$quarter_name)), 
                 selected=last_quarter, width= "95%"),
-          downloadButton('download_map', 'Download data', width= "95%"),  #For downloading the data
+          downloadButton(outputId = 'download_map', label = 'Download data', 
+                         width= "95%"),  #For downloading the data
           shiny::hr(),
           h5(style="font-weight: bold;", "Percentile", width= "95%"),
           img(src='legend.png', width= "95%", style="vertical-align:middle")
@@ -188,16 +224,21 @@ tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 
          ),
          div(style="float: top; height: 95%; width: 95%; background-color:#ffffff; 
              border: 0px solid #ffffff;",
-             column(4,  
-                    selectInput("quarter_flow", label = "Quarter ending", choices = sort(unique(data_cbfip$quartername)), 
-                                selected=max(data_cbfip$quartername))
+             column(3,
+                    selectInput("datatype_flow", label = "Type of patient:", 
+                                choices = data_type)
              ),
-             column(4,  
-                    selectInput("hbres_flow", label = "Select NHS Board of residence", 
+             column(3,  
+                    selectInput("quarter_flow", label = "Quarter:", 
+                    choices = unique(data_cbfip$quarter_name), 
+                                selected=tail(data_cbfip$quarter_name, n=1))
+             ),
+             column(3,  
+                    selectInput("hbres_flow", label = "Board of residence", 
                                 choices = unique(data_cbfip$hbres_name))
              ),
-             column(4,
-                    downloadButton('download_flow', 'Download data', 
+             column(3,
+                    downloadButton(outputId = 'download_flow', label = 'Download data',
                                    style="margin: 25px 10px 25px 10px ")  #For downloading the data
              )
          ),
@@ -229,22 +270,9 @@ tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 
 ##############################################.     
 tabPanel("Table", icon = icon("table"), style="float: top; height: 95%; width: 95%; 
           background-color:#ffffff; border: 0px solid #ffffff;",
-         column(4,
-                selectInput("geotype_expl", label = "Geography type", choices = geo_types),
-                selectInput("geoname_expl", label = "Geography name", choices = geo_names)
-         ),
-         column(4,
-                selectInput("datatype_expl", label = "Data type", choices = data_type),
-                selectInput("charttype_expl", label = "Chart type", choices = chart_type)
-         ),
-         column(4,
-                selectInput("quarter_expl", label = "Quarter ending", choices = quarter_data),
-                downloadButton('download_flow', 'Download data', style="margin: 25px 10px 25px 10px ")  #For downloading the data
-         ),
-         textOutput("text")
-)
+         p("Welcome to the data explorer of the hospital acute care statistics")
    )
-))
+)))
 
 ############################.
 ## Server ----
@@ -270,7 +298,7 @@ server <- shinyServer(function(input, output) {
   #Merging shapefile with dynamic selection of data
   #First for HB
   hb_pol <- reactive({merge(hb_bound, 
-                       data_mapipdc %>% subset(quarter_name==input$quarter_map
+                            data_mapipdc %>% subset(quarter_name==input$quarter_map
                                        & measure==input$measure_map
                                        & value_type == input$value_map
                                        & substr(loc_name,1,3)=="NHS") %>% #selecting only HB 
@@ -349,7 +377,7 @@ server <- shinyServer(function(input, output) {
   #### Table ----
   
   #Table data
-  table_data <- reactive({
+  table_mapdata <- reactive({
     data_mapipdc %>% subset(quarter_name==input$quarter_map & measure==input$measure_map) %>% 
       select(loc_name, quarter_name, measure, value_type, value) %>% 
       dcast(loc_name+quarter_name+measure~value_type, fun.aggregate=sum)
@@ -358,7 +386,7 @@ server <- shinyServer(function(input, output) {
   
   #Actual table.
   output$table_map <- DT::renderDataTable({
-    DT::datatable(table_data(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
+    DT::datatable(table_mapdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 14, dom = 'tip'),
                   colnames = c("Location", "Quarter", "Measure", "Episodes", "Crude Rate")  
     )
@@ -377,10 +405,17 @@ server <- shinyServer(function(input, output) {
 ##############Cross-boundary ----   
 ##############################################.     
   #Reactive data
+  #Creating dynamic selection of dataset.
+  data_flow <- reactive({switch(input$datatype_flow,
+                                 "Inpatients/Day cases" = data_cbfip,
+                                 "Outpatients" = data_cbfop
+                                )})
+  
+  
   #For all HB
   flow_all <- reactive({
-    data_cbfip %>% subset(quartername==input$quarter_flow & episodes>9) #%>% 
-    #       group_by(hbres_name, quartername) %>% 
+    data_flow() %>% subset(quarter_name==input$quarter_flow & count>9) #%>% 
+    #       group_by(hbres_name, quarter_name) %>% 
     #       top_n(5, episodes)
     #& episodes>9) Not right now, see TODO
     
@@ -388,7 +423,7 @@ server <- shinyServer(function(input, output) {
   
   #For only selected HB
   flow_one <- reactive({
-    data_cbfip %>% subset(quartername==input$quarter_flow & 
+    data_flow() %>% subset(quarter_name==input$quarter_flow & 
                       hbres_name==input$hbres_flow)
   })   
   
@@ -398,7 +433,7 @@ server <- shinyServer(function(input, output) {
   output$sankey_all <- renderGvis({
     
     options(gvis.plot.tag=NULL) #if changed to chart you will get the html code
-    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name','episodes')],
+    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name','count')],
                options = list(width = "automatic", sankey=opts
                ))
     
@@ -407,27 +442,26 @@ server <- shinyServer(function(input, output) {
   #This one with only the selected
   output$sankey_one <- renderGvis({
     
-    gvisSankey(flow_one()[,c('hbres_name','hbtreat_name','episodes')],
+    gvisSankey(flow_one()[,c('hbres_name','hbtreat_name','count')],
                options = list(width = "automatic",
                               gvis.plot.tag=NULL))#if changed to chart you will get the html code
     
   })
   
-  
   #####################################.    
-  #### Table ----
+  ### Table ----
   
   #Table data
-  table_data <- reactive({
-    data_cbfip %>% subset(quartername==input$quarter_flow) %>% 
-      select(hbres_name, hbtreat_name, quartername2, episodes)
+  table_cbfdata <- reactive({
+    data_flow() %>% subset(quarter_name==input$quarter_flow) %>% 
+      select(hbres_name, hbtreat_name, quarter_name, count)
   })
   
   #Actual table.
   output$table_crossb <- DT::renderDataTable({
-    DT::datatable(table_data(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
+    DT::datatable(table_cbfdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 10, dom = 'tip'),
-                  colnames = c("Residence board", "Treatment board",  "Quarter", "Episodes")  
+                  colnames = c("Residence board", "Treatment board",  "Quarter", "Count")  
     )
   })
   
@@ -440,8 +474,6 @@ server <- shinyServer(function(input, output) {
       write.csv(flow_all(), file) 
     }
   )
-  
-  
   
    
 })
