@@ -28,12 +28,13 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
              h3("Data explorer")),
       column(8,
              p("The data explorer allows you to find the exact piece of data you want. 
-               The four sections allow you to see the data in different ways. Within 
+               The five sections allow you to see the data in different ways. Within 
                each there are filters that let you select the slice of data you want."),
       tags$ul( 
         tags$li(tags$b("Time trend"), " - shows the data across time and allows you to see shifts in practice."),
         tags$li(tags$b("Age/sex"), " - shows the differences in age and sex composition for this data."),
-        tags$li(tags$b("Cross-boundary flow"), " - shows the where patients were treated."),
+        tags$li(tags$b("Deprivation"), " - shows the differences in activity across the deprivation gradient."),
+        tags$li(tags$b("Cross-boundary flow"), " - shows where patients were treated."),
         tags$li(tags$b("Table"), " - allows you to select a slice of data in a table format.")
         ),
       p("For each section you can download the data or view it as a table if you prefer."),
@@ -58,9 +59,9 @@ tabPanel("Time trend", icon = icon("area-chart"), style="height: 95%;
          ),
          mainPanel(width=12,
          plotlyOutput("trend_plot"),
-         HTML("<button data-toggle='collapse' href='#trendip' class='btn btn-primary'>
+         HTML("<button data-toggle='collapse' href='#trend' class='btn btn-primary'>
                   <strong>Show/hide table</strong></button>"),
-         HTML("<div id='trendip' class='collapse'> "),
+         HTML("<div id='trend' class='collapse'> "),
          DT::dataTableOutput("table_trend", width="95%"),
          HTML("</div>")
          )
@@ -88,6 +89,32 @@ tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%;
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='pyramid' class='collapse'> "),
                    DT::dataTableOutput("table_pyramid", width="95%"),
+                   HTML("</div>")
+                   )
+),
+##############################################.             
+##############Deprivation (SIMD) tab ----   
+##############################################.     
+tabPanel("Deprivation", icon = icon("gbp"), style="float: top; height: 95%; 
+         width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
+         wellPanel(
+           column(4, uiOutput("geotype_ui_simd")),  
+           column(4, uiOutput("locname_ui_simd")),
+           column(4, selectInput("quarter_simd", label = "Select the time period", 
+                                 choices = unique(data_simd$quarter_name), 
+                                 selected=tail(data_simd$quarter_name, n=1), width= "95%")), #to be fixed properly
+           column(9, selectInput("measure_simd", label = "Select the type of activity", 
+                                 choices = trend_measure, selectize=TRUE,
+                                 selected = c("All Inpatients and Daycases"))),
+           column(3, downloadButton(outputId = 'download_simd', 
+                                    label = 'Download data', width= "95%"))  #For downloading the data
+         ),
+         mainPanel(width=12,
+                   plotlyOutput("simd_plot"),
+                   HTML("<button data-toggle='collapse' href='#simd' class='btn btn-primary'>
+                        <strong>Show/hide table</strong></button>"),
+                   HTML("<div id='simd' class='collapse'> "),
+                   DT::dataTableOutput("table_simd", width="95%"),
                    HTML("</div>")
                    )
 ),

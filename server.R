@@ -16,8 +16,15 @@
 # Include bed time trend might require merging datsets
 #Fix formatting numbers tooltip
 
-#Add age and sex tables to table tab
-#Add specialty ones to table tab, rounding rate=crash
+#Crossboundary revamp (switch for your own board flow) 
+#and add people that come to a specific board (maybe text)
+#Alignment download boxes
+#Keep going with the NA's (specialty, age/sex, bed?)
+#Instructions for downloading plots
+#Final changes of text
+#Send comments on data issues to DC, AP
+#test PRA
+#Issues with return appointments in trend
 
 ############################.
 ## Server ----
@@ -41,7 +48,7 @@ function(input, output) {
   })
   
   #Reactive datasets
-  #reactive dataset for the ip plot
+  #reactive dataset for the trend plot
   data_trend_plot <- reactive({data_trend %>% 
       subset(loc_name == input$locname_trend & measure %in% input$measure_trend &
                geo_type == input$geotype_trend)
@@ -50,7 +57,7 @@ function(input, output) {
 
   #Table data
   table_trenddata <- reactive({
-    data_trendip_plot() %>% 
+    data_trend_plot() %>% 
       select(loc_name, quarter_name, measure, count, rate, los, avlos)
   })
   
@@ -86,8 +93,7 @@ function(input, output) {
   
   #####################################.    
   #### Downloading data ----
-  #for downloading data ipdc
-  output$download_trendip <- downloadHandler(
+  output$download_trend <- downloadHandler(
     filename =  'trend_data.csv',
     content = function(file) {
       write.csv(data_trend_plot(), file) 
@@ -152,12 +158,6 @@ function(input, output) {
                           title = "Number")) %>% 
       config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
 
-      #Layout
-#       layout(annotations = list(), #It needs this because of a buggy behaviour
-#              yaxis = list(title = "Stays", rangemode="tozero"), 
-#              xaxis = list(title = "Quarter"),  #axis parameter
-#              hovermode = 'false') %>%  # to get hover compare mode as default
-    
   }) 
   
 
@@ -165,7 +165,7 @@ function(input, output) {
   output$table_pyramid <- DT::renderDataTable({
     DT::datatable(data_table_pyramid(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Measure", "Age", "Sex", "Count")  
+                  colnames = c("Location", "Quarter", "Measure", "Age", "Sex", "Number")  
     )
   })
   
@@ -177,6 +177,72 @@ function(input, output) {
     filename =  'agesex_data.csv',
     content = function(file) {
       write.csv(data_pyramid_plot(), file) 
+    }
+  )
+  
+  ##############################################.             
+  ##############Deprivation simd----   
+  ##############################################.  
+  #Reactive dropdowns for this tab
+  output$geotype_ui_simd <- renderUI({
+    selectInput("geotype_simd", label = "Select the type of location", 
+                choices = geo_types, selected =  "Scotland")
+  })
+  
+  output$locname_ui_simd <- renderUI({
+    selectInput("locname_simd", "Select the location", 
+                choices =unique(data_simd$loc_name[data_simd$geo_type == input$geotype_simd]),
+                selectize = TRUE, selected = "Scotland")
+  })
+  
+  #Reactive datasets
+  #reactive dataset for the trend plot
+  data_simd_plot <- reactive({data_simd %>% 
+      subset(loc_name == input$locname_simd & 
+               measure == input$measure_simd &
+               geo_type == input$geotype_simd &
+               quarter_name == input$quarter_simd) 
+  })
+  
+  #Table data
+  data_table_simd <- reactive({
+    data_simd_plot() %>% 
+      select(loc_name, quarter_name, measure, simd, count, rate, avlos)
+  })
+  
+  #Plotting trend
+  output$simd_plot <- renderPlotly({
+    
+    #Text for tooltip
+    tooltip_simd <- c(paste0("Decile: ", data_simd_plot()$simd, "<br>",
+                            "Number: ", abs(data_simd_plot()$count)))
+    
+    plot_ly(data=data_simd_plot(), x=~simd , y=~count,
+            text=tooltip_simd, hoverinfo="text") %>% 
+      add_bars() %>%
+      layout(bargap = 0.1, 
+             yaxis = list(title = "Number"), 
+             xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>% 
+      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+    
+  }) 
+  
+  ######Table
+  output$table_simd <- DT::renderDataTable({
+    DT::datatable(data_table_simd(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
+                  options = list(pageLength = 20, dom = 'tip'),
+                  colnames = c("Location", "Quarter", "Measure", "SIMD quintile", 
+                               "Number", "DNA rate", "Mean length of stay")  
+    )
+  })
+  
+  #####################################.    
+  #### Downloading data ----
+  #for downloading data ipdc
+  output$download_simd <- downloadHandler(
+    filename =  'deprivation_data.csv',
+    content = function(file) {
+      write.csv(data_simd_plot(), file) 
     }
   )
   

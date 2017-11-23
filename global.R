@@ -56,6 +56,14 @@ data_bed <- readRDS("./data/beds.rds")
 ##############Specialty data ----   
 ##############################################.     
 #################Ip data
+# data_specip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_spec.csv", sep="")) %>% 
+#   # Excluding Golden Jubilee hb code (to avoid duplication)
+#   subset(!loc_code == "S08100001") %>% 
+#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
+#                            ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   droplevels() 
+# 
 # data_specip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_spec.csv", sep="")) %>% 
 #     # Excluding Scotland and Golden Jubilee (so no duplicate when merging).
 #     subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
@@ -65,20 +73,12 @@ data_bed <- readRDS("./data/beds.rds")
 #     mutate_if(is.character, factor) %>% #converting characters into factors
 #     droplevels() 
 # 
-# data_specip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_spec.csv", sep="")) %>% 
-#     # Excluding Golden Jubilee hb code (to avoid duplication)
-#     subset(!loc_code == "S08100001") %>% 
-#     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
-#                              ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
-#     mutate_if(is.character, factor) %>% #converting characters into factors
-#     droplevels() 
-# 
 # data_specip <- rbind(data_specip_treat, data_specip_res) %>% 
 #   mutate(avlos = round(avlos, 1)) %>% 
 #   mutate(file="Inpatients/Day Cases")
 # 
 # saveRDS(data_specip, "./data/spec_IP.rds")
-
+# 
 # data_specip <- readRDS("./data/spec_IP.rds")
 # 
 # # ###########################.
@@ -128,50 +128,55 @@ data_spec$file <- as.factor(data_spec$file)
 ##############SIMD data ----   
 ##############################################.     
 #################Ip data
-# data_simdip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_simd.csv", sep="")) %>% 
-#     # Excluding Scotland and Golden Jubilee (so no duplicate when merging).
-#     subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of residence", 
-#                              ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                     "Other"))) %>% 
-#     mutate_if(is.character, factor) %>% #converting characters into factors
-#     droplevels() 
-# 
 # data_simdip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_simd.csv", sep="")) %>% 
-#     # Excluding Golden Jubilee hb code (to avoid duplication)
-#     subset(!loc_code == "S08100001") %>% 
-#     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
-#                              ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
-#     mutate_if(is.character, factor) %>% #converting characters into factors
-#     droplevels() 
+#   # Excluding Scotland and Golden Jubilee (so no duplicate when merging).
+#   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
+#   mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other", 
+#                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
+#                                   "Health board of residence"))) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   droplevels() 
+# 
+# data_simdip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_simd.csv", sep="")) %>% 
+#   # Excluding Golden Jubilee hb code (to avoid duplication)
+#   subset(!loc_code == "S08100001") %>% 
+#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
+#                            "Health board of treatment",
+#                            ifelse(loc_code == "scot", "Scotland", 
+#                                   ifelse(hb_name == "Null" | hb_name == "Other" 
+#                                          | loc_name == "Other", "Other", "Hospital of treatment")))) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   droplevels() 
 # 
 # data_simdip <- rbind(data_simdip_treat, data_simdip_res) %>% 
 #   mutate(avlos = round(avlos, 1)) %>% 
-#   mutate(file="Inpatients/Day Cases")
+#   mutate(file="Inpatients/Day Cases") %>% 
+#   rename(count=stays)
 # 
 # saveRDS(data_simdip, "./data/SIMD_IP.rds")
-# 
 # data_simdip <- readRDS("./data/SIMD_IP.rds")
 # 
-# ###########################.
-# ##################Op data
+###########################.
+##################Op data
 # data_simdop_res <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_simd.csv", sep="")) %>% 
 #   # Excluding Scotland and Golden Jubilee(so no duplicate when merging)
 #   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
-#                            "Health board of residence", 
+#   mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other", 
 #                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                   "Other"))) %>% 
+#                                "Health board of residence"))) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
 # 
 # data_simdop_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_simd.csv", sep="")) %>%
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
 #   subset(!(loc_code == "board" & hb_code == "S08100001")) %>% 
+#   #Excluding three codes with no name, giving issues
+#   subset(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>% 
 #   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board", 
 #                            "Health board of treatment",
 #                            ifelse(loc_code == "scot", "Scotland", 
-#                                   ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>% 
+#                                   ifelse(hb_name == "Null" | hb_name == "Other" 
+#                                          | loc_name == "Other", "Other", "Hospital of treatment")))) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
 # 
@@ -181,19 +186,25 @@ data_spec$file <- as.factor(data_spec$file)
 #   mutate(file="Outpatients")
 # 
 # saveRDS(data_simdop, "./data/SIMD_OP.rds")
+# data_simdop <- readRDS("./data/SIMD_OP.rds")
 # 
-# #Merging both datasets, ip and op.
-# data_simd <- bind_rows(data_simdop, data_simdip)
+# Merging both datasets, ip and op.
+# data_simd <- bind_rows(data_simdop, data_simdip) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   subset(loc_name != "Null" & !is.na(simd)) %>% #Excluding Null values
+#   droplevels()
 # 
 # data_simd$measure <- as.character(data_simd$measure)
 # data_simd$measure[data_simd$measure=="New"] <- "New appointments"
 # data_simd$measure[data_simd$measure=="Return"] <- "Return appointments"
 # data_simd$measure <- as.factor(data_simd$measure)
+# data_simd$file <- as.factor(data_simd$file)
+# data_simd$simd <- as.factor(data_simd$simd)
 # 
 # saveRDS(data_simd, "./data/SIMD_IPOP.rds")
 
-data_simd <- readRDS("./data/SIMD_IPOP.rds")
-data_simd$file <- as.factor(data_simd$file)
+data_simd <- readRDS("./data/SIMD_IPOP.rds") 
+
 ##############################################.             
 ##############Time trend data ----   
 ##############################################.     
@@ -201,17 +212,20 @@ data_simd$file <- as.factor(data_simd$file)
 # data_trendipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_all.csv", sep="")) %>% 
 #   # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
 #   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of residence", 
-#                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                   "Other"))) %>% 
+#   mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other", 
+#                              ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
+#                                     "Health board of residence"))) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
 # 
 # data_trendiptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_all.csv", sep="")) %>% 
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
 #   subset(!loc_code == "S08100001") %>% 
-#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
-#                            ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
+#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
+#                              "Health board of treatment",
+#                              ifelse(loc_code == "scot", "Scotland", 
+#                                     ifelse(hb_name == "Null" | hb_name == "Other" 
+#                                            | loc_name == "Other", "Other", "Hospital of treatment")))) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
 # 
@@ -222,28 +236,36 @@ data_simd$file <- as.factor(data_simd$file)
 # 
 # saveRDS(data_trendip, "./data/trend_IP.rds")
 # data_trendip <- readRDS("./data/trend_IP.rds") 
-
-###########################.
-##################Op data
+# 
+##########################.
+#################Op data
 # data_trendopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_all.csv", sep="")) %>% 
 #   # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
 #   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
-#                            "Health board of residence", 
-#                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                   "Other"))) %>% 
+#     mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other", 
+#                              ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
+#                                  "Health board of residence"))) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
 # 
 # data_trendoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_all.csv", sep="")) %>%
+#   select(-c(X1)) %>% 
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
 #   subset(!(loc_code == "board" & hb_code == "S08100001")) %>% 
-#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board", 
-#                            "Health board of treatment",
-#                            ifelse(loc_code == "scot", "Scotland", 
-#                                   ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>% 
+#   #Excluding  codes with no name, giving issues
+#   subset(!(is.na(loc_name) | loc_name == "NULL")) %>% 
+#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08" | loc_code == "board", 
+#                              "Health board of treatment",
+#                              ifelse(loc_code == "scot", "Scotland", 
+#                                     ifelse(hb_name == "Null" | hb_name == "Other" 
+#                                            | loc_name == "Other", "Other", "Hospital of treatment")))) %>% 
+#   mutate(rate = as.numeric(rate)) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() 
+# 
+# # For some reason this file is slightly different in date formatting
+# data_trendoptreat$quarter_date <- as.factor(gsub("/", "-", data_trendoptreat$quarter_date))
+# data_trendoptreat$quarter_date <- as.factor(gsub("20", "", data_trendoptreat$quarter_date))
 # 
 # data_trendop <- rbind(data_trendoptreat, data_trendopres) %>% 
 #   rename(measure = appt_type)  %>% 
@@ -257,19 +279,22 @@ data_simd$file <- as.factor(data_simd$file)
 # 
 # saveRDS(data_trendop, "./data/trend_OP.rds") 
 # data_trendop <- readRDS("./data/trend_OP.rds") 
-
-#Merging both datasets, ip and op.
-# data_trend <- bind_rows(data_trendop, data_trendip)
+# 
+# Merging both datasets, ip and op.
+# data_trend <- bind_rows(data_trendop, data_trendip) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   subset(loc_name != "Null") %>% #Excluding Null values
+#   droplevels()
 # 
 # data_trend$quarter_date2 <- as.yearmon(data_trend$quarter_date, "%d-%m-%y") #date format
 # 
 # saveRDS(data_trend, "./data/trend_IPOP.rds")
 
-data_trend <- readRDS("./data/trend_IPOP.rds")
+data_trend <- readRDS("./data/trend_IPOP.rds") %>% 
+  #Excluding this, as it is not aggregated and creates issues
+  subset(!(loc_name == "Other" & geo_type == "Other"))
 
 trend_measure <- c(as.character(unique(data_trend$measure)))
-
-
 
 ##############################################.             
 ##############Population pyramid data ----   
@@ -290,7 +315,7 @@ trend_measure <- c(as.character(unique(data_trend$measure)))
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
 #   subset(!loc_code == "S08100001") %>% 
 #   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
-#                            ifelse(loc_code == "scot", "Scotland", "Hospital"))) %>% 
+#                            ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   select(-c(hb_code, hb_name, loc_code)) %>% 
@@ -323,7 +348,7 @@ trend_measure <- c(as.character(unique(data_trend$measure)))
 #   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board", 
 #                            "Health board of treatment",
 #                            ifelse(loc_code == "scot", "Scotland", 
-#                                   ifelse(hb_name == "Null", "Other", "Hospital")))) %>% 
+#                                   ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>% 
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   select(-c(hb_code, hb_name, loc_code)) %>% 
@@ -338,7 +363,10 @@ trend_measure <- c(as.character(unique(data_trend$measure)))
 # data_pyramidop <- readRDS("./data/pyramid_OP.rds")
 # 
 # #Merging both datasets, ip and op.
-# data_pyramid <- bind_rows(data_pyramidop, data_pyramidip)
+# data_pyramid <- bind_rows(data_pyramidop, data_pyramidip) %>% 
+#   mutate_if(is.character, factor) %>% #converting characters into factors
+#   subset(loc_name != "Null") %>% #Excluding Null values
+#   droplevels()
 # data_pyramid$quarter_date2 <- as.yearmon(data_pyramid$quarter_date, "%d-%m-%y") #date format
 # 
 # data_pyramid$measure <- as.character(data_pyramid$measure)
