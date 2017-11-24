@@ -163,6 +163,7 @@ tabPanel("Deprivation", icon = icon("gbp"), style="float: top; height: 95%;
 ##############################################.     
 tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
+         
          h4("Where are patients treated? - Flow of patients between Health Boards"),
          p("The majority of patients are treated in a hospital located in their own local 
            NHS Board area. However, patients are treated outside of their residence area for varied
@@ -173,35 +174,32 @@ tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 
            in Clydebank. The GJNH provides a range of national and regional services. It is 
            also a national resource to help meet the demand for planned procedures from across Scotland." 
          ),
-         div(style="float: top; height: 95%; width: 95%; background-color:#ffffff; 
-             border: 0px solid #ffffff;",
-             column(3,
+         wellPanel(
+           column(4,
                     selectInput("datatype_flow", label = "Select the hospital service", 
-                                choices = data_type)
+                                choices = data_type),
+                  checkboxInput("checkbox_flow", label = "Include flows within same board?", value = TRUE)
              ),
-             column(3,  
+             column(4,  
+                    selectInput("hb_flow", label = "Select the board of interest", 
+                                choices = unique(data_cbfip$hbres_name)),
+                    downloadButton(outputId = 'download_flow', label = 'Download data')  #For downloading the data
+             ),
+             column(4,
                     selectInput("quarter_flow", label = "Select the time period", 
-                    choices = unique(data_cbfip$quarter_name), 
+                                choices = unique(data_cbfip$quarter_name), 
                                 selected=tail(data_cbfip$quarter_name, n=1)) #to be fixed properly
-             ),
-             column(3,  
-                    selectInput("hbres_flow", label = "Board of residence", 
-                                choices = unique(data_cbfip$hbres_name))
-             ),
-             column(3,
-                    downloadButton(outputId = 'download_flow', label = 'Download data',
-                                   style="margin: 25px 10px 25px 10px ")  #For downloading the data
              )
          ),
-         div(style="float: bottom; height: 75%; width: 95%; 
-             background-color:#ffffff; border: 0px solid #ffffff;",
+         mainPanel(width=12,
+                   htmlOutput("sankey_all", width="96%"),
+                   br(),
              column(6,  
-                    htmlOutput("sankey_all", width="48%")
+                    htmlOutput("sankey_res", width="48%")
              ),
              column(6,
-                    htmlOutput("sankey_one", width="48%")
-             )
-         ),
+                    htmlOutput("sankey_treat", width="48%")
+             ),
          div(style="width:95%; height:5%",
              HTML("<button data-toggle='collapse' data-target='#crossb' 
                   class='btn btn-primary' style=padding: 6px 12px;>
@@ -209,12 +207,8 @@ tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 
              HTML("<div id='crossb' class='collapse'> "),
              DT::dataTableOutput("table_crossb", width="95%"),
              HTML("</div>")
-             ),
-         div(style="width:95%; height:5%",
-             p("To embed this graphic in your website include this code:                                                                                    "),
-             p("<iframe src='https://scotland.shinyapps.io/hospcare_crossboundary/' 
-               width=95% height=95%></iframe>")
              )
+         )
 ),
 ##############################################.             
 ##############Table tab ----   

@@ -9,15 +9,13 @@
 ##Packages ----
 ############################.
 library(DT) #data tables
-library(googleVis) #charts
+library(googleVis) #charts - sankey
 library(htmltools) #tooltips
 library(leaflet) # mapping package
 library(plotly) #interactive visualizations
 #library (rgdal) #reading shapefiles. Only needed for map, not in use at the moment
 library(reshape2) #for melting and dcast
-library(shiny)
-#library(shinydashboard) #forlayout
-#library(shinythemes) #for styling theme
+library(shiny) #interactive framework
 library(stringr) #manipulation strings
 library(tidyverse) #data manipulation, etc
 library (zoo) #for dates
@@ -38,7 +36,9 @@ file_types <-  c("Beds", "Inpatients/Day cases - Age/sex",
 geo_types <- c("Scotland", "Health board of treatment", "Health board of residence", 
                "Council area of residence", "Hospital of treatment", "Other")
 
-basefile_path <- "//stats/pub_incubator/01 Acute Activity/wrangling/data/base_files/"
+#basefile_path <- "//stats/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for desktop
+basefile_path <- "/conf/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for server
+
 
 ##############################################.             
 ##############Beds data ----   
@@ -284,6 +284,7 @@ data_simd <- readRDS("./data/SIMD_IPOP.rds")
 # data_trend <- bind_rows(data_trendop, data_trendip) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   subset(loc_name != "Null") %>% #Excluding Null values
+#   arrange(quarter_date2) %>% #sorting by date, so no odd plotting issues
 #   droplevels()
 # 
 # data_trend$quarter_date2 <- as.yearmon(data_trend$quarter_date, "%d-%m-%y") #date format
@@ -292,7 +293,7 @@ data_simd <- readRDS("./data/SIMD_IPOP.rds")
 
 data_trend <- readRDS("./data/trend_IPOP.rds") %>% 
   #Excluding this, as it is not aggregated and creates issues
-  subset(!(loc_name == "Other" & geo_type == "Other"))
+  subset(!(loc_name == "Other" & geo_type == "Other")) 
 
 trend_measure <- c(as.character(unique(data_trend$measure)))
 
@@ -444,23 +445,23 @@ data_pyramid <- readRDS("./data/pyramid_IPOP.rds")
 ##############Cross-boundary data ----   
 ##############################################.     
 #Ip data
-# data <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_cbf.csv", sep="")) %>% 
+# data_cbfip <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_cbf.csv", sep="")) %>% 
 #   subset(!(hbtreat_name %in% c("Non-NHS Provider")) #only Health boards
-#          & !(hbres_name %in% c("Other")) #only Health boards
-#          & boundary_ind == 1) %>%  #only including flows out of the HB
-#   select(-c(boundary_ind, hbtreat_currentdate, hbres_currentdate, episodes)) %>%
+#          & !(hbres_name %in% c("Other"))) %>%  #only Health boards
+#   select(-c(hbtreat_currentdate, hbres_currentdate, episodes)) %>%
 #   rename(count=stays) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   droplevels() #dropping missing factor levels 
 # 
 # #The Sankey diagram dislike duplicates - so set unique labels for from/to
-# data$hbtreat_name <- paste0(data$hbtreat_name,' ')
+# data_cbfip$hbtreat_name2 <- paste0(data_cbfip$hbtreat_name,' ')
 # 
-# #Taking out the NHS part from the names
-# data$hbtreat_name <- data$hbtreat_name  %>% str_replace("NHS ", "")
-# data$hbres_name <- data$hbres_name  %>% str_replace("NHS ", "")
+# #Taking out the NHS part from the names, to reduce length of tooltips
+# data_cbfip$hbtreat_name2 <- data_cbfip$hbtreat_name2  %>% str_replace("NHS ", "")
+# data_cbfip$hbtreat_name <- data_cbfip$hbtreat_name  %>% str_replace("NHS ", "")
+# data_cbfip$hbres_name <- data_cbfip$hbres_name  %>% str_replace("NHS ", "")
 # 
-# saveRDS(data, "./data/ipdc_crossbf.rds")
+# saveRDS(data_cbfip, "./data/ipdc_crossbf.rds")
 
 data_cbfip <- readRDS("./data/ipdc_crossbf.rds") %>% 
   droplevels()
@@ -474,18 +475,18 @@ data_cbfip <- readRDS("./data/ipdc_crossbf.rds") %>%
 #Op data
 # data_cbfop <-  read_csv(paste(basefile_path, "QAcute_Dec17_outpats_cbf.csv", sep="")) %>% 
 #     subset(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) #only Health boards
-#            & !(hbres_name %in% c("Other")) #only Health boards
-#            & boundary_ind == 1) %>%  #only including flows out of the HB
-#     select(-c(boundary_ind, hbtreat_currentdate, hbres_currentdate)) %>% 
+#            & !(hbres_name %in% c("Other"))) %>%  #only Health boards
+#     select(-c(hbtreat_currentdate, hbres_currentdate)) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #     rename(count=attendances) %>% 
 #     droplevels() 
 # 
 # #The Sankey diagram dislike duplicates - so set unique labels for from/to
-# data_cbfop$hbtreat_name <- paste0(data_cbfop$hbtreat_name,' ')
+# data_cbfop$hbtreat_name2 <- paste0(data_cbfop$hbtreat_name,' ')
 # 
 # #Taking out the NHS part from the names
 # data_cbfop$hbtreat_name <- data_cbfop$hbtreat_name  %>% str_replace("NHS ", "")
+# data_cbfop$hbtreat_name2 <- data_cbfop$hbtreat_name2  %>% str_replace("NHS ", "")
 # data_cbfop$hbres_name <- data_cbfop$hbres_name  %>% str_replace("NHS ", "")
 # 
 # saveRDS(data_cbfop, "./data/op_crossbf.rds")
@@ -506,15 +507,15 @@ colors_node <- c('CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'Cornflow
                  "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue",
                  'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 
                  "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue")
-
 colors_node_array <- paste0("[", paste0("'", colors_node,"'", collapse = ','), "]")
-colors_link <-c('blue', 'yellow','brown','lightblue', 'red', 'black',  "gray", "green", 
-                "orange", "gray", "pink", "lightgreen", "purple", "cyan")
-colors_link_array <- paste0("[", paste0("'", colors_link,"'", collapse = ','), "]")
+
+# colors_link <-c('blue', 'yellow','brown','lightblue', 'red', 'black',  "gray", "green", 
+#                 "orange", "gray", "pink", "lightgreen", "purple", "cyan")
+# colors_link_array <- paste0("[", paste0("'", colors_link,"'", collapse = ','), "]")
+# link: { colorMode: 'source',
+#   colors: ", colors_link_array ," },
 
 opts <- paste0("{
-               link: { colorMode: 'source',
-               colors: ", colors_link_array ," },
                node: { colors: ", colors_node_array ," }
                }" )
 ##END

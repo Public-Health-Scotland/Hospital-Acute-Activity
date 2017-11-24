@@ -16,7 +16,7 @@
 # Include bed time trend might require merging datsets
 #Fix formatting numbers tooltip
 
-#Crossboundary revamp (switch for your own board flow) 
+#Crossboundary - add text, ask feedback on revamp
 #and add people that come to a specific board (maybe text)
 #Alignment download boxes
 #Keep going with the NA's (specialty, age/sex, bed?)
@@ -24,7 +24,8 @@
 #Final changes of text
 #Send comments on data issues to DC, AP
 #test PRA
-#Issues with return appointments in trend
+#change simd quintiles to indicate most and least deprived.
+
 
 ############################.
 ## Server ----
@@ -369,17 +370,31 @@ function(input, output) {
   
   #For all HB
   flow_all <- reactive({
-    data_flow() %>% subset(quarter_name==input$quarter_flow & count>9) #%>% 
+    if(input$checkbox_flow == FALSE) {data_flow() %>% 
+        subset(quarter_name==input$quarter_flow & count>9 & boundary_ind == 1)
+    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & count>9)
+    }
+
     #       group_by(hbres_name, quarter_name) %>% 
     #       top_n(5, episodes)
     #& episodes>9) Not right now, see TODO
     
   })   
   
-  #For only selected HB
-  flow_one <- reactive({
-    data_flow() %>% subset(quarter_name==input$quarter_flow & 
-                             hbres_name==input$hbres_flow)
+  #For only selected HB of residence
+  flow_res <- reactive({
+    if(input$checkbox_flow == FALSE) {data_flow() %>% 
+        subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow & boundary_ind == 1)
+    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow)
+    }
+  })   
+  
+  #For only selected HB of residence
+  flow_treat <- reactive({
+    if(input$checkbox_flow == FALSE) {data_flow() %>% 
+        subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow & boundary_ind == 1)
+    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow)
+    }
   })   
   
   ############################.
@@ -388,16 +403,25 @@ function(input, output) {
   output$sankey_all <- renderGvis({
     
     options(gvis.plot.tag=NULL) #if changed to chart you will get the html code
-    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name','count')],
+    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name2','count')],
                options = list(width = "automatic", sankey=opts
                ))
     
   })
   
-  #This one with only the selected
-  output$sankey_one <- renderGvis({
+  #This one with only the selected hb of residence
+  output$sankey_res <- renderGvis({
     
-    gvisSankey(flow_one()[,c('hbres_name','hbtreat_name','count')],
+    gvisSankey(flow_res()[,c('hbres_name','hbtreat_name2','count')],
+               options = list(width = "automatic",
+                              gvis.plot.tag=NULL))#if changed to chart you will get the html code
+    
+  })
+  
+  #This one with only the selected hb of treatment
+  output$sankey_treat <- renderGvis({
+    
+    gvisSankey(flow_treat()[,c('hbres_name','hbtreat_name2','count')],
                options = list(width = "automatic",
                               gvis.plot.tag=NULL))#if changed to chart you will get the html code
     
@@ -408,15 +432,22 @@ function(input, output) {
   
   #Table data
   table_cbfdata <- reactive({
-    data_flow() %>% subset(quarter_name==input$quarter_flow) %>% 
-      select(hbres_name, hbtreat_name, quarter_name, count)
+    if(input$checkbox_flow == FALSE) {data_flow() %>% 
+        subset(quarter_name==input$quarter_flow  & boundary_ind == 1
+               & (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name, quarter_name, count)
+      
+    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & 
+                                     (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name, quarter_name, count)
+    }
   })
   
   #Actual table.
   output$table_crossb <- DT::renderDataTable({
     DT::datatable(table_cbfdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 10, dom = 'tip'),
-                  colnames = c("Residence board", "Treatment board",  "Quarter", "Count")  
+                  colnames = c("Residence board", "Treatment board",  "Quarter", "Number")  
     )
   })
   
@@ -424,9 +455,9 @@ function(input, output) {
   #### Downloading data ----
   #for downloading data
   output$download_flow <- downloadHandler(
-    filename =  'flow_data.csv',
+    filename =  'crossb_flow_data.csv',
     content = function(file) {
-      write.csv(flow_all(), file) 
+      write.csv(table_cbfdata()(), file) 
     }
   )
 
@@ -545,7 +576,7 @@ function(input, output) {
                                   rename(Health_board_residence=hbres_name,
                                          Health_board_treatment=hbtreat_name,
                                          Time_period=quarter_name,
-                                         Stays=count),
+                                         Appointments=count),
                                 "Outpatients - Time trend" = data_trend %>% 
                                   subset(file == "Outpatients") %>% 
                                   select(geo_type,loc_name, quarter_name, measure, 
