@@ -2,11 +2,8 @@
 #Jaime Villacampa October 17
 
 #TODO:
-#Clean files used to limit them to the variables that are getting used
-#Tidy table outputs
-
-#Talk with Demian regards the style
 #Fix issues with selection of dates (max date, etc)
+#Keep going with the NA's (specialty, bed?) - not needed right now
 
 #Figure out colors scale for map/fix legend image
 # Make map outpatients work (need to check raw data, add switch or merge datasets)
@@ -16,16 +13,13 @@
 # Include bed time trend might require merging datsets
 #Fix formatting numbers tooltip
 
-#Crossboundary - add text, ask feedback on revamp
-#and add people that come to a specific board (maybe text)
+#Crossboundary - add text with %s, ask feedback on revamp
 #Alignment download boxes
-#Keep going with the NA's (specialty, age/sex, bed?)
-#Instructions for downloading plots
-#Final changes of text
-#Send comments on data issues to DC, AP
 #test PRA
-#change simd quintiles to indicate most and least deprived.
-
+#color simd
+#others and hospitals in pyramid (maybe ditch?)
+#deal with return appointments for age/sex (there should be none)
+#in time trend fix Golden Jubilee duplication issue (check it in rest of files)
 
 ############################.
 ## Server ----
@@ -374,14 +368,9 @@ function(input, output) {
         subset(quarter_name==input$quarter_flow & count>9 & boundary_ind == 1)
     } else {data_flow() %>% subset(quarter_name==input$quarter_flow & count>9)
     }
-
-    #       group_by(hbres_name, quarter_name) %>% 
-    #       top_n(5, episodes)
-    #& episodes>9) Not right now, see TODO
-    
   })   
   
-  #For only selected HB of residence
+  # For only selected HB of residence
   flow_res <- reactive({
     if(input$checkbox_flow == FALSE) {data_flow() %>% 
         subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow & boundary_ind == 1)
@@ -389,7 +378,7 @@ function(input, output) {
     }
   })   
   
-  #For only selected HB of residence
+  # For only selected HB of treatment
   flow_treat <- reactive({
     if(input$checkbox_flow == FALSE) {data_flow() %>% 
         subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow & boundary_ind == 1)
@@ -398,8 +387,32 @@ function(input, output) {
   })   
   
   ############################.
-  #Visualizations
-  #This one with all HB at the same time.
+  # Text
+  output$crossb_restext <- renderText({
+    flow_textres <- data_flow() %>% 
+      subset(quarter_name == input$quarter_flow & hbres_name == input$hb_flow)
+    #Percentage of people treated in their own hb
+    value_res <- round(flow_textres$count[flow_textres$boundary_ind == 0] / 
+                         sum(flow_textres$count) * 100, 1)
+
+  paste0("<b>", value_res, "</b>", "% of the patients from ", input$hb_flow, 
+         " were attended in their own health board area.")
+  })
+  
+  output$crossb_treattext <- renderText({
+    flow_texttreat <- data_flow() %>% 
+      subset(quarter_name == input$quarter_flow & hbtreat_name == input$hb_flow)
+    #Percentage of people treated in this hb coming from other hb
+    value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
+                           sum(flow_texttreat$count) * 100, 1)
+    
+    paste0("<b>", value_treat, "</b>", "% of the patients attended in ",
+           input$hb_flow, " live in other health board areas.")
+  })
+  
+  ############################.
+  # Visualizations
+  # This one with all HB at the same time.
   output$sankey_all <- renderGvis({
     
     options(gvis.plot.tag=NULL) #if changed to chart you will get the html code
@@ -592,15 +605,17 @@ function(input, output) {
   
   #Actual table.
   output$table_explorer <- DT::renderDataTable({
+    #to take out underscore from column names shown in table.
+    table_colnames <- str_replace(names(data_table()), "_", " ")
+    
     DT::datatable(data_table(),style = 'bootstrap', class = 'table-bordered table-condensed', 
                   rownames = FALSE, options = list(pageLength = 20, dom = 'tip'), 
-                  filter = "top"
+                  filter = "top", colnames = table_colnames
     )
   })
   
   #####################################.    
   #### Downloading data ----
-  #for downloading data
   output$download_flow <- downloadHandler(
     filename =  'table_data.csv',
     content = function(file) {

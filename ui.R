@@ -37,7 +37,10 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
         tags$li(tags$b("Cross-boundary flow"), " - shows where patients were treated."),
         tags$li(tags$b("Table"), " - allows you to select a slice of data in a table format.")
         ),
-      p("For each section you can download the data or view it as a table if you prefer."),
+      p("For each section you can download the data or view it as a table if you prefer. 
+        You can also download some of the graphs from the data explorer. To do it, hover over 
+        the graph and a toolbar with a camera icon will appear, click in the icon to open a 
+        download dialog."),
       p("If you have any trouble using this tool or you have further questions relating to the data, please contact us at: ",
         tags$b(tags$a(href="mailto:snss.isdSCT@nhs.net ", "snss.isdSCT@nhs.net ")),
         "and we will be happy to help.")
@@ -195,9 +198,11 @@ tabPanel("Cross-boundary", icon = icon("share-alt"), style="float: top; height: 
                    htmlOutput("sankey_all", width="96%"),
                    br(),
              column(6,  
+                    htmlOutput("crossb_restext"),
                     htmlOutput("sankey_res", width="48%")
              ),
              column(6,
+                    htmlOutput("crossb_treattext"),
                     htmlOutput("sankey_treat", width="48%")
              ),
          div(style="width:95%; height:5%",
