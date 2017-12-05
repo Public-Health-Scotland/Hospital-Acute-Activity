@@ -36,9 +36,8 @@ file_types <-  c("Beds", "Inpatients/Day cases - Age/sex",
 geo_types <- c("Scotland", "Health board of treatment", "Health board of residence", 
                "Council area of residence", "Hospital of treatment", "Other")
 
-#basefile_path <- "//stats/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for desktop
-basefile_path <- "/conf/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for server
-
+basefile_path <- "//stats/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for desktop
+# basefile_path <- "/conf/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for server
 
 ##############################################.             
 ##############Beds data ----   
@@ -200,10 +199,11 @@ data_spec$file <- as.factor(data_spec$file)
 # data_simd$measure <- as.factor(data_simd$measure)
 # data_simd$file <- as.factor(data_simd$file)
 # data_simd$simd <- as.factor(data_simd$simd)
+# data_simd$simd <- recode(data_simd$simd, "1" = "1 - Most deprived", "5" = "5 - Least deprived")
 # 
 # saveRDS(data_simd, "./data/SIMD_IPOP.rds")
 
-data_simd <- readRDS("./data/SIMD_IPOP.rds") 
+data_simd <- readRDS("./data/SIMD_IPOP.rds")
 
 ##############################################.             
 ##############Time trend data ----   
@@ -280,22 +280,28 @@ data_simd <- readRDS("./data/SIMD_IPOP.rds")
 # saveRDS(data_trendop, "./data/trend_OP.rds") 
 # data_trendop <- readRDS("./data/trend_OP.rds") 
 # 
-# Merging both datasets, ip and op.
+# #Merging both datasets, ip and op.
 # data_trend <- bind_rows(data_trendop, data_trendip) %>% 
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   subset(loc_name != "Null") %>% #Excluding Null values
-#   arrange(quarter_date2) %>% #sorting by date, so no odd plotting issues
 #   droplevels()
 # 
-# data_trend$quarter_date2 <- as.yearmon(data_trend$quarter_date, "%d-%m-%y") #date format
+# #Long format, each measure type a row
+# data_trend <- data_trend %>% melt() %>% subset(!is.na(value))
+# data_trend$variable <- data_trend$variable %>%
+#   recode("count" = "Number", "rate" = "DNA rate", "los" = "Total length of stay",
+#          "avlos" = "Mean length of stay")
 # 
+# data_trend$quarter_date2 <- as.yearmon(data_trend$quarter_date, "%d-%m-%y") #date format
+# data_trend <- data_trend %>% arrange(quarter_date2) #sorting by date, so no odd plotting issues
 # saveRDS(data_trend, "./data/trend_IPOP.rds")
 
 data_trend <- readRDS("./data/trend_IPOP.rds") %>% 
   #Excluding this, as it is not aggregated and creates issues
-  subset(!(loc_name == "Other" & geo_type == "Other")) 
+  subset(!(loc_name == "Other" & geo_type == "Other"))
 
-trend_measure <- c(as.character(unique(data_trend$measure)))
+trend_service <- c(as.character(unique(data_trend$measure)))
+trend_measure <- c(as.character(unique(data_trend$variable)))
 
 ##############################################.             
 ##############Population pyramid data ----   
@@ -303,68 +309,72 @@ trend_measure <- c(as.character(unique(data_trend$measure)))
 #################Ip data
 # data_pyramid_ipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_agesex.csv", sep="")) %>%
 #   # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-#   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of residence", 
-#                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                   "Other"))) %>% 
+#   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
+#     mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
+#                              ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
+#                                     "Health board of residence"))) %>% 
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
-#   select(-c(hb_code, hb_name, loc_code)) %>% 
-#   droplevels() 
+#   select(-c(hb_code, hb_name, loc_code)) %>%
+#   droplevels()
 # 
-# data_pyramid_iptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_agesex.csv", sep="")) %>% 
+# data_pyramid_iptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_agesex.csv", sep="")) %>%
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
-#   subset(!loc_code == "S08100001") %>% 
-#   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08", "Health board of treatment",
-#                            ifelse(loc_code == "scot", "Scotland", "Hospital of treatment"))) %>% 
+#   subset(!loc_code == "S08100001") %>%
+#     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
+#                              "Health board of treatment",
+#                              ifelse(loc_code == "scot", "Scotland",
+#                                     ifelse(hb_name == "Null" | hb_name == "Other"
+#                                            | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
-#   select(-c(hb_code, hb_name, loc_code)) %>% 
-#   droplevels() 
+#   select(-c(hb_code, hb_name, loc_code)) %>%
+#   droplevels()
 # 
-# data_pyramidip <- rbind(data_pyramid_iptreat, data_pyramid_ipres) %>% 
-# rename(count = stays) %>% 
+# data_pyramidip <- rbind(data_pyramid_iptreat, data_pyramid_ipres) %>%
+# rename(count = stays) %>%
 # mutate(file = "Inpatients/Day Cases")
 # 
 # saveRDS(data_pyramidip, "./data/pyramid_IP.rds")
-# data_pyramidip <- readRDS("./data/pyramid_IP.rds") 
-
+# data_pyramidip <- readRDS("./data/pyramid_IP.rds")
+# 
 ###########################.
 ##################Op data
-# data_pyramidopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_agesex.csv", sep="")) %>% 
+# data_pyramidopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_agesex.csv", sep="")) %>%
 #   # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-#   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>% 
-#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
-#                            "Health board of residence", 
-#                            ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-#                                   "Other"))) %>% 
+#   subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
+#   mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
+#                              ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
+#                                  "Health board of residence"))) %>%
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
-#   select(-c(hb_code, hb_name, loc_code)) %>% 
-#   droplevels() 
+#   select(-c(hb_code, hb_name, loc_code)) %>%
+#   droplevels()
 # 
 # data_pyramidoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_agesex.csv", sep="")) %>%
 #   # Excluding Golden Jubilee hb code (to avoid duplication)
-#   subset(!(loc_code == "board" & hb_code == "S08100001")) %>% 
-#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board", 
-#                            "Health board of treatment",
-#                            ifelse(loc_code == "scot", "Scotland", 
-#                                   ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>% 
+#   subset(!(loc_code == "board" & hb_code == "S08100001")) %>%
+#   #Excluding  codes with no name, giving issues
+#   subset(!(is.na(loc_name) | loc_name == "NULL")) %>%
+#   mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
+#                              "Health board of treatment",
+#                              ifelse(loc_code == "scot", "Scotland",
+#                                     ifelse(hb_name == "Null" | hb_name == "Other"
+#                                            | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
 #   separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
 #   mutate_if(is.character, factor) %>% #converting characters into factors
-#   select(-c(hb_code, hb_name, loc_code)) %>% 
-#   droplevels() 
+#   select(-c(hb_code, hb_name, loc_code)) %>%
+#   droplevels()
 # 
-# data_pyramidop <- rbind(data_pyramidoptreat, data_pyramidopres) %>% 
-#   rename(measure = appt_type) %>% 
-#   mutate(file="Outpatients") 
+# data_pyramidop <- rbind(data_pyramidoptreat, data_pyramidopres) %>%
+#   rename(measure = appt_type) %>%
+#   mutate(file="Outpatients")
 # 
 # saveRDS(data_pyramidop, "./data/pyramid_OP.rds")
-# 
 # data_pyramidop <- readRDS("./data/pyramid_OP.rds")
 # 
 # #Merging both datasets, ip and op.
-# data_pyramid <- bind_rows(data_pyramidop, data_pyramidip) %>% 
+# data_pyramid <- bind_rows(data_pyramidop, data_pyramidip) %>%
 #   mutate_if(is.character, factor) %>% #converting characters into factors
 #   subset(loc_name != "Null") %>% #Excluding Null values
 #   droplevels()
@@ -508,12 +518,6 @@ colors_node <- c('CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'Cornflow
                  'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 
                  "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue")
 colors_node_array <- paste0("[", paste0("'", colors_node,"'", collapse = ','), "]")
-
-# colors_link <-c('blue', 'yellow','brown','lightblue', 'red', 'black',  "gray", "green", 
-#                 "orange", "gray", "pink", "lightgreen", "purple", "cyan")
-# colors_link_array <- paste0("[", paste0("'", colors_link,"'", collapse = ','), "]")
-# link: { colorMode: 'source',
-#   colors: ", colors_link_array ," },
 
 opts <- paste0("{
                node: { colors: ", colors_node_array ," }
