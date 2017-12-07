@@ -50,7 +50,7 @@ function(input, output) {
   #reactive dataset for the trend plot
   data_trend_plot <- reactive({data_trend %>% 
       subset(loc_name == input$locname_trend & measure %in% input$service_trend &
-               geo_type == input$geotype_trend & variable == input$measure_trend)
+               geo_type == input$geotype_trend)
     })
   
 
@@ -59,9 +59,8 @@ function(input, output) {
     data_trend %>% 
       subset(loc_name == input$locname_trend & measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
-      dcast(loc_name + quarter_name + measure ~ variable, fun.aggregate = sum)
+      select(c(loc_name, quarter_name, measure, count, rate, los, avlos))
   })
-  
   
   #Plotting ip
   output$trend_plot <- renderPlotly({
@@ -81,13 +80,25 @@ function(input, output) {
       
     }
     else {
+    
+    #renaming variable to be plotted based on user input. Maybe there are better ways
+    #This approach uses relative positions on the datasets which is not ideal and might
+    #have to be modified
+#     var_chosen <- ifelse(input$measure_trend == "Number", 3, 
+#                 ifelse(input$measure_trend == "DNA rate", 9, 
+#                        ifelse(input$measure_trend == "Total length of stay", 12,
+#                               ifelse(input$measure_trend == "Mean length of stay", 13, 3)))) 
+#     
+#     names(data_trend_plot())[var_chosen] <- "value"
+    
     #Text for tooltip
     tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
-                           data_trend_plot()$quarter_name, "<br>",
-                           "Number: ", format(data_trend_plot()$value), big.mark="," ))
+                        data_trend_plot()$quarter_name, "<br>",
+                        "Number: ", format(data_trend_plot()$count), big.mark="," ))
     
+    #Plotting time trend
     plot_ly(data=data_trend_plot(), x=~quarter_date2, 
-            y = ~value, text=tooltip, hoverinfo="text",
+            y = ~count, text=tooltip, hoverinfo="text",
             type = 'scatter', mode = 'lines+markers',
             color=~measure, colors = trend_pal) %>% 
       #Layout
@@ -104,7 +115,7 @@ function(input, output) {
   output$table_trend <- DT::renderDataTable({
     DT::datatable(table_trenddata(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 16, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of case", "Number", "DNA rate",
+                  colnames = c("Location", "Quarter", "Type of activity", "Number", "DNA rate",
                                "Total length of stay", "Mean length of stay")  
     )
   })
@@ -198,7 +209,7 @@ function(input, output) {
   output$table_pyramid <- DT::renderDataTable({
     DT::datatable(data_table_pyramid(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of case", "Age", "Sex", "Number")  
+                  colnames = c("Location", "Quarter", "Type of activity", "Age", "Sex", "Number")  
     )
   })
   
@@ -279,7 +290,7 @@ function(input, output) {
   output$table_simd <- DT::renderDataTable({
     DT::datatable(data_table_simd(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
                   options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of case", "SIMD quintile", 
+                  colnames = c("Location", "Quarter", "Type of activity", "SIMD quintile", 
                                "Number", "DNA rate", "Mean length of stay")  
     )
   })
@@ -538,10 +549,7 @@ function(input, output) {
                                           Specialty = specname,
                                           Time_period = quarter_name,
                                           Occupancy_percentage = p_occ,
-                                          All_avail_beds = aasb,
-                                          Total_occ_beds = tobd,
-                                          Mean_avail_beds = asb,
-                                          Mean_occ_beds = aob),
+                                          All_avail_beds = aasb),
                                 "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
                                   select(hbres_name, hbtreat_name, quarter_name, count) %>% 
                                   rename(Health_board_residence = hbres_name,
@@ -622,7 +630,7 @@ function(input, output) {
                                          Type_case = measure,
                                          SIMD_quintile = simd,
                                          Time_period = quarter_name,
-                                         Stays = stays,
+                                         Stays = count,
                                          Total_length_stay = los,
                                          Mean_length_stay = avlos) %>% 
                                   droplevels(),
