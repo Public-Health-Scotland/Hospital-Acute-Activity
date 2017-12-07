@@ -70,6 +70,7 @@ data_specip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_trea
 
 data_specip <- rbind(data_specip_treat, data_specip_res) %>%
   mutate(avlos = round(avlos, 1)) %>%
+  subset(!(is.na(measure))) %>% # a few random null measure cases
   mutate(file="Inpatients/Day Cases") 
 
 saveRDS(data_specip, "./data/spec_IP.rds")
@@ -145,6 +146,7 @@ data_simdip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_trea
 data_simdip <- rbind(data_simdip_treat, data_simdip_res) %>%
   mutate(avlos = round(avlos, 1)) %>%
   mutate(file="Inpatients/Day Cases") %>%
+  subset(!(is.na(measure))) %>% # a few random null measure cases
   rename(count=stays)
 
 saveRDS(data_simdip, "./data/SIMD_IP.rds")
@@ -226,7 +228,11 @@ data_trendiptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_trea
 data_trendip <- rbind(data_trendiptreat, data_trendipres) %>%
   mutate(avlos = round(avlos, 1)) %>%
   mutate(file="Inpatients/Day Cases") %>%
+  subset(!(is.na(measure))) %>% # a few random null measure cases
   rename(count = stays)
+
+#For some reason IP and OP have different formatting numbers for dates
+data_trendip$quarter_date2 <- as.yearmon(data_trendip$quarter_date, "%d/%m/%Y") #date format
 
 saveRDS(data_trendip, "./data/trend_IP.rds")
 data_trendip <- readRDS("./data/trend_IP.rds")
@@ -270,6 +276,8 @@ data_trendop$measure[data_trendop$measure=="New"] <- "New appointments"
 data_trendop$measure[data_trendop$measure=="Return"] <- "Return appointments"
 data_trendop$measure <- as.factor(data_trendop$measure)
 
+data_trendop$quarter_date2 <- as.yearmon(data_trendop$quarter_date, "%d-%m-%y") #date format
+
 saveRDS(data_trendop, "./data/trend_OP.rds")
 data_trendop <- readRDS("./data/trend_OP.rds")
 
@@ -285,7 +293,6 @@ data_trend <- bind_rows(data_trendop, data_trendip) %>%
 #   recode("count" = "Number", "rate" = "DNA rate", "los" = "Total length of stay",
 #          "avlos" = "Mean length of stay")
 
-data_trend$quarter_date2 <- as.yearmon(data_trend$quarter_date, "%d-%m-%y") #date format
 data_trend <- data_trend %>% arrange(quarter_date2) #sorting by date, so no odd plotting issues
 
 saveRDS(data_trend, "./data/trend_IPOP.rds")
@@ -320,8 +327,9 @@ data_pyramid_iptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_t
   droplevels()
 
 data_pyramidip <- rbind(data_pyramid_iptreat, data_pyramid_ipres) %>%
-rename(count = stays) %>%
-mutate(file = "Inpatients/Day Cases")
+  rename(count = stays) %>%
+  subset(!(is.na(measure))) %>% # a few random null measure cases
+  mutate(file = "Inpatients/Day Cases")
 
 saveRDS(data_pyramidip, "./data/pyramid_IP.rds")
 data_pyramidip <- readRDS("./data/pyramid_IP.rds")
@@ -356,6 +364,7 @@ data_pyramidoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_ages
 
 data_pyramidop <- rbind(data_pyramidoptreat, data_pyramidopres) %>%
   rename(measure = appt_type) %>%
+  mutate(rate = round(rate, 1)) %>% 
   mutate(file="Outpatients")
 
 saveRDS(data_pyramidop, "./data/pyramid_OP.rds")
