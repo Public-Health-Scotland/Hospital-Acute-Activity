@@ -2,28 +2,20 @@
 #Jaime Villacampa October 17
 
 #TODO:
-#Fix issues with selection of dates (max date, etc)
-#Keep going with the NA's (specialty, bed?) - not needed right now
+#Fix issues with selection of dates (max date and order)
+#Order quarter variable in tables based on date (use date variable instead?)
+#Add visualization for specialty (time trend, bar chart)
 
 #Figure out colors scale for map/fix legend image
 # Make map outpatients work (need to check raw data, add switch or merge datasets)
-# Include los and avlos in map?
+# Include los, dna rate and avlos in map, deprivation, age-sex?
 
-# Include Lenght of stay and DNA rate in time trends
-# Include bed time trend might require merging datsets
+# Include bed time trend might require merging datasets
 #Fix formatting numbers tooltip
 #Set labels for time trend (to avoid cases with decimals)
 
-#Crossboundary - ask feedback on revamp
 #Alignment download boxes
-#deal with return appointments for age/sex (there should be none)
-#in time trend fix Golden Jubilee duplication issue (check it in rest of files)
-#change color palette on trend
-#trend table both in trend and table tabs
-#email in intro
-#all underscores from table names
-#check negative numbers for pop pyramid in tables
-#use a switch instead of reshape for time trend
+#Think about color palette for trend
 
 ############################.
 ## Server ----
@@ -35,9 +27,10 @@ function(input, output) {
   ##############Time trend----   
   ##############################################.  
   #Reactive dropdowns for this tab
+  #They will provide a list of locations filtered by geography type
   output$geotype_ui_trend <- renderUI({
     selectInput("geotype_trend", label = "Select the type of location", 
-                choices = geo_types, selected =  "Scotland")
+                choices = geo_types_trend, selected =  "Scotland")
   })
   
   output$locname_ui_trend <- renderUI({
@@ -48,11 +41,15 @@ function(input, output) {
   
   #Reactive datasets
   #reactive dataset for the trend plot
-  data_trend_plot <- reactive({data_trend %>% 
+
+  data_trend_plot <- reactive({
+    data_trend %>% 
       subset(loc_name == input$locname_trend & measure %in% input$service_trend &
-               geo_type == input$geotype_trend)
+               geo_type == input$geotype_trend) %>% 
+      rename("Total length of stay (days)" = los, "Mean length of stay (days)" = avlos,
+             "Number of stays/appointments" = count, "Did not attend rate (%)" = rate)
+      
     })
-  
 
   #Table data
   table_trenddata <- reactive({
@@ -60,9 +57,11 @@ function(input, output) {
       subset(loc_name == input$locname_trend & measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
       select(c(loc_name, quarter_name, measure, count, rate, los, avlos))
+
+    
   })
   
-  #Plotting ip
+  #Plotting 
   output$trend_plot <- renderPlotly({
     #If no data available for that quarter then plot message saying data is missing
     if (is.data.frame(data_trend_plot()) && nrow(data_trend_plot()) == 0)
@@ -80,25 +79,16 @@ function(input, output) {
       
     }
     else {
-    
-    #renaming variable to be plotted based on user input. Maybe there are better ways
-    #This approach uses relative positions on the datasets which is not ideal and might
-    #have to be modified
-#     var_chosen <- ifelse(input$measure_trend == "Number", 3, 
-#                 ifelse(input$measure_trend == "DNA rate", 9, 
-#                        ifelse(input$measure_trend == "Total length of stay", 12,
-#                               ifelse(input$measure_trend == "Mean length of stay", 13, 3)))) 
-#     
-#     names(data_trend_plot())[var_chosen] <- "value"
-    
+
     #Text for tooltip
     tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
                         data_trend_plot()$quarter_name, "<br>",
-                        "Number: ", format(data_trend_plot()$count), big.mark="," ))
-    
+                        input$measure_trend, ": ", data_trend_plot()[[input$measure_trend]]))
+
     #Plotting time trend
     plot_ly(data=data_trend_plot(), x=~quarter_date2, 
-            y = ~count, text=tooltip, hoverinfo="text",
+            y = ~get(input$measure_trend), 
+            text=tooltip, hoverinfo="text",
             type = 'scatter', mode = 'lines+markers',
             color=~measure, colors = trend_pal) %>% 
       #Layout
@@ -133,6 +123,7 @@ function(input, output) {
   ##############Population pyramid----   
   ##############################################.  
   #Reactive dropdowns for this tab
+  #They will provide a list of locations filtered by geography type
   output$geotype_ui_pyramid <- renderUI({
     selectInput("geotype_pyramid", label = "Select the type of location", 
                 choices = geo_types, selected =  "Scotland")
@@ -145,23 +136,22 @@ function(input, output) {
   })
   
   #Reactive datasets
-  #reactive dataset for the ip plot
   data_pyramid_plot <- reactive({data_pyramid %>% 
       subset(loc_name == input$locname_pyramid & 
                measure == input$measure_pyramid &
                geo_type == input$geotype_pyramid &
                quarter_name == input$quarter_pyramid) %>% 
-      mutate(count = ifelse(sex=="Male", -(count), count))
+      mutate(count = ifelse(sex=="Male", -(count), count)) # so it plots correcttly and no stacked bars
   })
   
   #Table data
   data_table_pyramid <- reactive({
     data_pyramid_plot() %>% 
       select(loc_name, quarter_name, measure, age, sex, count) %>% 
-      mutate(count = abs(count))
+      mutate(count = abs(count)) #to go back to positive values
   })
   
-  #Plotting ip
+  #Plotting pyramid population chart
   output$pyramid_plot <- renderPlotly({
     #If no data available for that quarter then plot message saying data is missing
     if (is.data.frame(data_pyramid_plot()) && nrow(data_pyramid_plot()) == 0)
@@ -199,7 +189,7 @@ function(input, output) {
              yaxis = list(title = "Age"), 
              xaxis = list(tickmode = 'array', tickvals = brks,
                           ticktext = lbls, showline = TRUE,
-                          title = "Number")) %>% 
+                          title = paste("Number of", input$measure_pyramid))) %>% 
       config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     
     }
@@ -215,7 +205,6 @@ function(input, output) {
   
   #####################################.    
   #### Downloading data ----
-  #for downloading data ipdc
   output$download_pyramid <- downloadHandler(
     filename =  'agesex_data.csv',
     content = function(file) {
@@ -227,6 +216,7 @@ function(input, output) {
   ##############Deprivation simd----   
   ##############################################.  
   #Reactive dropdowns for this tab
+  #They will provide a list of locations filtered by geography type
   output$geotype_ui_simd <- renderUI({
     selectInput("geotype_simd", label = "Select the type of location", 
                 choices = geo_types, selected =  "Scotland")
@@ -239,7 +229,7 @@ function(input, output) {
   })
   
   #Reactive datasets
-  #reactive dataset for the trend plot
+  #reactive dataset for the simd plot
   data_simd_plot <- reactive({data_simd %>% 
       subset(loc_name == input$locname_simd & 
                measure == input$measure_simd &
@@ -253,7 +243,7 @@ function(input, output) {
       select(loc_name, quarter_name, measure, simd, count, rate, avlos)
   })
   
-  #Plotting trend
+  #Plotting simd bar chart
   output$simd_plot <- renderPlotly({
     #If no data available for that quarter then plot message saying data is missing
     if (is.data.frame(data_simd_plot()) && nrow(data_simd_plot()) == 0)
@@ -273,14 +263,14 @@ function(input, output) {
     else {
     
     #Text for tooltip
-    tooltip_simd <- c(paste0("Decile: ", data_simd_plot()$simd, "<br>",
+    tooltip_simd <- c(paste0("Quintile: ", data_simd_plot()$simd, "<br>",
                             "Number: ", abs(data_simd_plot()$count)))
     
     plot_ly(data=data_simd_plot(), x=~simd , y=~count,
             text=tooltip_simd, hoverinfo="text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
-             yaxis = list(title = "Number"), 
+             yaxis = list(title = paste("Number of", input$measure_simd)), 
              xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>% 
       config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
     }
@@ -297,7 +287,6 @@ function(input, output) {
   
   #####################################.    
   #### Downloading data ----
-  #for downloading data ipdc
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
     content = function(file) {
@@ -308,7 +297,7 @@ function(input, output) {
   ##############################################.             
   ##############Map ----   
   ##############################################.     
-  
+  ###SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
   #Merging shapefile with dynamic selection of data
   #First for HB
 #   hb_pol <- reactive({merge(hb_bound, 
@@ -460,7 +449,7 @@ function(input, output) {
                          sum(flow_textres$count) * 100, 1)
 
   paste0("<b>", value_res, "</b>", "% of the patients from ", input$hb_flow, 
-         " were attended in their own health board area.")
+         " were treated in their own health board area.")
   })
   
   output$crossb_treattext <- renderText({
@@ -470,7 +459,7 @@ function(input, output) {
     value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
                            sum(flow_texttreat$count) * 100, 1)
     
-    paste0("<b>", value_treat, "</b>", "% of the patients attended in ",
+    paste0("<b>", value_treat, "</b>", "% of the patients treated in ",
            input$hb_flow, " live in other health board areas.")
   })
   
@@ -509,6 +498,7 @@ function(input, output) {
   
   #Table data
   table_cbfdata <- reactive({
+    #This if statement selects what data to show depending on the checkbox status
     if(input$checkbox_flow == FALSE) {data_flow() %>% 
         subset(quarter_name==input$quarter_flow  & boundary_ind == 1
                & (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
@@ -530,7 +520,6 @@ function(input, output) {
   
   #####################################.    
   #### Downloading data ----
-  #for downloading data
   output$download_flow <- downloadHandler(
     filename =  'crossb_flow_data.csv',
     content = function(file) {
@@ -541,8 +530,8 @@ function(input, output) {
   ##############################################.             
   ##############Table----   
   ##############################################.  
-  #Make very very simple approach, changing file
-  #Table data
+  #Very simple approach, changing file with a switch, there might be better solutions
+  #Formats every dataset to what it requires for the table
   data_table <- reactive({switch(input$filename_table,
                                  "Beds" = data_bed %>% 
                                    rename(Area_name = loc_name,
@@ -624,7 +613,7 @@ function(input, output) {
                                 "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
                                   subset(file == "Inpatients/Day Cases") %>% 
                                   select(geo_type, loc_name, measure, simd, quarter_name, 
-                                         stays, los, avlos) %>% 
+                                         count, los, avlos) %>% 
                                   rename(Geography_level = geo_type,
                                          Area_name = loc_name,
                                          Type_case = measure,
@@ -668,7 +657,7 @@ function(input, output) {
   #Actual table.
   output$table_explorer <- DT::renderDataTable({
     #to take out underscore from column names shown in table.
-    table_colnames <- str_replace(names(data_table()), "_", " ")
+    table_colnames  <-  gsub("_", " ", colnames(data_table()))
     
     DT::datatable(data_table(),style = 'bootstrap', class = 'table-bordered table-condensed', 
                   rownames = FALSE, options = list(pageLength = 20, dom = 'tip'), 
