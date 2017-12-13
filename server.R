@@ -35,7 +35,7 @@ function(input, output) {
   
   output$locname_ui_trend <- renderUI({
     selectInput("locname_trend", "Select the location", 
-                choices =unique(data_trend$loc_name[data_trend$geo_type == input$geotype_trend]),
+                choices = sort(unique(data_trend$loc_name[data_trend$geo_type == input$geotype_trend])),
                 selectize = TRUE, selected = "Scotland")
   })
   
@@ -131,7 +131,7 @@ function(input, output) {
   
   output$locname_ui_pyramid <- renderUI({
     selectInput("locname_pyramid", "Select the location", 
-                choices =unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid]),
+                choices = sort(unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid])),
                 selectize = TRUE, selected = "Scotland")
   })
   
@@ -224,7 +224,7 @@ function(input, output) {
   
   output$locname_ui_simd <- renderUI({
     selectInput("locname_simd", "Select the location", 
-                choices =unique(data_simd$loc_name[data_simd$geo_type == input$geotype_simd]),
+                choices = sort(unique(data_simd$loc_name[data_simd$geo_type == input$geotype_simd])),
                 selectize = TRUE, selected = "Scotland")
   })
   

@@ -23,47 +23,23 @@ library (zoo) #for dates
 ############################.
 ##Data ----
 ############################.
-data_type <- c("Outpatients", "Inpatients/Day cases")
-
-#for table selection (table tab)
-file_types <-  c("Beds", "Inpatients/Day cases - Age/sex", 
-"Inpatients/Day cases - Cross boundary flow", "Inpatients/Day cases - Time trend", 
-"Inpatients/Day cases - Specialty", "Inpatients/Day cases - Deprivation (SIMD)", 
-"Outpatients - Age/sex", "Outpatients - Cross boundary flow", 
-"Outpatients - Time trend", "Outpatients - Specialty", 
-"Outpatients - Deprivation (SIMD)")
-
-geo_types <- c("Scotland", "Health board of treatment", "Health board of residence", 
-               "Council area of residence", "Hospital of treatment", "Other")
-
-##############Beds data ----   
+##############Beds data 
 data_bed <- readRDS("./data/beds.rds") 
 
-##############Specialty data ----   
-
+##############Specialty data  
 data_spec <- readRDS("./data/spec_IPOP.rds") 
-data_spec$file <- as.factor(data_spec$file)
 
-##############SIMD data ----   
-
+##############SIMD data   
 data_simd <- readRDS("./data/SIMD_IPOP.rds")
 
-##############Time trend data ----   
-data_trend <- readRDS("./data/trend_IPOP.rds") %>% 
-  #Excluding this, as it is not aggregated and creates issues
-  subset(!(loc_name == "Other" & geo_type == "Other"))
+##############Time trend data  
+data_trend <- readRDS("./data/trend_IPOP.rds") 
 
-trend_service <- c(as.character(unique(data_trend$measure)))
-trend_measure <- c("Number", "DNA rate", "Total length of stay", "Mean length of stay")
-
-##############Population pyramid data ----   
-
+##############Population pyramid data   
 data_pyramid <- readRDS("./data/pyramid_IPOP.rds")
 
-pyramid_service <- c(as.character(unique(data_pyramid$measure)))
-
-
-##############Map data ----   
+##############Map data  
+# Not in use at the moment
 # data_mapop <- readRDS("./data/op_map.rds") 
 # 
 # ##########.
@@ -71,9 +47,37 @@ pyramid_service <- c(as.character(unique(data_pyramid$measure)))
 # ca_bound<-readOGR("./shapefiles","CA_simpl") #Reading file with council shapefiles
 # hb_bound<-readOGR("./shapefiles","HB_simpl") #Reading file with health board shapefiles
 
-##############Cross-boundary data ----   
-data_cbfip <- readRDS("./data/ipdc_crossbf.rds") 
-data_cbfop <- readRDS("./data/op_crossbf.rds") 
+##############Cross-boundary data    
+data_cbfip <- readRDS("./data/ipdc_crossbf.rds") #inpatients
+data_cbfop <- readRDS("./data/op_crossbf.rds") #outpatients
+
+##############Others 
+#All of these are for dropdown selections in different parts of the app.
+#Used in the crossboundary diagram
+data_type <- c("Outpatients", "Inpatients/Day cases")
+
+#So selected quarter is the latest available. Needs to be automated.
+latest_quarter <- c("Jul - Sep-17")
+  
+  #for table selection (table tab)
+  file_types <-  c("Beds", "Inpatients/Day cases - Age/sex", 
+                   "Inpatients/Day cases - Cross boundary flow", "Inpatients/Day cases - Time trend", 
+                   "Inpatients/Day cases - Specialty", "Inpatients/Day cases - Deprivation (SIMD)", 
+                   "Outpatients - Age/sex", "Outpatients - Cross boundary flow", 
+                   "Outpatients - Time trend", "Outpatients - Specialty", 
+                   "Outpatients - Deprivation (SIMD)")
+
+#Used in most tabs  
+geo_types <- c("Scotland", "Health board of treatment", "Health board of residence", 
+               "Council area of residence", "Hospital of treatment", "Other")
+
+#Used in trend as at the moment Other not included in time trend
+geo_types_trend <- c("Scotland", "Health board of treatment", "Health board of residence", 
+               "Council area of residence", "Hospital of treatment")
+
+trend_service <- c(as.character(unique(data_trend$measure)))
+trend_measure <- c("Number of stays/appointments", "Total length of stay (days)", "Mean length of stay (days)", "Did not attend rate (%)")
+pyramid_service <- c(as.character(unique(data_pyramid$measure)))
 
 ############################.
 ##Plot parameters ----
@@ -82,7 +86,7 @@ data_cbfop <- readRDS("./data/op_crossbf.rds")
 trend_pal <- c("#004785", "#4c7ea9", "#99b5ce", "#00a2e5", "#4cbeed", "#99daf5")  
 
 ##Cross-boundary----
-#Defining colors 
+#Defining colors for sankey diagram
 colors_node <- c('CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 
                  "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue",
                  'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 

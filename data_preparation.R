@@ -58,8 +58,6 @@ data_specip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_sp
   droplevels()
 
 data_specip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_spec.csv", sep="")) %>%
-    # Excluding Golden Jubilee hb code (to avoid duplication)
-    subset(!loc_code == "S08100001") %>%
     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                              "Health board of treatment",
                              ifelse(loc_code == "scot", "Scotland",
@@ -88,9 +86,7 @@ data_specop_res <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_spec.csv",
   droplevels()
 
 data_specop_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_spec.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!(loc_code == "board" & hb_code == "S08100001")) %>%
-  mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
+  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                            "Health board of treatment",
                            ifelse(loc_code == "scot", "Scotland",
                                   ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>%
@@ -116,6 +112,13 @@ data_spec$measure[data_spec$measure=="Return"] <- "Return appointments"
 data_spec$measure <- as.factor(data_spec$measure)
 data_spec$file <- as.factor(data_spec$file)
 
+data_spec$measure <- data_spec$measure %>% 
+  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
+         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
+         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
+         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
+         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients")
+
 saveRDS(data_spec, "./data/spec_IPOP.rds")
 data_spec <- readRDS("./data/spec_IPOP.rds") 
 
@@ -133,8 +136,6 @@ data_simdip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_si
   droplevels()
 
 data_simdip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_simd.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!loc_code == "S08100001") %>%
   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                            "Health board of treatment",
                            ifelse(loc_code == "scot", "Scotland",
@@ -164,11 +165,9 @@ data_simdop_res <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_simd.csv",
   droplevels()
 
 data_simdop_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_simd.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!(loc_code == "board" & hb_code == "S08100001")) %>%
   #Excluding three codes with no name, giving issues
   subset(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
-  mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
+  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                            "Health board of treatment",
                            ifelse(loc_code == "scot", "Scotland",
                                   ifelse(hb_name == "Null" | hb_name == "Other"
@@ -198,6 +197,13 @@ data_simd$file <- as.factor(data_simd$file)
 data_simd$simd <- as.factor(data_simd$simd)
 data_simd$simd <- recode(data_simd$simd, "1" = "1 - Most deprived", "5" = "5 - Least deprived")
 
+data_simd$measure <- data_simd$measure %>% 
+  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
+         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
+         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
+         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
+         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients")
+
 saveRDS(data_simd, "./data/SIMD_IPOP.rds")
 data_simd <- readRDS("./data/SIMD_IPOP.rds")
 
@@ -215,8 +221,6 @@ data_trendipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_al
   droplevels()
 
 data_trendiptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_all.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!loc_code == "S08100001") %>%
   mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                              "Health board of treatment",
                              ifelse(loc_code == "scot", "Scotland",
@@ -249,11 +253,9 @@ data_trendopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_all.csv", 
   droplevels()
 
 data_trendoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_all.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!(loc_code == "board" & hb_code == "S08100001")) %>%
   #Excluding  codes with no name, giving issues
   subset(!(is.na(loc_name) | loc_name == "NULL")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08" | loc_code == "board",
+  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                              "Health board of treatment",
                              ifelse(loc_code == "scot", "Scotland",
                                     ifelse(hb_name == "Null" | hb_name == "Other"
@@ -285,15 +287,18 @@ data_trendop <- readRDS("./data/trend_OP.rds")
 data_trend <- bind_rows(data_trendop, data_trendip) %>%
   mutate_if(is.character, factor) %>% #converting characters into factors
   subset(loc_name != "Null") %>% #Excluding Null values
+  #Excluding this, as it is not aggregated and creates issues
+  subset(!(loc_name == "Other" & geo_type == "Other")) %>% 
   droplevels()
 
-#Long format, each measure type a row
-# data_trend <- data_trend %>% melt() %>% subset(!is.na(value))
-# data_trend$variable <- data_trend$variable %>%
-#   recode("count" = "Number", "rate" = "DNA rate", "los" = "Total length of stay",
-#          "avlos" = "Mean length of stay")
-
 data_trend <- data_trend %>% arrange(quarter_date2) #sorting by date, so no odd plotting issues
+
+data_trend$measure <- data_trend$measure %>% 
+  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
+         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
+         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
+         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
+         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients") 
 
 saveRDS(data_trend, "./data/trend_IPOP.rds")
 data_trend <- readRDS("./data/trend_IPOP.rds") 
@@ -314,8 +319,6 @@ data_pyramid_ipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res
   droplevels()
 
 data_pyramid_iptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_agesex.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!loc_code == "S08100001") %>%
     mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                              "Health board of treatment",
                              ifelse(loc_code == "scot", "Scotland",
@@ -348,11 +351,9 @@ data_pyramidopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_agesex.c
   droplevels()
 
 data_pyramidoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_agesex.csv", sep="")) %>%
-  # Excluding Golden Jubilee hb code (to avoid duplication)
-  subset(!(loc_code == "board" & hb_code == "S08100001")) %>%
   #Excluding  codes with no name, giving issues
   subset(!(is.na(loc_name) | loc_name == "NULL")) %>%
-  mutate(geo_type = ifelse(substr(hb_code, 1, 3) == "S08" & loc_code == "board",
+  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
                              "Health board of treatment",
                              ifelse(loc_code == "scot", "Scotland",
                                     ifelse(hb_name == "Null" | hb_name == "Other"
@@ -382,6 +383,13 @@ data_pyramid$measure[data_pyramid$measure=="New"] <- "New appointments"
 data_pyramid$measure[data_pyramid$measure=="Return"] <- "Return appointments"
 data_pyramid$measure <- as.factor(data_pyramid$measure)
 data_pyramid$avlos <- round(data_pyramid$avlos,1)
+
+data_pyramid$measure <- data_pyramid$measure %>% 
+  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
+         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
+         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
+         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
+         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients") 
 
 saveRDS(data_pyramid, "./data/pyramid_IPOP.rds")
 data_pyramid <- readRDS("./data/pyramid_IPOP.rds")

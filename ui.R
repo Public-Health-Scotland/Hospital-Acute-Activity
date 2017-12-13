@@ -7,11 +7,9 @@
 ############################.
 ### Visual interface ----
 ############################.
-
-# Define UI for application that draws a histogram
 fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ", 
           tags$head( 
-            tags$style( #to avoid error messages
+            tags$style( #to avoid red text error messages in the whole app, take out for testing
               type="text/css", ".shiny-output-error { visibility: hidden; }", 
               ".shiny-output-error:before { visibility: hidden; }"
               ) 
@@ -22,7 +20,7 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
 ##############################################.             
 ##############Introduction tab ----   
 ##############################################.     
-    tabPanel("Introduction", icon = icon("medkit"), style="float: top; height: 95%; 
+    tabPanel("Introduction", icon = icon("info-circle"), style="float: top; height: 95%; 
               width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
       column(2,
              h3("Data explorer")),
@@ -42,25 +40,23 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
       tags$ul( 
         tags$li("There can be occasions when there are issues with the quality of the data presented. 
                 Known issues are summarised in the ", 
-                tags$a(href="http://www.isdscotland.org/tpp/data-quality", "Data Quality"),
+                tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
                 " section. "),
         tags$li("The data for the most recent quarter is provisional. Provisional data 
                 is subject to change in future publications as submissions may be updated 
                 to reflect a more accurate and complete set of data from NHS Boards."),
-        tags$li("•	Disclosure control methods have been applied to the data in order to 
-                protect patient confidentiality therefore figures may not be additive.  ")
+        tags$li("Disclosure control methods have been applied to the data in order to 
+                protect patient confidentiality therefore figures may not be additive.")
         ),
-      p("For each section you can download the data or view it as a table if you prefer. "),
-      p("A disclosure control method has been applied so the figures might not be additive."),
       p("If you have any trouble using this tool or you have further questions relating to the data, please contact us at: ",
-        tags$b(tags$a(href="mailto:maighread.simpson@nhs.net", "maighread.simpson@nhs.net")),
+        tags$b(tags$a(href="mailto:nss.isdtransformingpublishing@nhs.net", "nss.isdtransformingpublishing@nhs.net")),
         " and we will be happy to help.")
       )
     ), 
 ##############################################.             
 ##############Time trend tab ----   
 ##############################################.     
-tabPanel("Time trend", icon = icon("area-chart"), style="height: 95%; 
+tabPanel("Time trend", icon = icon("line-chart"), style="height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
           h3("Time trend"),
          p("This section allows you to see changes over time. You can use the filters 
@@ -68,21 +64,22 @@ tabPanel("Time trend", icon = icon("area-chart"), style="height: 95%;
            the ‘show/hide table’ button. To download your data selection as a csv file 
            use the ‘download data’ button. If you hover over the chart you will see a 
            number of buttons which will allow you to select parts of the chart, zoom in 
-           or out or save the chart as an image.."),
+           or out or save the chart as an image."),
          wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"),
                    column(6, uiOutput("geotype_ui_trend")),  
                    column(6, uiOutput("locname_ui_trend")),
                    column(6, 
                 selectInput("service_trend", label = "Select type of activity", multiple=TRUE, 
                             choices = trend_service, selectize=TRUE,
-                            selected = c("All Inpatients and Daycases"))),
+                            selected = c("All inpatients and daycases"))),
                 column(6, selectInput("measure_trend", label = "Select measure", 
                                       choices = trend_measure, selected = "Number")),
                 column(6, downloadButton(outputId = 'download_trend', 
-                            label = 'Download data', width= "95%"))  #For downloading the data
+                            label = 'Download data', width= "95%"))  
          ),
          mainPanel(width=12,
          plotlyOutput("trend_plot"),
+         #Button to show hide div where data table is
          HTML("<button data-toggle='collapse' href='#trend' class='btn btn-primary'>
                   <strong>Show/hide table</strong></button>"),
          HTML("<div id='trend' class='collapse'> "),
@@ -110,12 +107,13 @@ tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%;
                                selected = latest_quarter, width= "95%")), 
                    column(9, selectInput("measure_pyramid", label = "Select the type of activity", 
                                choices = pyramid_service, selectize=TRUE,
-                               selected = c("All Inpatients and Daycases"))),
+                               selected = c("All inpatients and daycases"))),
                    column(3, br(), downloadButton(outputId = 'download_pyramid', 
                                             label = 'Download data', width= "95%"))  #For downloading the data
          ),
          mainPanel(width=12,
                    plotlyOutput("pyramid_plot"),
+                   #Button to show hide div where data table is
                    HTML("<button data-toggle='collapse' href='#pyramid' class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='pyramid' class='collapse'> "),
@@ -126,7 +124,7 @@ tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%;
 ##############################################.             
 ##############Deprivation (SIMD) tab ----   
 ##############################################.     
-tabPanel("Deprivation", icon = icon("male"), style="float: top; height: 95%; 
+tabPanel("Deprivation", icon = icon("user-circle-o"), style="float: top; height: 95%; 
          width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
          p("This section allows you to explore the data by different levels of ", 
@@ -144,12 +142,13 @@ tabPanel("Deprivation", icon = icon("male"), style="float: top; height: 95%;
                                  selected=latest_quarter, width= "95%")), 
            column(9, selectInput("measure_simd", label = "Select the type of activity", 
                                  choices = pyramid_service, selectize=TRUE,
-                                 selected = c("All Inpatients and Daycases"))),
+                                 selected = c("All inpatients and daycases"))),
            column(3, downloadButton(outputId = 'download_simd', 
                                     label = 'Download data', width= "95%"))  #For downloading the data
          ),
          mainPanel(width=12,
                    plotlyOutput("simd_plot"),
+                   #Button to show/hide div where data table is
                    HTML("<button data-toggle='collapse' href='#simd' class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='simd' class='collapse'> "),
@@ -159,7 +158,10 @@ tabPanel("Deprivation", icon = icon("male"), style="float: top; height: 95%;
 ),
 ##############################################.             
 ##############Map tab ----   
-##############################################.     
+##############################################.    
+# 
+###SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
+# 
 # tabPanel("Map", icon = icon("globe"), style="float: top; height: 95%; width: 95%; 
 #           background-color:#ffffff; border: 0px solid #ffffff;",
 #          h4(textOutput("title_map")),
@@ -219,12 +221,12 @@ tabPanel("Cross-boundary", icon = icon("exchange"), style="float: top; height: 9
            column(4,
                     selectInput("datatype_flow", label = "Select the hospital service", 
                                 choices = data_type),
-                  checkboxInput("checkbox_flow", label = "Include flows within same board?", value = TRUE)
+                  checkboxInput("checkbox_flow", label = "Include flows within same board?", value = FALSE)
              ),
              column(4,  
                     selectInput("hb_flow", label = "Select the board of interest", 
                                 choices = unique(data_cbfip$hbres_name)),
-                    downloadButton(outputId = 'download_flow', label = 'Download data')  #For downloading the data
+                    downloadButton(outputId = 'download_flow', label = 'Download data') 
              ),
              column(4,
                     selectInput("quarter_flow", label = "Select the time period", 
@@ -244,6 +246,7 @@ tabPanel("Cross-boundary", icon = icon("exchange"), style="float: top; height: 9
                     htmlOutput("sankey_treat", width="48%")
              ),
          div(style="width:95%; height:5%",
+             #Button to show/hide div where data table is
              HTML("<button data-toggle='collapse' data-target='#crossb' 
                   class='btn btn-primary' style=padding: 6px 12px;>
                   <strong>Show/hide table</strong></button>"),
@@ -269,8 +272,17 @@ tabPanel("Table", icon = icon("table"), style="float: top; height: 95%; width: 9
          column(4,
            downloadButton(outputId = 'download_table', label = 'Download data',
                         style="margin: 25px 10px 25px 10px ")
-         ),  #For downloading the data
-        DT::dataTableOutput("table_explorer", width="95%")
+         ),  
+        DT::dataTableOutput("table_explorer", width="95%"),
+        #Footnote for Tayside beds data
+        conditionalPanel(
+          condition = "input.filename_table == 'Beds'",
+          p("Beds data for NHS Tayside from May/June 2016 onwards are inaccurate due to a 
+          system issue with their patient management system. Please bear this in mind when looking 
+            at data. Further detail about this can be found in the ",
+            tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
+            "section.")
+        )
    )
   )
 )
