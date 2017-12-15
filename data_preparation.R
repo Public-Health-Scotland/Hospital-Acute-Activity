@@ -24,13 +24,11 @@ basefile_path <- "/conf/pub_incubator/01 Acute Activity/wrangling/data/base_file
 ##############Beds data ----   
 ##############################################. 
 #Data from SPSS method - developed by SCT
-data_bed <- read_csv(paste(basefile_path, "beds_final.csv", sep="")) %>%
+data_bed <- read_csv(paste(basefile_path, "open_data/beds final.csv", sep="")) %>%
   mutate(value = round(value, 1)) %>% 
   mutate_if(is.character, factor) %>% #converting characters into factors
-  select(-c(lookup)) %>% 
-  mutate(ind = recode(ind, "Average Available Staffed Beds" = "aasb", "% Occupancy" = "p_occ")) %>% 
-  dcast(QTR + location + specname ~ ind,  fun.aggregate = sum) %>% 
-  rename(quarter_name = QTR, loc_name = location)
+  mutate(measure = recode(measure, "Average Available Staffed Beds" = "aasb", "% Occupancy" = "p_occ")) %>% 
+  dcast(quarter_date + loc_name + spec_name ~ measure,  fun.aggregate = sum)
 
 saveRDS(data_bed, "./data/beds.rds")
 data_bed <- readRDS("./data/beds.rds") 
