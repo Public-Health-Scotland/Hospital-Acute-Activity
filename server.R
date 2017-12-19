@@ -16,6 +16,7 @@
 
 #Alignment download boxes
 #Think about color palette for trend
+#include functionality to save cross-boundary plots
 
 ############################.
 ## Server ----
@@ -60,11 +61,14 @@ function(input, output) {
 
     
   })
-  
-  #Plotting 
+
+    #Plotting 
   output$trend_plot <- renderPlotly({
     #If no data available for that quarter then plot message saying data is missing
-    if (is.data.frame(data_trend_plot()) && nrow(data_trend_plot()) == 0)
+    #The same if measure DNA rate and no DNA select as service
+    if ((is.data.frame(data_trend_plot()) && nrow(data_trend_plot()) == 0) |
+        (input$measure_trend == "Did not attend rate (%)" & 
+         !("Did not attend outpatient appointments" %in% input$service_trend )))
     {
       #plotting empty plot just with text
       text_na <- list(x = 5, y = 5, text = "No data available" ,
@@ -535,10 +539,10 @@ function(input, output) {
   data_table <- reactive({switch(input$filename_table,
                                  "Beds" = data_bed %>% 
                                    rename(Area_name = loc_name,
-                                          Specialty = specname,
+                                          Specialty = spec_name,
                                           Time_period = quarter_name,
                                           Occupancy_percentage = p_occ,
-                                          All_avail_beds = aasb),
+                                          All_available_beds = aasb),
                                 "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
                                   select(hbres_name, hbtreat_name, quarter_name, count) %>% 
                                   rename(Health_board_residence = hbres_name,

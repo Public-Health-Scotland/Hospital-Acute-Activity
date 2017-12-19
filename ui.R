@@ -38,7 +38,7 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
         ),
       p("When using the data explorer please take the following factors into consideration:"),
       tags$ul( 
-        tags$li("There can be occasions when there are issues with the quality of the data presented. 
+        tags$li("There are issues with the quality of the data presented. 
                 Known issues are summarised in the ", 
                 tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
                 " section. "),
@@ -207,16 +207,14 @@ tabPanel("Cross-boundary", icon = icon("exchange"), style="float: top; height: 9
          h3("Cross-boundary flow"),
          p("This section allows you to see where patients are treated. The top chart 
            shows where patients living in each NHS Board are treated. The bottom charts 
-           show data specific to the NHS Board selected in the ‘Board of Interest’ filter. 
+           show data specific to the NHS Board selected in the ‘Board of interest’ filter. 
            The left chart shows where patients living in the NHS Board of interest are 
            treated. The right chart shows where patients treated in the NHS Board of 
-           interest come from. To exclude patients treated in their own NHS Board from 
+           interest come from. To include patients treated in their own NHS Board in 
            the charts, use the ‘flows within own Health Board’ tick box." ),
          p("You can use the filters to select the data you are interested in. To view the 
            data in a table use the ‘show/hide table’ button. To download your data selection 
-           as a csv use the ‘download data’ button. If you hover over the chart you will see 
-           a number of buttons which  will allow you to select parts of the chart, zoom in 
-           or out or save the chart as an image."),
+           as a csv use the ‘download data’ button."),
          wellPanel(
            column(4,
                     selectInput("datatype_flow", label = "Select the hospital service", 
