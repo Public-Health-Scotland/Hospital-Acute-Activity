@@ -42,7 +42,7 @@ data_bed <- read_csv(paste(
   "QAcute_Dec17_beds.csv",
   sep="")) %>%
   select(-c(quarter_date, hb_code, hb_name, loc_code)) %>%
-  mutate_at(c("asb", "aob", "p_occ"), funs(round(.,1)))
+  mutate_at(c("asb", "aob", "p_occ"), funs(round(., 1)))
 
 # saveRDS(data_bed, "./data/beds.rds")
 
@@ -71,8 +71,8 @@ data_spec_ip_treat <- read_csv(paste(
 
 
 # 1.3 - Combine inpatient files
-data_spec_ip <- inp(data_spec_ip_treat,
-                    data_spec_ip_res)
+data_spec_ip <- comb_inp(data_spec_ip_treat,
+                         data_spec_ip_res)
 
 # saveRDS(data_spec_ip, "./data/spec_IP.rds")
 
@@ -82,9 +82,55 @@ data_spec_ip <- inp(data_spec_ip_treat,
 
 # 2.1 - Residence data
 data_spec_op_res <- read_csv(paste(
-  basefile_path,
+  base_filepath,
   "QAcute_Dec17_OP_res_spec.csv",
   sep="")) %>%
   res()
 
+
+# 2.2 - Treatment data
+# NOTE - the original code relating to this file is slightly
+# different to that which is defined in the 'treat' function
+# The end result, however, should be exactly the same
+data_spec_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_spec.csv",
+  sep="")) %>%
+  treat() %>%
+  mutate(rate = as.numeric(rate))
+
+
+# 2.3 - Combine outpatient files
+data_spec_op <- comb_outp(data_spec_op_treat,
+                          data_spec_op_res)
+
+# saveRDS(data_spec_op, "./data/spec_OP.rds")
+
+
+# 3 - Combine inpatient and outpatient files
+data_spec <- comb_all(data_spec_op,
+                      data_spec_ip)
+
+# saveRDS(data_spec, "./data/spec_IPOP.rds")
+
+
+# 4 - Delete all intermediate files
+rm(data_spec_ip_res, data_spec_ip_treat,
+   data_spec_ip, data_spec_op_res,
+   data_spec_op_treat, data_spec_op)
+
+
+
+### Section 4: SIMD Data ----
+
+
+# 1 - Inpatient data
+
+
+# 1.1 - Residence data
+data_simd_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_simd.csv",
+  sep="")) %>%
+  res()
 

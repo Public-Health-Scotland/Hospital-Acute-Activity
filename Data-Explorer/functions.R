@@ -5,16 +5,17 @@
 ### Original Author: Jack Hannah
 ### Original Date: 01 June 2018
 ### Last edited by: Jack Hannah
-### Last edited on: 01 June 2018
+### Last edited on: 04 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
 ### Packages required:
-### dplyr (for data manipulation)
+### dplyr and tidyr (for data manipulation)
 ###
 ### This script defines several functions to be called
 ### in the next script (data_preparation.R) which will
-### be used to manipulate a series of base files
+### be used to manipulate and combine a series of base
+### files
 
 
 
@@ -23,12 +24,7 @@
 
 # 1 - Load libraries
 library(dplyr)
-
-
-# 2 - Define base filepath
-base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
-                       "/wrangling/data/base_files/",
-                       sep = "")
+library(tidyr)
 
 
 
@@ -52,9 +48,7 @@ res <- function(df){
       ~ "Council area of residence",
       TRUE
       ~ "Health board of residence"
-    )) #%>%
-    #mutate_if(is.character, as.factor) %>%
-    #droplevels()
+    ))
 }
 
 
@@ -81,9 +75,54 @@ treat <- function(df){
 # Section 2.3: Combining inpatient files ----
 # This function contains the steps for combining
 # and manipulating inpatient files
-inp <- function(df_1, df_2){
+comb_inp <- function(df_1, df_2){
   bind_rows(df_1, df_2) %>%
     mutate(avlos = round(avlos, 1),
            file = "Inpatients/Day Cases") %>%
+    
+    # Remove a few random null measure cases
     drop_na(measure)
+}
+
+
+
+# Section 2.4: Combining outpatient files ----
+# This function contains the steps for combining
+# and manipulating outpatient files
+comb_outp <- function(df_1, df_2){
+  bind_rows(df_1, df_2) %>%
+    rename(measure = appt_type) %>%
+    mutate(file = "Outpatients",
+           rate = round(rate, 1))
+}
+
+
+
+# Section 2.5: Combining inpatient and outpatient files ----
+# This function contains the steps for combining
+# the inpatient and outpatient files created using
+# the previous two functions
+comb_all <- function(df_1, df_2){
+  bind_rows(df_1, df_2) %>%
+    
+    # Exclude others as there are
+    # duplicates from both files
+    filter(geo_type != "Other") %>%
+    
+    # Recode measure into a more informative descrition
+    # and/or to remove capital letters from mid-sentence
+    # words
+    mutate(measure = recode(
+      measure,
+      "DNA" = "Did not attend outpatient appointments",
+      "Transfers" = "Inpatient transfers",
+      "All Appointments" = "All outpatient appointments",
+      "New" = "New outpatient appointments",
+      "Return" = "Return outpatient appointments",
+      "All Inpatients" = "All inpatients",
+      "All Inpatients and Daycases" = "All inpatients and daycases",
+      "All Daycases" = "All daycases",
+      "Emergency Inpatients" = "Emergency inpatients",
+      "Elective Inpatients" = "Elective inpatients"
+    ))
 }
