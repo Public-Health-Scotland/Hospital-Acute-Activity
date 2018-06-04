@@ -22,7 +22,7 @@
 ### Section 1: Housekeeping ----
 
 
-# 1 - Load libraries
+# 1.1 - Load libraries
 library(dplyr)
 library(tidyr)
 
@@ -104,10 +104,6 @@ comb_outp <- function(df_1, df_2){
 # the previous two functions
 comb_all <- function(df_1, df_2){
   bind_rows(df_1, df_2) %>%
-    
-    # Exclude others as there are
-    # duplicates from both files
-    filter(geo_type != "Other") %>%
     
     # Recode measure into a more informative descrition
     # and/or to remove capital letters from mid-sentence
