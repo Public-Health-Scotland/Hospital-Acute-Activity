@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 04 June 2018
+### Last edited on: 05 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -242,8 +242,8 @@ data_trend_ip <- comb_inp(data_trend_ip_treat,
   # Create a new column representing the last month
   # in each financial quarter
   # This will be used as the x-axis in a shiny plot
-  # Make it a character and convert back to yearmon
-  # later, as yearmon doesn't work with bind_rows
+  # Make it a character and convert back to 'yearmon'
+  # later, as 'yearmon' doesn't work with bind_rows
   mutate(quarter_date_last = as.character(
     as.yearmon(quarter_date, "%d/%m/%Y")))
   
@@ -285,8 +285,8 @@ data_trend_op <- comb_outp(data_trend_op_treat,
   # Create a new column representing the last month
   # in each financial quarter
   # This will be used as the x-axis in a shiny plot
-  # Make it a character and convert back to yearmon
-  # later, as yearmon doesn't work with bind_rows
+  # Make it a character and convert back to 'yearmon'
+  # later, as 'yearmon' doesn't work with bind_rows
   mutate(quarter_date_last = as.character(
     as.yearmon(quarter_date, "%d/%m/%Y")))
 
@@ -303,7 +303,7 @@ data_trend <- comb_all(data_trend_op,
            geo_type == "Other")) %>%
   
   # Convert the column representing the last month in each
-  # financial quarter back to yearmon
+  # financial quarter back to 'yearmon'
   mutate(quarter_date_last = as.yearmon(quarter_date_last)) %>%
   
   # Arrange by date for later plotting
