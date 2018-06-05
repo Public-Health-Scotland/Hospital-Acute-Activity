@@ -11,7 +11,9 @@
 ###
 ### Packages required:
 ### readr (for reading csv files);
-### dplyr and tidyr (for data manipulation)
+### dplyr and tidyr (for data manipulation);
+### zoo (for dates);
+### stringi (for string manipulation)
 ###
 ### This script creates the files used in the data
 ### explorer by manipulating a series of base files
@@ -25,6 +27,8 @@
 library(readr)
 library(dplyr)
 library(tidyr)
+library(zoo)
+library(stringi)
 
 
 # 1.2 - Define base filepath
@@ -96,8 +100,7 @@ data_spec_op_treat <- read_csv(paste(
   base_filepath,
   "QAcute_Dec17_OP_treat_spec.csv",
   sep="")) %>%
-  treat() %>%
-  mutate(rate = as.numeric(rate))
+  treat()
 
 
 # 3.2.3 - Combine outpatient files
@@ -206,3 +209,110 @@ data_simd <- comb_all(data_simd_op,
 rm(data_simd_ip_res, data_simd_ip_treat,
    data_simd_ip, data_simd_op_res,
    data_simd_op_treat, data_simd_op)
+
+
+
+### Section 5: Time Trend Data ----
+
+
+# 5.1 - Inpatient data
+
+
+# 5.1.1 - Residence data
+data_trend_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_all.csv",
+  sep="")) %>%
+  res()
+
+
+# 5.1.2 - Treatment data
+data_trend_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_all.csv",
+  sep="")) %>%
+  treat()
+
+
+# 5.1.3 - Combine inpatient files
+data_trend_ip <- comb_inp(data_trend_ip_treat,
+                          data_trend_ip_res) %>%
+  rename(count = stays) %>%
+  
+  # Create a new column representing the last month
+  # in each financial quarter
+  # This will be used as the x-axis in a shiny plot
+  # Make it a character and convert back to yearmon
+  # later, as yearmon doesn't work with bind_rows
+  mutate(quarter_date_last = as.character(
+    as.yearmon(quarter_date, "%d/%m/%Y")))
+  
+# saveRDS(data_trend_ip, "./data/trend_IP.rds")
+
+
+# 5.2 - Outpatient data
+
+
+# 5.2.1 - Residence data
+data_trend_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_all.csv",
+  sep="")) %>%
+  res() %>%
+  
+  # The quarter dates in this file have dashes rather
+  # than forward slashes, and don't have the '20' prefix
+  # for years, so re-format for consistency with the
+  # other files
+  mutate(quarter_date = gsub("-", "/", quarter_date),
+         quarter_date = stri_replace_last_fixed(
+           quarter_date, "/", "/20"
+         ))
+
+
+# 5.2.2 - Treatment data
+data_trend_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_all.csv",
+  sep="")) %>%
+  treat()
+
+
+# 5.2.3 - Combine outpatient files
+data_trend_op <- comb_outp(data_trend_op_treat,
+                           data_trend_op_res) %>%
+  
+  # Create a new column representing the last month
+  # in each financial quarter
+  # This will be used as the x-axis in a shiny plot
+  # Make it a character and convert back to yearmon
+  # later, as yearmon doesn't work with bind_rows
+  mutate(quarter_date_last = as.character(
+    as.yearmon(quarter_date, "%d/%m/%Y")))
+
+# saveRDS(data_trend_op, "./data/trend_OP.rds")
+
+
+# 5.3 - Combine inpatient and outpatient files
+data_trend <- comb_all(data_trend_op,
+                       data_trend_ip) %>%
+  
+  # Exclude null values and non-aggregated
+  # 'Other' values
+  filter(!(loc_name %in% c("Null", "Other") &
+           geo_type == "Other")) %>%
+  
+  # Convert the column representing the last month in each
+  # financial quarter back to yearmon
+  mutate(quarter_date_last = as.yearmon(quarter_date_last)) %>%
+  
+  # Arrange by date for later plotting
+  arrange(quarter_date_last)
+
+# saveRDS(data_trend, "./data/trend_IPOP.rds")
+
+
+# 5.4 - Delete all intermediate files
+rm(data_trend_ip_res, data_trend_ip_treat,
+   data_trend_ip, data_trend_op_res,
+   data_trend_op_treat, data_trend_op)
