@@ -237,15 +237,7 @@ data_trend_ip_treat <- read_csv(paste(
 # 5.1.3 - Combine inpatient files
 data_trend_ip <- comb_inp(data_trend_ip_treat,
                           data_trend_ip_res) %>%
-  rename(count = stays) %>%
-  
-  # Create a new column representing the last month
-  # in each financial quarter
-  # This will be used as the x-axis in a shiny plot
-  # Make it a character and convert back to 'yearmon'
-  # later, as 'yearmon' doesn't work with bind_rows
-  mutate(quarter_date_last = as.character(
-    as.yearmon(quarter_date, "%d/%m/%Y")))
+  rename(count = stays)
   
 # saveRDS(data_trend_ip, "./data/trend_IP.rds")
 
@@ -280,15 +272,7 @@ data_trend_op_treat <- read_csv(paste(
 
 # 5.2.3 - Combine outpatient files
 data_trend_op <- comb_outp(data_trend_op_treat,
-                           data_trend_op_res) %>%
-  
-  # Create a new column representing the last month
-  # in each financial quarter
-  # This will be used as the x-axis in a shiny plot
-  # Make it a character and convert back to 'yearmon'
-  # later, as 'yearmon' doesn't work with bind_rows
-  mutate(quarter_date_last = as.character(
-    as.yearmon(quarter_date, "%d/%m/%Y")))
+                           data_trend_op_res)
 
 # saveRDS(data_trend_op, "./data/trend_OP.rds")
 
@@ -302,9 +286,11 @@ data_trend <- comb_all(data_trend_op,
   filter(!(loc_name %in% c("Null", "Other") &
            geo_type == "Other")) %>%
   
-  # Convert the column representing the last month in each
-  # financial quarter back to 'yearmon'
-  mutate(quarter_date_last = as.yearmon(quarter_date_last)) %>%
+  # Create a new column representing the last month
+  # in each financial quarter
+  # This will be used as the x-axis in a shiny plot
+  mutate(quarter_date_last = as.yearmon(quarter_date,
+                                        "%d/%m/%Y")) %>%
   
   # Arrange by date for later plotting
   arrange(quarter_date_last)
@@ -350,9 +336,6 @@ data_pyramid_ip_treat <- read_csv(paste(
 
 
 # 6.1.3 - Combine inpatient files
-# NOTE - the original code doesn't round avlos
-# but every comparable file does round it, so
-# it's rounded here
 data_pyramid_ip <- comb_inp(data_pyramid_ip_treat,
                             data_pyramid_ip_res) %>%
   rename(count = stays)
@@ -395,3 +378,62 @@ data_pyramid_op <- comb_outp(data_pyramid_op_treat,
 
 
 # 6.3 - Combine inpatient and outpatient files
+data_pyramid <- comb_all(data_pyramid_op,
+                         data_pyramid_ip) %>%
+  
+  # Exclude null values
+  filter(loc_name != "Null") %>%
+  
+  # Create a new column representing the last month
+  # in each financial quarter
+  mutate(quarter_date_last = as.yearmon(quarter_date,
+                                        "%d/%m/%Y"))
+
+# saveRDS(data_pyramid, "./data/pyramid_IPOP.rds")
+
+
+# 6.4 - Delete all intermediate files
+rm(data_pyramid_ip_res, data_pyramid_ip_treat,
+   data_pyramid_ip, data_pyramid_op_res,
+   data_pyramid_op_treat, data_pyramid_op)
+
+
+
+### Section 7: Map Data ----
+
+
+# 7.1 - Inpatient data
+data_map_ipdc <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_all.csv",
+  sep="")) %>%
+  
+  # Exclude Scotland, Golden Jubilee and
+  # non-territorial codes
+  # NOTE - the original code removed rows where
+  # loc_name == "Others", but there are no entries
+  # with this value, so assuming that meant either
+  # "Scotland" or "Other"
+  filter(!(loc_name %in% c("Scotland", "Other") |
+           hb_name %in% c("Scotland", "Other"))) %>%
+  
+  # Create a dummy variable for crude rate, and
+  # labels for the map tooltip
+  # NOTE - in the original code, this file had
+  # only 5,047 rows
+  mutate(crude_rate = seq(1:5799),
+         labs = paste0(
+           loc_name, '</br>', 'Admissions: ',
+           stays, '</br>', 'Crude rate: ',
+           crude_rate)) %>%
+  
+  # Convert to long format to allow multiple selections in
+  # the map
+  gather("value_type", "value", c("stays","crude_rate")) %>%
+  mutate(value_type = recode(
+    value_type,
+    "stays" = "Admissions",
+    "crude_rate" = "Crude rate"
+  ))
+  
+# saveRDS(data_map_ipdc, "./data/ipdc_map.rds")
