@@ -122,3 +122,7 @@ comb_all <- function(df_1, df_2){
       "Elective Inpatients" = "Elective inpatients"
     ))
 }
+
+
+
+### END OF SCRIPT ###

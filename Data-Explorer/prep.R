@@ -17,6 +17,43 @@
 ###
 ### This script creates the files used in the data
 ### explorer by manipulating a series of base files
+###
+### With the exception of the Beds, Map and Cross-
+### Boundary data, data manipulation is conducted in
+### the following format and order:
+###
+### Section X: Data
+###
+###
+### X.1 - Inpatient data
+###
+###
+### X.1.1 - Residence data
+###
+### X.1.2 - Treatment data
+###
+### X.1.3 - Combine inpatient files
+###
+###
+### X.2 - Outpatient data
+###
+###
+### X.2.1 - Residence data
+###
+### X.2.2 - Treatment data
+###
+### X.2.3 - Combine outpatient files
+###
+###
+### X.3 - Combine inpatient and outpatient files
+###
+###
+### X.4 - Delete all intermediate files
+###
+###
+### The Beds data isn't split by inpatient and outpatient
+### (or residence and treatment), and the Map and Cross-
+### Boundary data aren't split by residence and treatment
 
 
 
@@ -155,7 +192,7 @@ data_simd_ip <- comb_inp(data_simd_ip_res,
                          data_simd_ip_treat) %>%
   rename(count = stays)
 
-# saveRDS(data_simdip, "./data/SIMD_IP.rds")
+# saveRDS(data_simd_ip, "./data/SIMD_IP.rds")
 
 
 # 4.2 - Outpatient data
@@ -284,7 +321,7 @@ data_trend <- comb_all(data_trend_op,
   # Exclude null values and non-aggregated
   # 'Other' values
   filter(!(loc_name %in% c("Null", "Other") &
-           geo_type == "Other")) %>%
+             geo_type == "Other")) %>%
   
   # Create a new column representing the last month
   # in each financial quarter
@@ -412,15 +449,13 @@ data_map_ipdc <- read_csv(paste(
   # non-territorial codes
   # NOTE - the original code removed rows where
   # loc_name == "Others", but there are no entries
-  # with this value, so assuming that meant either
-  # "Scotland" or "Other"
+  # with this value, so assuming that meant exclude
+  # values equal to either "Scotland" or "Other"
   filter(!(loc_name %in% c("Scotland", "Other") |
-           hb_name %in% c("Scotland", "Other"))) %>%
+             hb_name %in% c("Scotland", "Other"))) %>%
   
   # Create a dummy variable for crude rate, and
   # labels for the map tooltip
-  # NOTE - in the original code, this file had
-  # only 5,047 rows
   mutate(crude_rate = seq(1:5799),
          labs = paste0(
            loc_name, '</br>', 'Admissions: ',
@@ -437,3 +472,99 @@ data_map_ipdc <- read_csv(paste(
   ))
   
 # saveRDS(data_map_ipdc, "./data/ipdc_map.rds")
+
+
+# 7.2 - Outpatient data
+data_map_op <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_all.csv",
+  sep="")) %>%
+  
+  # Exclude Scotland, Golden Jubilee and
+  # non-territorial codes
+  filter(!(loc_name %in% c("Scotland", "Other") |
+             hb_name %in% c("Scotland", "Other"))) %>%
+  
+  # Create a dummy variable for crude rate, and
+  # labels for the map tooltip
+  mutate(crude_rate = seq(1:1932),
+         labs = paste0(
+           loc_name, '</br>', 'Appointments: ',
+           count, '</br>', 'Rate: ',
+           crude_rate)) %>%
+  
+  # Convert to long format to allow multiple selections in
+  # the map
+  gather("value_type", "value", c("count", "rate", "crude_rate")) %>%
+  drop_na(value) %>%
+  mutate(value_type = recode(
+    value_type,
+    "count" = "Appointments",
+    "rate" = "DNA rate",
+    "crude_rate" = "Crude rate"
+  ))
+
+# saveRDS(data_map_op, "./data/op_map.rds")
+
+
+
+### Section 8: Cross-Boundary Data ----
+
+
+# 8.1 - Inpatient data
+data_cbf_ip <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_cbf.csv",
+  sep="")) %>%
+  
+  # Select health boards only
+  filter(hbtreat_name != "Non-NHS Provider" &
+           hbres_name != "Other") %>%
+  
+  select(-c(hbtreat_currentdate, hbres_currentdate,
+            episodes)) %>%
+  rename(count = stays) %>%
+  
+  # Create a duplicate variable of hbtreat_name
+  # but add a space at the end
+  # This is to create unique labels for from/to
+  # for the Sankey diagram
+  mutate(hb_treat_space = paste0(hbtreat_name, " ")) %>%
+  
+  # To reduce the length of the tooltip, remove 'NHS'
+  # from the name of all health board variables
+  mutate_at(vars(contains("hb")),
+            funs(stri_replace_first_fixed(., "NHS ", "")))
+
+# saveRDS(data_cbf_ip, "./data/ipdc_crossbf.rds")
+
+
+# 8.2 - Outpatient data
+data_cbf_op <-  read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_outpats_cbf.csv",
+  sep="")) %>%
+  
+  # Select health boards only
+  filter(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) &
+           hbres_name != "Other") %>%
+  
+  select(-c(hbtreat_currentdate, hbres_currentdate)) %>%
+  rename(count = attendances) %>%
+  
+  # Create a duplicate variable of hbtreat_name
+  # but add a space at the end
+  # This is to create unique labels for from/to
+  # for the Sankey diagram
+  mutate(hb_treat_space = paste0(hbtreat_name, " ")) %>%
+  
+  # To reduce the length of the tooltip, remove 'NHS'
+  # from the name of all health board variables
+  mutate_at(vars(contains("hb")),
+            funs(stri_replace_first_fixed(., "NHS ", "")))
+
+# saveRDS(data_cbf_op, "./data/op_crossbf.rds")
+
+
+
+### END OF SCRIPT ###
