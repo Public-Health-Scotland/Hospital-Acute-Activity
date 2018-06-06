@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 05 June 2018
+### Last edited on: 06 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -316,3 +316,82 @@ data_trend <- comb_all(data_trend_op,
 rm(data_trend_ip_res, data_trend_ip_treat,
    data_trend_ip, data_trend_op_res,
    data_trend_op_treat, data_trend_op)
+
+
+
+### Section 6: Population Pyramid Data ----
+
+
+# 6.1 - Inpatient data
+
+
+# 6.1.1 - Residence data
+data_pyramid_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_agesex.csv",
+  sep="")) %>%
+  res() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.1.2 - Treatment data
+data_pyramid_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_agesex.csv",
+  sep="")) %>%
+  treat() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.1.3 - Combine inpatient files
+# NOTE - the original code doesn't round avlos
+# but every comparable file does round it, so
+# it's rounded here
+data_pyramid_ip <- comb_inp(data_pyramid_ip_treat,
+                            data_pyramid_ip_res) %>%
+  rename(count = stays)
+
+# saveRDS(data_pyramid_ip, "./data/pyramid_IP.rds")
+
+
+# 6.2 - Outpatient data
+
+
+# 6.2.1 - Residence data
+data_pyramid_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_agesex.csv",
+  sep="")) %>%
+  res() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.2.2 - Treatment data
+data_pyramid_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_agesex.csv",
+  sep="")) %>%
+  treat() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.2.3 - Combine outpatient files
+data_pyramid_op <- comb_outp(data_pyramid_op_treat,
+                             data_pyramid_op_res)
+
+# saveRDS(data_pyramid_op, "./data/pyramid_OP.rds")
+
+
+# 6.3 - Combine inpatient and outpatient files
