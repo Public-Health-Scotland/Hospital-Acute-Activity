@@ -464,7 +464,7 @@ data_map_ipdc <- read_csv(paste(
   
   # Convert to long format to allow multiple selections in
   # the map
-  gather("value_type", "value", c("stays","crude_rate")) %>%
+  gather("value_type", "value", c("stays", "crude_rate")) %>%
   mutate(value_type = recode(
     value_type,
     "stays" = "Admissions",
