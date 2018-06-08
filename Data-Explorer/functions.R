@@ -5,7 +5,7 @@
 ### Original Author: Jack Hannah
 ### Original Date: 01 June 2018
 ### Last edited by: Jack Hannah
-### Last edited on: 04 June 2018
+### Last edited on: 08 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -34,7 +34,7 @@ library(tidyr)
 # Section 2.1: Residence files ----
 # This function contains the data manipulation steps
 # to be applied to all residence (res) files
-res <- function(df){
+res <- function(df) {
   df %>%
     
   # Exclude Scotland and Golden Jubilee
@@ -56,7 +56,7 @@ res <- function(df){
 # Section 2.2: Treatment files ----
 # This function contains the data manipulation steps
 # to be applied to all treatment (treat) files
-treat <- function(df){
+treat <- function(df) {
   df %>%
     mutate(geo_type = case_when(
       substr(loc_code, 1, 3) == "S08"
@@ -75,7 +75,7 @@ treat <- function(df){
 # Section 2.3: Combining inpatient files ----
 # This function contains the steps for combining
 # and manipulating inpatient files
-comb_inp <- function(df_1, df_2){
+comb_inp <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     mutate(avlos = round(avlos, 1),
            file = "Inpatients/Day Cases") %>%
@@ -89,7 +89,7 @@ comb_inp <- function(df_1, df_2){
 # Section 2.4: Combining outpatient files ----
 # This function contains the steps for combining
 # and manipulating outpatient files
-comb_outp <- function(df_1, df_2){
+comb_outp <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     rename(measure = appt_type) %>%
     mutate(file = "Outpatients",
@@ -102,7 +102,7 @@ comb_outp <- function(df_1, df_2){
 # This function contains the steps for combining
 # the inpatient and outpatient files created using
 # the previous two functions
-comb_all <- function(df_1, df_2){
+comb_all <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     
     # Recode measure into a more informative descrition
