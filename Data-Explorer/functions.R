@@ -5,12 +5,13 @@
 ### Original Author: Jack Hannah
 ### Original Date: 01 June 2018
 ### Last edited by: Jack Hannah
-### Last edited on: 08 June 2018
+### Last edited on: 11 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
 ### Packages required:
-### dplyr and tidyr (for data manipulation)
+### dplyr and tidyr (for data manipulation);
+### stringi (for string manipulation)
 ###
 ### This script defines several functions to be called
 ### in the next script (data_preparation.R) which will
@@ -25,6 +26,7 @@
 # 1.1 - Load libraries
 library(dplyr)
 library(tidyr)
+library(stringi)
 
 
 
@@ -121,6 +123,20 @@ comb_all <- function(df_1, df_2) {
       "Emergency Inpatients" = "Emergency inpatients",
       "Elective Inpatients" = "Elective inpatients"
     ))
+}
+
+
+# Section 2.6: Formatting dates ----
+# The correct date format for files in this instance is
+# dd/mm/yyyy
+# Some files contain dates in the form dd-mm-yy
+# This function converts those dates into the correct format
+convert_dates <- function(df) {
+  df %>%
+    mutate(quarter_date = gsub("-", "/", quarter_date),
+           quarter_date = stri_replace_last_fixed(
+             quarter_date, "/", "/20"
+           ))
 }
 
 
