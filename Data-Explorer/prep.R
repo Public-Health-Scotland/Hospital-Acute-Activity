@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 08 June 2018
+### Last edited on: 11 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -74,6 +74,10 @@ base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
                        sep = "")
 
 
+# 1.3 - Load functions script
+# source("C:\\Users\\jackha03\\Documents\\Rshiny\\Data-Explorer\\functions.R")
+
+
 
 ### Section 2: Beds Data ----
 
@@ -126,7 +130,8 @@ data_spec_op_res <- read_csv(paste(
   base_filepath,
   "QAcute_Dec17_OP_res_spec.csv",
   sep="")) %>%
-  res()
+  res() %>%
+  convert_dates()
 
 
 # 3.2.2 - Treatment data
@@ -203,7 +208,8 @@ data_simd_op_res <- read_csv(paste(
   base_filepath,
   "QAcute_Dec17_OP_res_simd.csv",
   sep="")) %>%
-  res()
+  res() %>%
+  convert_dates()
 
 
 # 4.2.2 - Treatment data
@@ -214,7 +220,8 @@ data_simd_op_treat <- read_csv(paste(
   
   # Exclude three location codes which have no name
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
-  treat()
+  treat() %>%
+  convert_dates()
 
 
 # 4.2.3 - Combine outpatient files
@@ -288,15 +295,7 @@ data_trend_op_res <- read_csv(paste(
   "QAcute_Dec17_OP_res_all.csv",
   sep="")) %>%
   res() %>%
-  
-  # The quarter dates in this file have dashes rather
-  # than forward slashes, and don't have the '20' prefix
-  # for years, so re-format for consistency with the
-  # other files
-  mutate(quarter_date = gsub("-", "/", quarter_date),
-         quarter_date = stri_replace_last_fixed(
-           quarter_date, "/", "/20"
-         ))
+  convert_dates()
 
 
 # 5.2.2 - Treatment data
@@ -389,6 +388,7 @@ data_pyramid_op_res <- read_csv(paste(
   "QAcute_Dec17_OP_res_agesex.csv",
   sep="")) %>%
   res() %>%
+  convert_dates() %>%
   
   # Split sex and age into two columns
   separate(sex_age, c("sex", "age"), "\\s") %>%
@@ -401,6 +401,7 @@ data_pyramid_op_treat <- read_csv(paste(
   "QAcute_Dec17_OP_treat_agesex.csv",
   sep="")) %>%
   treat() %>%
+  convert_dates() %>%
   
   # Split sex and age into two columns
   separate(sex_age, c("sex", "age"), "\\s") %>%
@@ -479,6 +480,7 @@ data_map_op <- read_csv(paste(
   base_filepath,
   "QAcute_Dec17_OP_res_all.csv",
   sep="")) %>%
+  convert_dates() %>%
   
   # Exclude Scotland, Golden Jubilee and
   # non-territorial codes
@@ -544,6 +546,7 @@ data_cbf_op <-  read_csv(paste(
   base_filepath,
   "QAcute_Dec17_outpats_cbf.csv",
   sep="")) %>%
+  convert_dates() %>%
   
   # Select health boards only
   filter(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) &
