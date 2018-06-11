@@ -45,6 +45,8 @@ fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ",
         tags$li("The data for the most recent quarter is provisional. Provisional data 
                 is subject to change in future publications as submissions may be updated 
                 to reflect a more accurate and complete set of data from NHS Boards."),
+        tags$li("Missing data points within graphs / missing rows of data within the tables
+                means no data / activity."),
         tags$li("Disclosure control methods have been applied to the data in order to 
                 protect patient confidentiality therefore figures may not be additive.")
         ),
