@@ -414,8 +414,8 @@ function(input, output) {
   #Reactive data
   #Creating dynamic selection of dataset.
   data_flow <- reactive({switch(input$datatype_flow,
-                                "Inpatients/Day cases" = data_cbfip,
-                                "Outpatients" = data_cbfop
+                                "Inpatients/Day cases" = data_cbf_ip,
+                                "Outpatients" = data_cbf_op
   )})
   
   
