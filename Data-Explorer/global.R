@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 11 June 2018
+### Last edited on: 14 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -193,7 +193,9 @@ trend_pal <- c("#004785", "#4c7ea9", "#99b5ce",
 # 4.2 - Cross-Boundary colour palette for Sankey diagram
 colours_node <- rep("CornflowerBlue", times = 28)
 
-colours_node_array <- paste0("[", paste0("'", colours_node, "'", collapse = ','), "]")
+colours_node_array <- paste0("[", paste0("'", colours_node,
+                                         "'", collapse = ','),
+                             "]")
 
 opts <- paste0("{
                node: { colours: ", colours_node_array ," }
