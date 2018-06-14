@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 11 June 2018
+### Last edited on: 14 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -75,7 +75,10 @@ base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
 
 
 # 1.3 - Load functions script
-# source("C:\\Users\\jackha03\\Documents\\Rshiny\\Data-Explorer\\functions.R")
+# TO DO - change this when files are moved to the TP folder
+source(paste("C:\\Users\\jackha03\\Documents\\Rshiny",
+             "\\Data-Explorer\\functions.R",
+             sep = ""))
 
 
 
@@ -503,6 +506,7 @@ data_map_op <- read_csv(paste(
   # Convert to long format to allow multiple selections in
   # the map
   gather("value_type", "value", c("count", "rate", "crude_rate")) %>%
+  
   drop_na(value) %>%
   mutate(value_type = recode(
     value_type,
