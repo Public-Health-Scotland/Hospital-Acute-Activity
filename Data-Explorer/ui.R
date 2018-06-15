@@ -116,7 +116,7 @@ tabPanel("Time trend", icon = icon("line-chart"),
            of the chart, zoom in or out or save the chart as an image."),
          wellPanel(tags$style(".well {background-color: #ffffff;
                               border: 0px solid #336699;}"),
-                   column(6, uiOutput("geotype_trend")),  
+                   column(6, uiOutput("geotype_ui_trend")),  
                    column(6, uiOutput("locname_ui_trend")),
                    column(6,
                           selectInput("service_trend",

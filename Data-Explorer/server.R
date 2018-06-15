@@ -1,125 +1,179 @@
-#Syntax to create the data explorer
-#Jaime Villacampa October 17
+################################################################
+### Server
+### Data Explorer script 5 of 5
+###
+### Original Author: Jaime Villacampa
+### Original Date: October 2017
+### Last edited by: Jack Hannah
+### Last edited on: 15 June 2018
+###
+### Written to be run on RStudio Desktop
+###
+### This script controls what the data explorer *does*
 
-#TODO:
-#Fix issues with selection of dates (max date and order)
-#Order quarter variable in tables based on date (use date variable instead?)
-#Add visualization for specialty (time trend, bar chart)
 
-#Figure out colors scale for map/fix legend image
-# Make map outpatients work (need to check raw data, add switch or merge datasets)
+
+### TO DO: ----
+
+
+# Fix issues with selection of dates (max date and order)
+# Order quarter variable in tables based on date (use date variable instead?)
+# Add visualization for specialty (time trend, bar chart)
+
+# Figure out colors scale for map/fix legend image
+# Make map outpatients work (need to check raw data, add switch or
+# merge datasets)
 # Include los, dna rate and avlos in map, deprivation, age-sex?
 
 # Include bed time trend might require merging datasets
-#Fix formatting numbers tooltip
-#Set labels for time trend (to avoid cases with decimals)
+# Fix formatting numbers tooltip
+# Set labels for time trend (to avoid cases with decimals)
 
-#Alignment download boxes
-#Think about color palette for trend
-#include functionality to save cross-boundary plots
+# Alignment download boxes
+# Think about color palette for trend
+# Include functionality to save cross-boundary plots
 
-############################.
-## Server ----
-############################.
+
+
+### Server ----
+
 
 function(input, output) {
   
-  ##############################################.             
-  ##############Time trend----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+               
+  ### Time trend----   
+    
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_trend <- renderUI({
-    selectInput("geotype_trend", label = "Select the type of location", 
-                choices = geo_types_trend, selected =  "Scotland")
+    selectInput("geotype_trend",
+                label = "Select the type of location", 
+                choices = geo_type_trend,
+                selected =  "Scotland")
   })
   
   output$locname_ui_trend <- renderUI({
     selectInput("locname_trend", "Select the location", 
-                choices = sort(unique(data_trend$loc_name[data_trend$geo_type == input$geotype_trend])),
-                selectize = TRUE, selected = "Scotland")
+                choices = data_trend %>%
+                  filter(geo_type == input$geotype_trend) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
-  #Reactive datasets
-  #reactive dataset for the trend plot
+  # Reactive datasets
+  # Reactive dataset for the trend plot
 
   data_trend_plot <- reactive({
     data_trend %>% 
-      subset(loc_name == input$locname_trend & measure %in% input$service_trend &
+      filter(loc_name == input$locname_trend &
+               measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
-      rename("Total length of stay (days)" = los, "Mean length of stay (days)" = avlos,
-             "Number of stays/appointments" = count, "Did not attend rate (%)" = rate)
-      
-    })
+      rename("Total length of stay (days)" = los,
+             "Mean length of stay (days)" = avlos,
+             "Number of stays / appointments" = count,
+             "Did not attend rate (%)" = rate)
+      })
 
-  #Table data
-  table_trenddata <- reactive({
+  # Table data
+  table_trend_data <- reactive({
     data_trend %>% 
-      subset(loc_name == input$locname_trend & measure %in% input$service_trend &
+      filter(loc_name == input$locname_trend &
+               measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
-      select(c(loc_name, quarter_name, measure, count, rate, los, avlos))
-
-    
+      select(loc_name, quarter_name, measure, count, rate, los, avlos)
   })
 
-    #Plotting 
+    # Plotting 
   output$trend_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
-    #The same if measure DNA rate and no DNA select as service
-    if ((is.data.frame(data_trend_plot()) && nrow(data_trend_plot()) == 0) |
+    
+    # If no data are available for that quarter then plot message
+    # saying data are missing
+    # The same if measure DNA rate and no DNA select as service
+    if ((is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
-         !("Did not attend outpatient appointments" %in% input$service_trend )))
+         !("Did not attend outpatient appointments" %in% input$service_trend)
+         ))
     {
-      #plotting empty plot just with text
+      # Plotting empty plot just with text
       text_na <- list(x = 5, y = 5, text = "No data available" ,
                       xref = "x", yref = "y",  showarrow = FALSE)
       
       plot_ly() %>%
         layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+               
+               # Empty layout
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
       
-    }
-    else {
+    } else {
 
-    #Text for tooltip
+    # Text for tooltip
     tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
                         data_trend_plot()$quarter_name, "<br>",
-                        input$measure_trend, ": ", data_trend_plot()[[input$measure_trend]]))
+                        input$measure_trend, ": ",
+                        data_trend_plot()[[input$measure_trend]]))
 
-    #Plotting time trend
-    plot_ly(data=data_trend_plot(), x=~quarter_date2, 
+    # Plotting time trend
+    plot_ly(data = data_trend_plot(),
+            x = ~quarter_date_last, 
             y = ~get(input$measure_trend), 
-            text=tooltip, hoverinfo="text",
-            type = 'scatter', mode = 'lines+markers',
-            color=~measure, colors = trend_pal) %>% 
-      #Layout
-      layout(annotations = list(), #It needs this because of a buggy behaviour
-             yaxis = list(title = input$measure_trend, rangemode="tozero"), 
-             xaxis = list(title = "Time period"),  #axis parameter
-             hovermode = 'false') %>%  # to get hover compare mode as default
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+            text = tooltip,
+            hoverinfo = "text",
+            type = 'scatter',
+            mode = 'lines+markers',
+            color = ~measure,
+            colors = trend_pal) %>%
+      
+      # Layout
+      layout(annotations = list(), # It needs this due to a buggy behaviour
+             yaxis = list(title = input$measure_trend,
+                          rangemode = "tozero"),
+             
+             # Axis parameter
+             xaxis = list(title = "Time period"),
+             
+             # To get hover compare mode as default
+             hovermode = 'false') %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = F,
+             collaborate = F, editable = F)
     }
     
     }) 
 
-  ######Table
-  output$table_trend <- DT::renderDataTable({
-    DT::datatable(table_trenddata(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 16, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "Number", "DNA rate",
-                               "Total length of stay", "Mean length of stay")  
+  # Table
+  output$table_trend <- renderDataTable({
+    datatable(table_trend_data(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 16, dom = 'tip'),
+              colnames = c("Location", "Quarter", "Type of activity",
+                           "Number", "DNA rate",
+                           "Total length of stay", "Mean length of stay")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+
+      
+  # Downloading data
   output$download_trend <- downloadHandler(
     filename =  'trend_data.csv',
     content = function(file) {
-      write.csv(data_trend_plot(), file) 
+      write_csv(data_trend_plot(), file) 
     }
   )
   
