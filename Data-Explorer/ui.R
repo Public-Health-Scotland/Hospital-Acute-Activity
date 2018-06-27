@@ -1,90 +1,152 @@
-#Syntax to create the data explorer
-#Jaime Villacampa October 17
+################################################################
+### UI
+### Data Explorer script 4 of 5
+###
+### Original Author: Jaime Villacampa
+### Original Date: October 2017
+### Last edited by: Jack Hannah
+### Last edited on: 14 June 2018
+###
+### Written to be run on RStudio Desktop
+###
+### This script creates the user interface of the
+### data explorer
 
-#TODO:
-#see server syntax
 
-############################.
-### Visual interface ----
-############################.
-fluidPage(style="width: 100%; height: 100%; max-width: 1200px; ", 
-          tags$head( 
-            tags$style( #to avoid red text error messages in the whole app, take out for testing
-              type="text/css", ".shiny-output-error { visibility: hidden; }", 
+
+
+### Section 1: Visual interface ----
+
+
+fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", 
+          tags$head(
+            
+            # Prevent red text error messages from appearing
+            # throughout the app
+            tags$style(
+              type = "text/css",
+              ".shiny-output-error { visibility: hidden; }", 
               ".shiny-output-error:before { visibility: hidden; }"
-              ) 
-            ),
+            ) 
+          ),
+          
+          # Create a navigation bar
+          navbarPage("",
+                     
+                     
+                     
+             
+### Section 2: Introduction tab ----   
 
-   navbarPage("", # Navigation bar
-              
-##############################################.             
-##############Introduction tab ----   
-##############################################.     
-    tabPanel("Introduction", icon = icon("info-circle"), style="float: top; height: 95%; 
-              width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
-      column(2,
-             h3("Data explorer")),
-      column(10,
-             p("The data explorer allows you to find the data you want and visualise 
-               it in different ways. Within each of the following five sections there 
-               are filters that let you select the data you are interested in:"),
-      tags$ul( 
-        tags$li(tags$b("Time trend"), " - shows the data over time."),
-        tags$li(tags$b("Age/sex"), " - shows the age and sex distribution of the data."),
-        tags$li(tags$b("Deprivation"), " - shows activity across different levels of deprivation."),
-        tags$li(tags$b("Cross-boundary flow"), " - shows the relationship between where patients live
-                and where they are treated."),
-        tags$li(tags$b("Table"), " - allows you to view the data in a table.")
-        ),
-      p("When using the data explorer please take the following factors into consideration:"),
-      tags$ul( 
-        tags$li("There are issues with the quality of the data presented. 
-                Known issues are summarised in the ", 
-                tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
-                " section. "),
-        tags$li("The data for the most recent quarter is provisional. Provisional data 
-                is subject to change in future publications as submissions may be updated 
-                to reflect a more accurate and complete set of data from NHS Boards."),
-        tags$li("Disclosure control methods have been applied to the data in order to 
-                protect patient confidentiality therefore figures may not be additive.")
-        ),
-      p("If you have any trouble using this tool or you have further questions relating to the data, please contact us at: ",
-        tags$b(tags$a(href="mailto:nss.isdtransformingpublishing@nhs.net", "nss.isdtransformingpublishing@nhs.net")),
-        " and we will be happy to help.")
-      )
-    ), 
-##############################################.             
-##############Time trend tab ----   
-##############################################.     
-tabPanel("Time trend", icon = icon("line-chart"), style="height: 95%; 
-          width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
-          h3("Time trend"),
-         p("This section allows you to see changes over time. You can use the filters 
-           to select the data you are interested in.  To view the data in a table use 
-           the ‘show/hide table’ button. To download your data selection as a csv file 
-           use the ‘download data’ button. If you hover over the chart you will see a 
-           number of buttons which will allow you to select parts of the chart, zoom in 
-           or out or save the chart as an image."),
-         wellPanel(tags$style(".well {background-color:#ffffff; border: 0px solid #336699;}"),
+     
+tabPanel("Introduction", icon = icon("info-circle"),
+         style = "float: top; height: 95%; 
+                  width: 95%; background-color: #ffffff;
+                  border: 0px solid #ffffff;",
+         column(2,
+                h3("Data explorer")),
+         column(10,
+                p("The data explorer allows you to find the data you want
+                  and visualise it in different ways. Within each of the
+                  following five sections there are filters that let you
+                  select the data you are interested in:"),
+                tags$ul( 
+                  tags$li(tags$b("Time trend"),
+                          " - shows the data over time."),
+                  tags$li(tags$b("Age/sex"),
+                          " - shows the age and sex distribution of
+                          the data."),
+                  tags$li(tags$b("Deprivation"),
+                          " - shows activity across different levels
+                          of deprivation."),
+                  tags$li(tags$b("Cross-boundary flow"),
+                          " - shows the relationship between where
+                          patients live and where they are treated."),
+                  tags$li(tags$b("Table"), " - allows you to view the
+                          data in a table.")
+                ),
+                p("When using the data explorer please take the
+                  following factors into consideration:"),
+                tags$ul( 
+                  tags$li("There are issues with the quality of the
+                          data presented. Known issues are summarised
+                          in the ", 
+                          tags$a(
+                            href = paste("http://www.isdscotland.org",
+                                         "/tpp/data-quality",
+                                         sep = ""),
+                            "data quality"), " section."),
+                  tags$li("The data for the most recent quarter are
+                          provisional. Provisional data are subject
+                          to change in future publications as submissions
+                          may be updated to reflect a more accurate and
+                          complete set of data from NHS Boards."),
+                  tags$li("Missing data points within graphs / missing
+                          rows of data within the tables means no data
+                          / activity."),
+                  tags$li("Disclosure control methods have been applied
+                          to the data in order to protect patient
+                          confidentiality therefore figures may not
+                          be additive.")),
+                p("If you have any trouble using this tool or you have
+                  further questions relating to the data, please contact
+                  us at: ",
+                  tags$b(tags$a(
+                    href = "mailto:nss.isdtransformingpublishing@nhs.net",
+                    "nss.isdtransformingpublishing@nhs.net")),
+                  " and we will be happy to help.")
+         )
+),
+
+
+
+### Section 3: Time trend tab ----   
+
+     
+tabPanel("Time trend", icon = icon("line-chart"),
+          style="height: 95%; width: 95%; background-color: #ffffff;
+          border: 0px solid #ffffff;",
+         h3("Time trend"),
+         p("This section allows you to see changes over time. You can
+           use the filters to select the data you are interested in.
+           To view the data in a table use the ‘show/hide table’ button.
+           To download your data selection as a csv file use the
+           ‘download data’ button. If you hover over the chart you will
+           see a number of buttons which will allow you to select parts
+           of the chart, zoom in or out or save the chart as an image."),
+         wellPanel(tags$style(".well {background-color: #ffffff;
+                              border: 0px solid #336699;}"),
                    column(6, uiOutput("geotype_ui_trend")),  
                    column(6, uiOutput("locname_ui_trend")),
-                   column(6, 
-                selectInput("service_trend", label = "Select type of activity", multiple=TRUE, 
-                            choices = trend_service, selectize=TRUE,
-                            selected = c("All inpatients and daycases"))),
-                column(6, selectInput("measure_trend", label = "Select measure", 
-                                      choices = trend_measure, selected = "Number")),
-                column(6, downloadButton(outputId = 'download_trend', 
-                            label = 'Download data', width= "95%"))  
+                   column(6,
+                          selectInput("service_trend",
+                                      label = "Select type of activity",
+                                      multiple = TRUE, 
+                                      choices = trend_service,
+                                      selectize = TRUE,
+                                      selected =
+                                        c("All inpatients and daycases"))
+                          ),
+                   column(6,
+                          selectInput("measure_trend",
+                                      label = "Select measure", 
+                                      choices = trend_measure,
+                                      selected = "Number")),
+                   column(6,
+                          downloadButton(outputId = 'download_trend',
+                                         label = 'Download data',
+                                         width= "95%"))  
          ),
-         mainPanel(width=12,
-         plotlyOutput("trend_plot"),
-         #Button to show hide div where data table is
-         HTML("<button data-toggle='collapse' href='#trend' class='btn btn-primary'>
-                  <strong>Show/hide table</strong></button>"),
-         HTML("<div id='trend' class='collapse'> "),
-         DT::dataTableOutput("table_trend", width="95%"),
-         HTML("</div>")
+         mainPanel(width = 12,
+                   plotlyOutput("trend_plot"),
+                   
+                   # Button to show / hide div where data table is
+                   HTML("<button data-toggle = 'collapse' href = '#trend' 
+                        class='btn btn-primary'>
+                        <strong>Show/hide table</strong></button>"),
+                   HTML("<div id = 'trend' class = 'collapse'> "),
+                   dataTableOutput("table_trend", width = "95%"),
+                   HTML("</div>")
          )
 ),
 ##############################################.             
@@ -223,12 +285,12 @@ tabPanel("Cross-boundary", icon = icon("exchange"), style="float: top; height: 9
              ),
              column(4,  
                     selectInput("hb_flow", label = "Select the board of interest", 
-                                choices = unique(data_cbfip$hbres_name)),
+                                choices = unique(data_cbf_ip$hbres_name)),
                     downloadButton(outputId = 'download_flow', label = 'Download data') 
              ),
              column(4,
                     selectInput("quarter_flow", label = "Select the time period", 
-                                choices = unique(data_cbfip$quarter_name), 
+                                choices = unique(data_cbf_ip$quarter_name), 
                                 selected = latest_quarter) 
              )
          ),

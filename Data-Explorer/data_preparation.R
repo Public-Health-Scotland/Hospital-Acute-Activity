@@ -1,499 +1,594 @@
-#Syntax to create the data explorer
-#In this file include data transformation needed to create data files for data explorer
-#This code does not interfere with the shiny app, it just prepares the data the app will use.
-#Jaime Villacampa December 17
+################################################################
+### Data Preparation
+### Data Explorer script 2 of 5
+###
+### Original Author: Jaime Villacampa
+### Original Date: December 2017
+### Last edited by: Jack Hannah
+### Last edited on: 14 June 2018
+###
+### Written to be run on RStudio Desktop
+###
+### Packages required:
+### readr (for reading csv files);
+### dplyr and tidyr (for data manipulation);
+### zoo (for dates);
+### stringi (for string manipulation)
+###
+### This script creates the files used in the data
+### explorer by manipulating a series of base files
+###
+### With the exception of the Beds, Map and Cross-
+### Boundary data, data manipulation is conducted in
+### the following format and order:
+###
+### Section X: Data
+###
+###
+### X.1 - Inpatient data
+###
+###
+### X.1.1 - Residence data
+###
+### X.1.2 - Treatment data
+###
+### X.1.3 - Combine inpatient files
+###
+###
+### X.2 - Outpatient data
+###
+###
+### X.2.1 - Residence data
+###
+### X.2.2 - Treatment data
+###
+### X.2.3 - Combine outpatient files
+###
+###
+### X.3 - Combine inpatient and outpatient files
+###
+###
+### X.4 - Delete all intermediate files
+###
+###
+### The Beds data isn't split by inpatient and outpatient
+### (or residence and treatment), and the Map and Cross-
+### Boundary data aren't split by residence and treatment
 
-#TODO:
-#see server syntax
 
-############################.
-##Packages ----
-############################.
-library(reshape2) #for melting and dcast
-library(stringr) #manipulation strings
-library(tidyverse) #data manipulation, etc
-library (zoo) #for dates
 
-############################.
-##Filepath ----
-############################.
-basefile_path <- "//stats/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for desktop
-basefile_path <- "/conf/pub_incubator/01 Acute Activity/wrangling/data/base_files/" #for server
+### Section 1: Housekeeping ----
 
-##############################################.             
-##############Beds data ----   
-##############################################. 
-#Data from SPSS method - developed by SCT
-data_bed <- read_csv(paste(basefile_path, "open_data/beds final.csv", sep="")) %>%
-  mutate(value = round(value, 1)) %>% 
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  mutate(measure = recode(measure, "Average Available Staffed Beds" = "aasb", "% Occupancy" = "p_occ")) %>% 
-  dcast(quarter_name + loc_name + spec_name ~ measure,  fun.aggregate = sum)
 
-saveRDS(data_bed, "./data/beds.rds")
-data_bed <- readRDS("./data/beds.rds") 
+# 1.1 - Load libraries
+library(readr)
+library(dplyr)
+library(tidyr)
+library(zoo)
+library(stringi)
 
-#Data from R method - developed by TPP
-# data_bed <- read_csv(paste(basefile_path, "QAcute_Dec17_beds.csv", sep="")) %>%
-#   select(-c(quarter_date, hb_code, hb_name, loc_code)) %>%
-#   mutate_at(c("asb", "aob", "p_occ"), funs(round(.,1))) %>%
-#   mutate_if(is.character, factor) #converting characters into factors
-# 
-# saveRDS(data_bed, "./data/beds.rds")
-# data_bed <- readRDS("./data/beds.rds") 
 
-##############################################.             
-##############Specialty data ----   
-##############################################.     
-#################Ip data
-data_specip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_spec.csv", sep="")) %>%
-  # Excluding Scotland and Golden Jubilee (so no duplicate when merging).
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other ",
-                           ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                  "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+# 1.2 - Define base filepath
+base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
+                       "/wrangling/data/base_files/",
+                       sep = "")
 
-data_specip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_spec.csv", sep="")) %>%
-    mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                             "Health board of treatment",
-                             ifelse(loc_code == "scot", "Scotland",
-                                    ifelse(hb_name == "Null" | hb_name == "Other"
-                                           | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_specip <- rbind(data_specip_treat, data_specip_res) %>%
-  mutate(avlos = round(avlos, 1)) %>%
-  subset(!(is.na(measure))) %>% # a few random null measure cases
-  mutate(file="Inpatients/Day Cases") 
+# 1.3 - Load functions script
+# TO DO - change this when files are moved to the TP folder
+source(paste("C:\\Users\\jackha03\\Documents\\Rshiny",
+             "\\Data-Explorer\\functions.R",
+             sep = ""))
 
-saveRDS(data_specip, "./data/spec_IP.rds")
-data_specip <- readRDS("./data/spec_IP.rds") 
 
-# ###########################.
-# ##################Op data
-data_specop_res <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_spec.csv", sep="")) %>%
-  # Excluding Scotland and Golden Jubilee(so no duplicate when merging)
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                           ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                  "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_specop_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_spec.csv", sep="")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                           "Health board of treatment",
-                           ifelse(loc_code == "scot", "Scotland",
-                                  ifelse(hb_name == "Null", "Other", "Hospital of treatment")))) %>%
-  mutate(rate = as.numeric(rate)) %>% 
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+### Section 2: Beds Data ----
 
-data_specop <- rbind(data_specop_treat, data_specop_res) %>%
-  rename(measure = appt_type) %>%
-  mutate(file="Outpatients") %>%
-  mutate(rate = round(rate, 1))
 
-saveRDS(data_specop, "./data/spec_OP.rds")
+data_bed <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_beds.csv",
+  sep = "")) %>%
+  select(-c(quarter_date, hb_code, hb_name, loc_code)) %>%
+  mutate_at(c("asb", "aob", "p_occ"), funs(round(., 1)))
 
-#Merging both datasets, ip and op.
-data_spec <- bind_rows(data_specop, data_specip) %>% 
-  #excluding others as there are duplicates from both files
-  subset(geo_type != "Other")
+# Save file
+saveRDS(data_bed, paste(
+  base_filepath,
+  "R files/beds.rds",
+  sep = ""))
 
-data_spec$measure <- as.character(data_spec$measure)
-data_spec$measure[data_spec$measure=="New"] <- "New appointments"
-data_spec$measure[data_spec$measure=="Return"] <- "Return appointments"
-data_spec$measure <- as.factor(data_spec$measure)
-data_spec$file <- as.factor(data_spec$file)
 
-data_spec$measure <- data_spec$measure %>% 
-  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
-         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
-         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
-         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
-         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients")
 
-saveRDS(data_spec, "./data/spec_IPOP.rds")
-data_spec <- readRDS("./data/spec_IPOP.rds") 
+### Section 3: Specialty Data ----
 
-##############################################.             
-##############SIMD data ----   
-##############################################.     
-#################Ip data
-data_simdip_res <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_simd.csv", sep="")) %>%
-  # Excluding Scotland and Golden Jubilee (so no duplicate when merging).
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                           ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                  "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_simdip_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_simd.csv", sep="")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                           "Health board of treatment",
-                           ifelse(loc_code == "scot", "Scotland",
-                                  ifelse(hb_name == "Null" | hb_name == "Other"
-                                         | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+# 3.1 - Inpatient data
 
-data_simdip <- rbind(data_simdip_treat, data_simdip_res) %>%
-  mutate(avlos = round(avlos, 1)) %>%
-  mutate(file="Inpatients/Day Cases") %>%
-  subset(!(is.na(measure))) %>% # a few random null measure cases
-  rename(count=stays)
 
-saveRDS(data_simdip, "./data/SIMD_IP.rds")
-data_simdip <- readRDS("./data/SIMD_IP.rds")
+# 3.1.1 - Residence data
+data_spec_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_spec.csv",
+  sep = "")) %>%
+  res()
 
-##########################.
-#################Op data
-data_simdop_res <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_simd.csv", sep="")) %>%
-  # Excluding Scotland and Golden Jubilee(so no duplicate when merging)
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                           ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                               "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_simdop_treat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_simd.csv", sep="")) %>%
-  #Excluding three codes with no name, giving issues
-  subset(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                           "Health board of treatment",
-                           ifelse(loc_code == "scot", "Scotland",
-                                  ifelse(hb_name == "Null" | hb_name == "Other"
-                                         | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+# 3.1.2 - Treatment data
+data_spec_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_spec.csv",
+  sep = "")) %>%
+  treat()
 
-data_simdop <- rbind(data_simdop_treat, data_simdop_res) %>%
-  rename(measure = appt_type) %>%
-  mutate(rate = round(rate, 1)) %>%
-  mutate(file="Outpatients")
 
-saveRDS(data_simdop, "./data/SIMD_OP.rds")
-data_simdop <- readRDS("./data/SIMD_OP.rds")
+# 3.1.3 - Combine inpatient files
+data_spec_ip <- comb_inp(data_spec_ip_treat,
+                         data_spec_ip_res)
 
-# Merging both datasets, ip and op.
-data_simd <- bind_rows(data_simdop, data_simdip) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  subset(loc_name != "Null" & !is.na(simd)) %>% #Excluding Null values
-  droplevels()
 
-data_simd$measure <- as.character(data_simd$measure)
-data_simd$measure[data_simd$measure=="New"] <- "New appointments"
-data_simd$measure[data_simd$measure=="Return"] <- "Return appointments"
-data_simd$measure <- as.factor(data_simd$measure)
-data_simd$file <- as.factor(data_simd$file)
-data_simd$simd <- as.factor(data_simd$simd)
-data_simd$simd <- recode(data_simd$simd, "1" = "1 - Most deprived", "5" = "5 - Least deprived")
+# 3.2 - Outpatient data
 
-data_simd$measure <- data_simd$measure %>% 
-  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
-         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
-         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
-         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
-         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients")
 
-saveRDS(data_simd, "./data/SIMD_IPOP.rds")
-data_simd <- readRDS("./data/SIMD_IPOP.rds")
+# 3.2.1 - Residence data
+data_spec_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_spec.csv",
+  sep = "")) %>%
+  res() %>%
+  convert_dates()
 
-##############################################.             
-##############Time trend data ----   
-##############################################.     
-#################Ip data
-data_trendipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_all.csv", sep="")) %>%
-  # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                             ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                    "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_trendiptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_all.csv", sep="")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                             "Health board of treatment",
-                             ifelse(loc_code == "scot", "Scotland",
-                                    ifelse(hb_name == "Null" | hb_name == "Other"
-                                           | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+# 3.2.2 - Treatment data
+data_spec_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_spec.csv",
+  sep = "")) %>%
+  treat()
 
-data_trendip <- rbind(data_trendiptreat, data_trendipres) %>%
-  mutate(avlos = round(avlos, 1)) %>%
-  mutate(file="Inpatients/Day Cases") %>%
-  subset(!(is.na(measure))) %>% # a few random null measure cases
+
+# 3.2.3 - Combine outpatient files
+data_spec_op <- comb_outp(data_spec_op_treat,
+                          data_spec_op_res)
+
+
+# 3.3 - Combine inpatient and outpatient files
+data_spec <- comb_all(data_spec_op,
+                      data_spec_ip) %>%
+  
+  # Exclude others as there are
+  # duplicates from both files
+  filter(geo_type != "Other")
+
+# Save file
+saveRDS(data_spec, paste(
+  base_filepath,
+  "R files/spec.rds",
+  sep = ""))
+
+
+# 3.4 - Delete all intermediate files
+rm(data_spec_ip_res, data_spec_ip_treat,
+   data_spec_ip, data_spec_op_res,
+   data_spec_op_treat, data_spec_op)
+
+
+
+### Section 4: SIMD Data ----
+
+
+# 4.1 - Inpatient data
+
+
+# 4.1.1 - Residence data
+data_simd_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_simd.csv",
+  sep = "")) %>%
+  res()
+
+
+# 4.1.2 - Treatment data
+data_simd_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_simd.csv",
+  sep = "")) %>%
+  treat()
+
+
+# 4.1.3 - Combine inpatient files
+data_simd_ip <- comb_inp(data_simd_ip_res,
+                         data_simd_ip_treat) %>%
   rename(count = stays)
 
-#For some reason IP and OP have different formatting numbers for dates
-data_trendip$quarter_date2 <- as.yearmon(data_trendip$quarter_date, "%d/%m/%Y") #date format
 
-saveRDS(data_trendip, "./data/trend_IP.rds")
-data_trendip <- readRDS("./data/trend_IP.rds")
+# 4.2 - Outpatient data
 
-##########################.
-#################Op data
-data_trendopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_all.csv", sep="")) %>%
-  # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-    mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                             ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                 "Health board of residence"))) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
 
-data_trendoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_all.csv", sep="")) %>%
-  #Excluding  codes with no name, giving issues
-  subset(!(is.na(loc_name) | loc_name == "NULL")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                             "Health board of treatment",
-                             ifelse(loc_code == "scot", "Scotland",
-                                    ifelse(hb_name == "Null" | hb_name == "Other"
-                                           | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  mutate(rate = as.numeric(rate)) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
+# 4.2.1 - Residence data
+data_simd_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_simd.csv",
+  sep = "")) %>%
+  res() %>%
+  convert_dates()
 
-# For some reason this file is slightly different in date formatting
-data_trendoptreat$quarter_date <- as.factor(gsub("/", "-", data_trendoptreat$quarter_date))
-data_trendoptreat$quarter_date <- as.factor(gsub("20", "", data_trendoptreat$quarter_date))
 
-data_trendop <- rbind(data_trendoptreat, data_trendopres) %>%
-  rename(measure = appt_type)  %>%
-  mutate(rate = round(rate, 1)) %>%
-  mutate(file = "Outpatients")
+# 4.2.2 - Treatment data
+data_simd_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_simd.csv",
+  sep = "")) %>%
+  
+  # Exclude three location codes which have no name
+  filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
+  treat() %>%
+  convert_dates()
 
-data_trendop$measure <- as.character(data_trendop$measure)
-data_trendop$measure[data_trendop$measure=="New"] <- "New appointments"
-data_trendop$measure[data_trendop$measure=="Return"] <- "Return appointments"
-data_trendop$measure <- as.factor(data_trendop$measure)
 
-data_trendop$quarter_date2 <- as.yearmon(data_trendop$quarter_date, "%d-%m-%y") #date format
+# 4.2.3 - Combine outpatient files
+data_simd_op <- comb_outp(data_simd_op_treat,
+                          data_simd_op_res)
 
-saveRDS(data_trendop, "./data/trend_OP.rds")
-data_trendop <- readRDS("./data/trend_OP.rds")
 
-#Merging both datasets, ip and op.
-data_trend <- bind_rows(data_trendop, data_trendip) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  subset(loc_name != "Null") %>% #Excluding Null values
-  #Excluding this, as it is not aggregated and creates issues
-  subset(!(loc_name == "Other" & geo_type == "Other")) %>% 
-  droplevels()
+# 4.3 - Combine inpatient and outpatient files
+data_simd <- comb_all(data_simd_op,
+                      data_simd_ip) %>%
+  
+  # Exclude null values
+  filter(loc_name != "Null") %>%
+  drop_na(simd) %>%
+  
+  # Recode to explain meaning of SIMD
+  mutate(simd = recode(
+    as.character(simd),
+    "1" = "1 - Most deprived",
+    "5" = "5 - Least deprived"
+    ))
 
-data_trend <- data_trend %>% arrange(quarter_date2) #sorting by date, so no odd plotting issues
+# Save file
+saveRDS(data_simd, paste(
+  base_filepath,
+  "R files/simd.rds",
+  sep = ""))
 
-data_trend$measure <- data_trend$measure %>% 
-  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
-         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
-         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
-         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
-         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients") 
 
-saveRDS(data_trend, "./data/trend_IPOP.rds")
-data_trend <- readRDS("./data/trend_IPOP.rds") 
+# 4.4 - Delete all intermediate files
+rm(data_simd_ip_res, data_simd_ip_treat,
+   data_simd_ip, data_simd_op_res,
+   data_simd_op_treat, data_simd_op)
 
-##############################################.             
-##############Population pyramid data ----   
-##############################################.     
-#################Ip data
-data_pyramid_ipres <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_agesex.csv", sep="")) %>%
-  # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-    mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                             ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                    "Health board of residence"))) %>%
-  separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  select(-c(hb_code, hb_name, loc_code)) %>%
-  droplevels()
 
-data_pyramid_iptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_treat_agesex.csv", sep="")) %>%
-    mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                             "Health board of treatment",
-                             ifelse(loc_code == "scot", "Scotland",
-                                    ifelse(hb_name == "Null" | hb_name == "Other"
-                                           | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  select(-c(hb_code, hb_name, loc_code)) %>%
-  droplevels()
 
-data_pyramidip <- rbind(data_pyramid_iptreat, data_pyramid_ipres) %>%
+### Section 5: Time Trend Data ----
+
+
+# 5.1 - Inpatient data
+
+
+# 5.1.1 - Residence data
+data_trend_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_all.csv",
+  sep = "")) %>%
+  res()
+
+
+# 5.1.2 - Treatment data
+data_trend_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_all.csv",
+  sep = "")) %>%
+  treat()
+
+
+# 5.1.3 - Combine inpatient files
+data_trend_ip <- comb_inp(data_trend_ip_treat,
+                          data_trend_ip_res) %>%
+  rename(count = stays)
+
+
+# 5.2 - Outpatient data
+
+
+# 5.2.1 - Residence data
+data_trend_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_all.csv",
+  sep = "")) %>%
+  res() %>%
+  convert_dates()
+
+
+# 5.2.2 - Treatment data
+data_trend_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_all.csv",
+  sep = "")) %>%
+  treat()
+
+
+# 5.2.3 - Combine outpatient files
+data_trend_op <- comb_outp(data_trend_op_treat,
+                           data_trend_op_res)
+
+
+# 5.3 - Combine inpatient and outpatient files
+data_trend <- comb_all(data_trend_op,
+                       data_trend_ip) %>%
+  
+  # Exclude null values and non-aggregated
+  # 'Other' values
+  filter(!(loc_name %in% c("Null", "Other") &
+             geo_type == "Other")) %>%
+  
+  # Create a new column representing the last month
+  # in each financial quarter
+  # This will be used as the x-axis in a shiny plot
+  mutate(quarter_date_last = as.yearmon(quarter_date,
+                                        "%d/%m/%Y")) %>%
+  
+  # Arrange by date for later plotting
+  arrange(quarter_date_last)
+
+# Save file
+saveRDS(data_trend, paste(
+  base_filepath,
+  "R files/trend.rds",
+  sep = ""))
+
+
+# 5.4 - Delete all intermediate files
+rm(data_trend_ip_res, data_trend_ip_treat,
+   data_trend_ip, data_trend_op_res,
+   data_trend_op_treat, data_trend_op)
+
+
+
+### Section 6: Population Pyramid Data ----
+
+
+# 6.1 - Inpatient data
+
+
+# 6.1.1 - Residence data
+data_pyramid_ip_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_agesex.csv",
+  sep = "")) %>%
+  res() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.1.2 - Treatment data
+data_pyramid_ip_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_treat_agesex.csv",
+  sep = "")) %>%
+  treat() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.1.3 - Combine inpatient files
+data_pyramid_ip <- comb_inp(data_pyramid_ip_treat,
+                            data_pyramid_ip_res) %>%
+  rename(count = stays)
+
+
+# 6.2 - Outpatient data
+
+
+# 6.2.1 - Residence data
+data_pyramid_op_res <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_agesex.csv",
+  sep = "")) %>%
+  res() %>%
+  convert_dates() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.2.2 - Treatment data
+data_pyramid_op_treat <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_treat_agesex.csv",
+  sep = "")) %>%
+  treat() %>%
+  convert_dates() %>%
+  
+  # Split sex and age into two columns
+  separate(sex_age, c("sex", "age"), "\\s") %>%
+  select(-c(hb_code, hb_name, loc_code))
+
+
+# 6.2.3 - Combine outpatient files
+data_pyramid_op <- comb_outp(data_pyramid_op_treat,
+                             data_pyramid_op_res)
+
+
+# 6.3 - Combine inpatient and outpatient files
+data_pyramid <- comb_all(data_pyramid_op,
+                         data_pyramid_ip) %>%
+  
+  # Exclude null values
+  filter(loc_name != "Null") %>%
+  
+  # Create a new column representing the last month
+  # in each financial quarter
+  mutate(quarter_date_last = as.yearmon(quarter_date,
+                                        "%d/%m/%Y"))
+
+# Save file
+saveRDS(data_pyramid, paste(
+  base_filepath,
+  "R files/pyramid.rds",
+  sep = ""))
+
+
+# 6.4 - Delete all intermediate files
+rm(data_pyramid_ip_res, data_pyramid_ip_treat,
+   data_pyramid_ip, data_pyramid_op_res,
+   data_pyramid_op_treat, data_pyramid_op)
+
+
+
+### Section 7: Map Data ----
+
+
+# 7.1 - Inpatient data
+data_map_ipdc <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_stays_res_all.csv",
+  sep = "")) %>%
+  
+  # Exclude Scotland, Golden Jubilee and
+  # non-territorial codes
+  # NOTE - the original code removed rows where
+  # loc_name == "Others", but there are no entries
+  # with this value, so assuming that meant exclude
+  # values equal to either "Scotland" or "Other"
+  filter(!(loc_name %in% c("Scotland", "Other") |
+             hb_name %in% c("Scotland", "Other"))) %>%
+  
+  # Create a dummy variable for crude rate, and
+  # labels for the map tooltip
+  mutate(crude_rate = seq(1:5799),
+         labs = paste0(
+           loc_name, '</br>', 'Admissions: ',
+           stays, '</br>', 'Crude rate: ',
+           crude_rate)) %>%
+  
+  # Convert to long format to allow multiple selections in
+  # the map
+  gather("value_type", "value", c("stays", "crude_rate")) %>%
+  mutate(value_type = recode(
+    value_type,
+    "stays" = "Admissions",
+    "crude_rate" = "Crude rate"
+  ))
+
+# Save file
+saveRDS(data_map_ipdc, paste(
+  base_filepath,
+  "R files/map_ipdc.rds",
+  sep = ""))
+
+
+# 7.2 - Outpatient data
+data_map_op <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_OP_res_all.csv",
+  sep = "")) %>%
+  convert_dates() %>%
+  
+  # Exclude Scotland, Golden Jubilee and
+  # non-territorial codes
+  filter(!(loc_name %in% c("Scotland", "Other") |
+             hb_name %in% c("Scotland", "Other"))) %>%
+  
+  # Create a dummy variable for crude rate, and
+  # labels for the map tooltip
+  mutate(crude_rate = seq(1:1932),
+         labs = paste0(
+           loc_name, '</br>', 'Appointments: ',
+           count, '</br>', 'Rate: ',
+           crude_rate)) %>%
+  
+  # Convert to long format to allow multiple selections in
+  # the map
+  gather("value_type", "value", c("count", "rate", "crude_rate")) %>%
+  
+  drop_na(value) %>%
+  mutate(value_type = recode(
+    value_type,
+    "count" = "Appointments",
+    "rate" = "DNA rate",
+    "crude_rate" = "Crude rate"
+  ))
+
+# Save file
+saveRDS(data_map_op, paste(
+  base_filepath,
+  "R files/map_op.rds",
+  sep = ""))
+
+
+
+### Section 8: Cross-Boundary Data ----
+
+
+# 8.1 - Inpatient data
+data_cbf_ip <- read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_IPDC_cbf.csv",
+  sep = "")) %>%
+  
+  # Select health boards only
+  filter(hbtreat_name != "Non-NHS Provider" &
+           hbres_name != "Other") %>%
+  
+  select(-c(hbtreat_currentdate, hbres_currentdate,
+            episodes)) %>%
   rename(count = stays) %>%
-  subset(!(is.na(measure))) %>% # a few random null measure cases
-  mutate(file = "Inpatients/Day Cases")
+  
+  # Create a duplicate variable of hbtreat_name
+  # but add a space at the end
+  # This is to create unique labels for from/to
+  # for the Sankey diagram
+  mutate(hb_treat_space = paste0(hbtreat_name, " ")) %>%
+  
+  # To reduce the length of the tooltip, remove 'NHS'
+  # from the name of all health board variables
+  mutate_at(vars(contains("hb")),
+            funs(stri_replace_first_fixed(., "NHS ", "")))
 
-saveRDS(data_pyramidip, "./data/pyramid_IP.rds")
-data_pyramidip <- readRDS("./data/pyramid_IP.rds")
+# Save file
+saveRDS(data_cbf_ip, paste(
+  base_filepath,
+  "R files/cbf_ip.rds",
+  sep = ""))
 
-###########################.
-##################Op data
-data_pyramidopres <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_agesex.csv", sep="")) %>%
-  # Excluding Scotland (so no duplicate when merging) and non-territorial codes.
-  subset(!(loc_name %in% c("Scotland", 'Golden Jubilee National Hospital'))) %>%
-  mutate(geo_type = ifelse(hb_name == "Other" | hb_name == "Null" | loc_name == "Other", "Other",
-                             ifelse(substr(loc_code, 1, 3) == "S12", "Council area of residence",
-                                 "Health board of residence"))) %>%
-  separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  select(-c(hb_code, hb_name, loc_code)) %>%
-  droplevels()
 
-data_pyramidoptreat <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_treat_agesex.csv", sep="")) %>%
-  #Excluding  codes with no name, giving issues
-  subset(!(is.na(loc_name) | loc_name == "NULL")) %>%
-  mutate(geo_type = ifelse(substr(loc_code, 1, 3) == "S08",
-                             "Health board of treatment",
-                             ifelse(loc_code == "scot", "Scotland",
-                                    ifelse(hb_name == "Null" | hb_name == "Other"
-                                           | loc_name == "Other", "Other", "Hospital of treatment")))) %>%
-  separate(sex_age, c("sex", "age"), " ") %>% #Splitting into 2 columns
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  select(-c(hb_code, hb_name, loc_code)) %>%
-  droplevels()
+# 8.2 - Outpatient data
+data_cbf_op <-  read_csv(paste(
+  base_filepath,
+  "QAcute_Dec17_outpats_cbf.csv",
+  sep = "")) %>%
+  convert_dates() %>%
+  
+  # Select health boards only
+  filter(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) &
+           hbres_name != "Other") %>%
+  
+  select(-c(hbtreat_currentdate, hbres_currentdate)) %>%
+  rename(count = attendances) %>%
+  
+  # Create a duplicate variable of hbtreat_name
+  # but add a space at the end
+  # This is to create unique labels for from/to
+  # for the Sankey diagram
+  mutate(hb_treat_space = paste0(hbtreat_name, " ")) %>%
+  
+  # To reduce the length of the tooltip, remove 'NHS'
+  # from the name of all health board variables
+  mutate_at(vars(contains("hb")),
+            funs(stri_replace_first_fixed(., "NHS ", "")))
 
-data_pyramidop <- rbind(data_pyramidoptreat, data_pyramidopres) %>%
-  rename(measure = appt_type) %>%
-  mutate(rate = round(rate, 1)) %>% 
-  mutate(file="Outpatients")
+# Save file
+saveRDS(data_cbf_op, paste(
+  base_filepath,
+  "R files/cbf_op.rds",
+  sep = ""))
 
-saveRDS(data_pyramidop, "./data/pyramid_OP.rds")
-data_pyramidop <- readRDS("./data/pyramid_OP.rds")
 
-#Merging both datasets, ip and op.
-data_pyramid <- bind_rows(data_pyramidop, data_pyramidip) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  subset(loc_name != "Null") %>% #Excluding Null values
-  droplevels()
-data_pyramid$quarter_date2 <- as.yearmon(data_pyramid$quarter_date, "%d-%m-%y") #date format
 
-data_pyramid$measure <- as.character(data_pyramid$measure)
-data_pyramid$measure[data_pyramid$measure=="New"] <- "New appointments"
-data_pyramid$measure[data_pyramid$measure=="Return"] <- "Return appointments"
-data_pyramid$measure <- as.factor(data_pyramid$measure)
-data_pyramid$avlos <- round(data_pyramid$avlos,1)
-
-data_pyramid$measure <- data_pyramid$measure %>% 
-  recode("DNA" = "Did not attend outpatient appointments", "Transfers" = "Inpatient transfers",
-         "All Appointments" = "All outpatient appointments", "New appointments" = "New outpatient appointments",
-         "Return appointments" = "Return outpatient appointments", "All Inpatients" = "All inpatients",
-         "All Inpatients and Daycases" = "All inpatients and daycases", "All Daycases" = "All daycases",
-         "Emergency Inpatients" = "Emergency inpatients", "Elective Inpatients" = "Elective inpatients") 
-
-saveRDS(data_pyramid, "./data/pyramid_IPOP.rds")
-data_pyramid <- readRDS("./data/pyramid_IPOP.rds")
-
-##############################################.             
-##############Map data ----   
-##############################################.     
-#################Ip data
-data_mapipdc <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_stays_res_all.csv", sep="")) %>%
-  subset(!(loc_name %in% c("Others"))) %>%  # Excluding Scotland, Golden Jubilee and non-territorial codes.
-  subset(!(hb_name %in% c("Scotland", "Other"))) %>%  # Excluding Scotland, Golden Jubilee and non-territorial codes.
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
-
-## Temporal solution for crude rate - dummy variable
-#data_mapipdc$cruderate <- round(data_mapipdc$cruderate, 0) # rounding to 0
-data_mapipdc$cruderate <- 1:5047 #dummy variable for now
-#data_mapipdc$quarter_date <- as.yearmon(data_mapipdc$quarter_date, "%d-%m-%y") #date format
-
-#Creating labels for map tooltip
-data_mapipdc$labs <- paste0( data_mapipdc$loc_name, '</br>', 'Admissions: ', data_mapipdc$stays,
-                     '</br>', 'Crude rate: ', data_mapipdc$cruderate)
-
-#Long format to allow multiple selections in map
-data_mapipdc <- data_mapipdc %>% melt(measure.vars = c("stays","cruderate"), variable.name="value_type")
-data_mapipdc$value_type <- data_mapipdc$value_type %>% recode("stays" = "Admissions", "cruderate" = "Crude rate")
-
-saveRDS(data_mapipdc, "./data/ipdc_map.rds")
-data_mapipdc <- readRDS("./data/ipdc_map.rds")
-
-###########################.
-##################Op data
-data_mapop <- read_csv(paste(basefile_path, "QAcute_Dec17_OP_res_all.csv", sep="")) %>%
-  subset(!(loc_name %in% c("Other", "Scotland"))) %>%  # Excluding Scotland, Golden Jubilee and non-territorial codes.
-  subset(!(hb_name %in% c("Scotland", "Other"))) %>%  # Excluding Scotland, Golden Jubilee and non-territorial codes.
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels()
-
-# ## Temporal solution for crude rate - dummy variable
-data_mapop$cruderate <- 1:3496 #dummy variable for now
-#data_mapop$rate[is.na(data$rate)] <- sample(10:100, size=sum(is.na(data_mapop$rate)), replace=T)
-# data_mapop$quarter_date <- as.yearmon(data_mapop$quarter_date, "%d-%m-%y") #date format
-
-# #Creating labels for map tooltip
-data_mapop$labs <- paste0( data_mapop$loc_name, '</br>', 'Appointments: ', data_mapop$count,
-                     '</br>', 'Rate: ', data_mapop$cruderate)
-
-#Long format to allow multiple selections in map
-data_mapop <- data_mapop %>% melt(measure.vars = c("count","rate", "cruderate"),
-                      variable.name="value_type") %>%
-  filter(!is.na(value))
-
-data_mapop$value_type <- data$value_type %>%
-  recode("count" = "Appointments", "rate" = "DNA rate", "cruderate"="Crude rate")
-
-saveRDS(data, "./data/op_map.rds")
-
-data_mapop <- readRDS("./data/op_map.rds")
-
-##############################################.             
-##############Cross-boundary data ----   
-##############################################.     
-#Ip data
-data_cbfip <- read_csv(paste(basefile_path, "QAcute_Dec17_IPDC_cbf.csv", sep="")) %>%
-  subset(!(hbtreat_name %in% c("Non-NHS Provider")) #only Health boards
-         & !(hbres_name %in% c("Other"))) %>%  #only Health boards
-  select(-c(hbtreat_currentdate, hbres_currentdate, episodes)) %>%
-  rename(count=stays) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-  droplevels() #dropping missing factor levels
-
-#The Sankey diagram dislike duplicates - so set unique labels for from/to
-data_cbfip$hbtreat_name2 <- paste0(data_cbfip$hbtreat_name,' ')
-
-#Taking out the NHS part from the names, to reduce length of tooltips
-data_cbfip$hbtreat_name2 <- data_cbfip$hbtreat_name2  %>% str_replace("NHS ", "")
-data_cbfip$hbtreat_name <- data_cbfip$hbtreat_name  %>% str_replace("NHS ", "")
-data_cbfip$hbres_name <- data_cbfip$hbres_name  %>% str_replace("NHS ", "")
-
-saveRDS(data_cbfip, "./data/ipdc_crossbf.rds")
-data_cbfip <- readRDS("./data/ipdc_crossbf.rds") 
-
-#Me trying to modify correctly the dates.
-# data_cbfip$quarter_name2 <- data_cbfip$quarter_name #This variable is created to be displayed in the table correctly
-# data_cbfip$quarter_date2 <- as.yearmon(data_cbfip$quarter_date, "%b-%y")
-# 
-# data_cbfip[sort(order(data_cbfip$quarter_date)[])]
-
-#Op data
-data_cbfop <-  read_csv(paste(basefile_path, "QAcute_Dec17_outpats_cbf.csv", sep="")) %>%
-    subset(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) #only Health boards
-           & !(hbres_name %in% c("Other"))) %>%  #only Health boards
-    select(-c(hbtreat_currentdate, hbres_currentdate)) %>%
-  mutate_if(is.character, factor) %>% #converting characters into factors
-    rename(count=attendances) %>%
-    droplevels()
-
-#The Sankey diagram dislike duplicates - so set unique labels for from/to
-data_cbfop$hbtreat_name2 <- paste0(data_cbfop$hbtreat_name,' ')
-
-#Taking out the NHS part from the names
-data_cbfop$hbtreat_name <- data_cbfop$hbtreat_name  %>% str_replace("NHS ", "")
-data_cbfop$hbtreat_name2 <- data_cbfop$hbtreat_name2  %>% str_replace("NHS ", "")
-data_cbfop$hbres_name <- data_cbfop$hbres_name  %>% str_replace("NHS ", "")
-
-saveRDS(data_cbfop, "./data/op_crossbf.rds")
-data_cbfop <- readRDS("./data/op_crossbf.rds") 
-
-####################   END   #######################################.
+### END OF SCRIPT ###
