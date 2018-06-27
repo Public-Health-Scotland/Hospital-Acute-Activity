@@ -72,9 +72,8 @@ tabPanel("Introduction", icon = icon("info-circle"),
                           data presented. Known issues are summarised
                           in the ", 
                           tags$a(
-                            href = paste("http://www.isdscotland.org",
-                                         "/tpp/data-quality",
-                                         sep = ""),
+                            href = paste0("http://www.isdscotland.org",
+                                         "/tpp/data-quality"),
                             "data quality"), " section."),
                   tags$li("The data for the most recent quarter are
                           provisional. Provisional data are subject
