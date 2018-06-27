@@ -44,9 +44,8 @@ library(zoo)
 
 
 # 1.2 - Define base filepath
-base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
-                       "/wrangling/data/base_files/",
-                       sep = "")
+base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
+                        "/wrangling/data/base_files/")
 
 
 
@@ -54,55 +53,47 @@ base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
 
 
 # Beds data
-data_bed <- readRDS(paste(
+data_bed <- readRDS(paste0(
   base_filepath,
-  "R files/beds.rds",
-  sep = ""))
+  "R files/beds.rds"))
 
 # Specialty data
-data_spec <- readRDS(paste(
+data_spec <- readRDS(paste0(
   base_filepath,
-  "R files/spec.rds",
-  sep = ""))
+  "R files/spec.rds"))
 
 # SIMD data
-data_simd <- readRDS(paste(
+data_simd <- readRDS(paste0(
   base_filepath,
-  "R files/simd.rds",
-  sep = ""))
+  "R files/simd.rds"))
 
 # Time Trend data
-data_trend <- readRDS(paste(
+data_trend <- readRDS(paste0(
   base_filepath,
-  "R files/trend.rds",
-  sep = ""))
+  "R files/trend.rds"))
 
 # Population Pyramid data
-data_pyramid <- readRDS(paste(
+data_pyramid <- readRDS(paste0(
   base_filepath,
-  "R files/pyramid.rds",
-  sep = ""))
+  "R files/pyramid.rds"))
 
 # Map data (outpatients)
 # Not in use at the moment
-# data_map_op <- readRDS(paste(
+# data_map_op <- readRDS(paste0(
 #   base_filepath,
-#   "R files/map_op.rds",
-#   sep = ""))
+#   "R files/map_op.rds"))
 
 # Cross-Boundary data
 
 # Inpatients
-data_cbf_ip <- readRDS(paste(
+data_cbf_ip <- readRDS(paste0(
   base_filepath,
-  "R files/cbf_ip.rds",
-  sep = ""))
+  "R files/cbf_ip.rds"))
 
 # Outpatients
-data_cbf_op <- readRDS(paste(
+data_cbf_op <- readRDS(paste0(
   base_filepath,
-  "R files/cbf_op.rds",
-  sep = ""))
+  "R files/cbf_op.rds"))
 
 
 
