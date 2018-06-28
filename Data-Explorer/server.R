@@ -54,9 +54,10 @@ function(input, output) {
   })
   
   output$locname_ui_trend <- renderUI({
-    selectInput("locname_trend", "Select the location", 
+    selectInput("locname_trend",
+                "Select the location",
                 choices = data_trend %>%
-                  filter(geo_type == input$geotype_trend) %>%
+                  subset(geo_type == input$geotype_trend) %>%
                   distinct(loc_name) %>%
                   arrange(loc_name) %>%
                   pull(loc_name),
@@ -69,7 +70,7 @@ function(input, output) {
 
   data_trend_plot <- reactive({
     data_trend %>% 
-      filter(loc_name == input$locname_trend &
+      subset(loc_name == input$locname_trend &
                measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
       rename("Total length of stay (days)" = los,
@@ -81,7 +82,7 @@ function(input, output) {
   # Table data
   table_trend_data <- reactive({
     data_trend %>% 
-      filter(loc_name == input$locname_trend &
+      subset(loc_name == input$locname_trend &
                measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
       select(loc_name, quarter_name, measure, count, rate, los, avlos)
@@ -177,96 +178,130 @@ function(input, output) {
     }
   )
   
-  ##############################################.             
-  ##############Population pyramid----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+             
+  ### Population pyramid----   
+    
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_pyramid <- renderUI({
-    selectInput("geotype_pyramid", label = "Select the type of location", 
-                choices = geo_types, selected =  "Scotland")
+    selectInput("geotype_pyramid",
+                label = "Select the type of location", 
+                choices = geo_types,
+                selected =  "Scotland")
   })
   
   output$locname_ui_pyramid <- renderUI({
-    selectInput("locname_pyramid", "Select the location", 
-                choices = sort(unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid])),
+    selectInput("locname_pyramid",
+                "Select the location",
+                choices = data_pyramid %>%
+                  subset(geo_type == input$geotype_pyramid) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                #choices = sort(unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid])),
                 selectize = TRUE, selected = "Scotland")
   })
   
-  #Reactive datasets
+  # Reactive datasets
   data_pyramid_plot <- reactive({data_pyramid %>% 
       subset(loc_name == input$locname_pyramid & 
                measure == input$measure_pyramid &
                geo_type == input$geotype_pyramid &
-               quarter_name == input$quarter_pyramid) %>% 
-      mutate(count = ifelse(sex=="Male", -(count), count)) # so it plots correcttly and no stacked bars
+               quarter_name == input$quarter_pyramid) %>%
+      
+      # So the graph plots correctly with no stacked bars
+      mutate(count = ifelse(sex == "Male", -(count), count))
   })
   
-  #Table data
+  # Table data
   data_table_pyramid <- reactive({
     data_pyramid_plot() %>% 
-      select(loc_name, quarter_name, measure, age, sex, count) %>% 
-      mutate(count = abs(count)) #to go back to positive values
+      select(loc_name, quarter_name, measure, age, sex, count) %>%
+      
+      # To go back to positive values
+      mutate(count = abs(count))
   })
   
-  #Plotting pyramid population chart
+  # Plotting pyramid population chart
   output$pyramid_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
+    
+    # If no data available for that quarter then plot message saying data is missing
     if (is.data.frame(data_pyramid_plot()) && nrow(data_pyramid_plot()) == 0)
     {
-    #plotting empty plot just with text
-    text_na <- list(x = 5, y = 5, text = "No data available" ,
+      
+    # Plotting empty plot just with text
+    text_na <- list(x = 5, y = 5, text = "No data available",
       xref = "x", yref = "y",  showarrow = FALSE)
     
     plot_ly() %>%
       layout(annotations = text_na,
-             #empty layout
+             
+             # empty layout
              yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-             xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-      config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+             xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>%
       
-    }
-    else {
-    #Breaks and labels for plot
-    breaks <- round(max(abs(data_pyramid_plot()$count))/3)
+      # Take out plotly logo and collaborate button
+      config(displayModeBar = FALSE)
+      
+    } else {
+    
+    # Breaks and labels for plot
+    breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
     max <- round(max(abs(data_pyramid_plot()$count)))
     
-    #Calculate breaks and labels for x axis
+    # Calculate breaks and labels for x axis
     brks <- c(seq(-max, 0, breaks), seq(breaks, max, breaks))
     lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
                                   seq(breaks, max, breaks))))
     
-    #Text for tooltip
-    tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ", data_pyramid_plot()$age, "<br>",
-                           "Number: ", abs(data_pyramid_plot()$count)))
+    # Text for tooltip
+    tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ",
+                            data_pyramid_plot()$age, "<br>",
+                           "Number: ",
+                           abs(data_pyramid_plot()$count)))
     
-    plot_ly(data=data_pyramid_plot(), x= ~count, y=~age, color=~sex, colors = trend_pal,
-            text=tooltip_pyr, hoverinfo="text") %>% 
+    plot_ly(data=data_pyramid_plot(),
+            x = ~count,
+            y = ~age,
+            color = ~sex,
+            colors = trend_pal,
+            text = tooltip_pyr,
+            hoverinfo="text") %>% 
       add_bars(orientation = 'h') %>%
-      layout(bargap = 0.1, barmode = 'overlay',
+      layout(bargap = 0.1,
+             barmode = 'overlay',
              yaxis = list(title = "Age"), 
-             xaxis = list(tickmode = 'array', tickvals = brks,
-                          ticktext = lbls, showline = TRUE,
-                          title = paste("Number of", input$measure_pyramid))) %>% 
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+             xaxis = list(tickmode = 'array',
+                          tickvals = brks,
+                          ticktext = lbls,
+                          showline = TRUE,
+                          title = paste("Number of", input$measure_pyramid))) %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = F, collaborate=F, editable =F)
     
     }
   }) 
 
-  ######Table
-  output$table_pyramid <- DT::renderDataTable({
-    DT::datatable(data_table_pyramid(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "Age", "Sex", "Number")  
+  # Table
+  output$table_pyramid <- renderDataTable({
+    datatable(data_table_pyramid(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20, dom = 'tip'),
+              colnames = c("Location", "Quarter", "Type of activity", "Age", "Sex", "Number")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+  
+     
+  # Downloading data ----
   output$download_pyramid <- downloadHandler(
     filename =  'agesex_data.csv',
     content = function(file) {
-      write.csv(data_pyramid_plot(), file) 
+      write_csv(data_pyramid_plot(), file) 
     }
   )
   
