@@ -145,7 +145,8 @@ tabPanel("Time trend",
                         class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id = 'trend' class = 'collapse'> "),
-                   dataTableOutput("table_trend", width = "95%"),
+                   dataTableOutput("table_trend",
+                                   width = "95%"),
                    HTML("</div>")
          )
 ),
@@ -153,6 +154,8 @@ tabPanel("Time trend",
 
             
 ### Section 4: Population pyramid tab ----
+
+
 tabPanel("Age/sex",
          icon = icon("bar-chart"),
          style="float: top; height: 95%; 
@@ -162,36 +165,57 @@ tabPanel("Age/sex",
             of the data. You can use the filters to select the data you are
             interested in. To view the data in a table use the ‘show/hide table’
             button. To download your data selection as a csv file use the
-            ‘download data’ button. If you hover over the chart you will see a
+            ‘download data’ button. If you hover over the chart you will see a 
             number of buttons which will allow you to select parts of the chart,
-           zoom in or out or save the chart as an image."),
+            zoom in or out or save the chart as an image."),
          wellPanel(
                    column(4, uiOutput("geotype_ui_pyramid")),  
                    column(4, uiOutput("locname_ui_pyramid")),
-                   column(4, selectInput("quarter_pyramid", label = "Select the time period", 
-                               choices = unique(data_pyramid$quarter_name), 
-                               selected = latest_quarter, width= "95%")), 
-                   column(9, selectInput("measure_pyramid", label = "Select the type of activity", 
-                               choices = pyramid_service, selectize=TRUE,
-                               selected = c("All inpatients and daycases"))),
-                   column(3, br(), downloadButton(outputId = 'download_pyramid', 
-                                            label = 'Download data', width= "95%"))  #For downloading the data
+                   column(4,
+                          selectInput("quarter_pyramid",
+                                      label = "Select the time period",
+                                      choices = data_pyramid %>%
+                                        distinct(quarter_name) %>%
+                                        pull(quarter_name),
+                                      selected = latest_quarter,
+                                      width = "95%")), 
+                   column(9,
+                          selectInput("measure_pyramid",
+                                      label = "Select the type of activity",
+                                      choices = pyramid_service,
+                                      selectize=TRUE,
+                                      selected = c("All inpatients and daycases"))),
+                   column(3,
+                          br(),
+                          
+                          # For downloading the data
+                          downloadButton(outputId = 'download_pyramid',
+                                         label = 'Download data',
+                                         width= "95%"))
          ),
-         mainPanel(width=12,
+         mainPanel(width = 12,
                    plotlyOutput("pyramid_plot"),
-                   #Button to show hide div where data table is
-                   HTML("<button data-toggle='collapse' href='#pyramid' class='btn btn-primary'>
+                   
+                   # Button to show hide div where data table is
+                   HTML("<button data-toggle='collapse' href='#pyramid' 
+                        class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='pyramid' class='collapse'> "),
-                   DT::dataTableOutput("table_pyramid", width="95%"),
+                   dataTableOutput("table_pyramid",
+                                   width = "95%"),
                    HTML("</div>")
-                   )
+         )
 ),
-##############################################.             
-##############Deprivation (SIMD) tab ----   
-##############################################.     
-tabPanel("Deprivation", icon = icon("user-circle-o"), style="float: top; height: 95%; 
-         width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
+
+
+           
+### Section 5: Deprivation (SIMD) tab ----   
+   
+
+tabPanel("Deprivation",
+         icon = icon("user-circle-o"),
+         style = "float: top; height: 95%; width: 95%;
+         background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
          p("This section allows you to explore the data by different levels of ", 
            tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", "deprivation"), 
@@ -203,22 +227,38 @@ tabPanel("Deprivation", icon = icon("user-circle-o"), style="float: top; height:
          wellPanel(
            column(4, uiOutput("geotype_ui_simd")),  
            column(4, uiOutput("locname_ui_simd")),
-           column(4, selectInput("quarter_simd", label = "Select the time period", 
-                                 choices = unique(data_simd$quarter_name), 
-                                 selected=latest_quarter, width= "95%")), 
-           column(9, selectInput("measure_simd", label = "Select the type of activity", 
-                                 choices = pyramid_service, selectize=TRUE,
-                                 selected = c("All inpatients and daycases"))),
-           column(3, downloadButton(outputId = 'download_simd', 
-                                    label = 'Download data', width= "95%"))  #For downloading the data
-         ),
-         mainPanel(width=12,
+           column(4,
+                  selectInput("quarter_simd",
+                              label = "Select the time period",
+                              choices = data_simd %>%
+                                distinct(quarter_name) %>%
+                                pull(quarter_name),
+                              selected = latest_quarter,
+                              width = "95%")), 
+           column(9,
+                  selectInput("measure_simd",
+                              label = "Select the type of activity",
+                              choices = pyramid_service,
+                              selectize = TRUE,
+                              selected = c("All inpatients and daycases"))),
+           
+           # For downloading the data
+           column(3,
+                  downloadButton(outputId = 'download_simd', 
+                                    label = 'Download data',
+                                 width= "95%"))),
+         
+         
+         mainPanel(width = 12,
                    plotlyOutput("simd_plot"),
-                   #Button to show/hide div where data table is
-                   HTML("<button data-toggle='collapse' href='#simd' class='btn btn-primary'>
+                   
+                   # Button to show/hide div where data table is
+                   HTML("<button data-toggle='collapse' href='#simd' 
+                        class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='simd' class='collapse'> "),
-                   DT::dataTableOutput("table_simd", width="95%"),
+                   dataTableOutput("table_simd",
+                                   width = "95%"),
                    HTML("</div>")
                    )
 ),

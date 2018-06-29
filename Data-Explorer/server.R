@@ -154,8 +154,9 @@ function(input, output) {
              hovermode = 'false') %>%
       
       # Take out plotly logo and collaborate button
-      config(displaylogo = F,
-             collaborate = F, editable = F)
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     }
     
     }) 
@@ -192,7 +193,7 @@ function(input, output) {
   output$geotype_ui_pyramid <- renderUI({
     selectInput("geotype_pyramid",
                 label = "Select the type of location", 
-                choices = geo_types,
+                choices = geo_type,
                 selected =  "Scotland")
   })
   
@@ -204,8 +205,8 @@ function(input, output) {
                   distinct(loc_name) %>%
                   arrange(loc_name) %>%
                   pull(loc_name),
-                #choices = sort(unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid])),
-                selectize = TRUE, selected = "Scotland")
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
   # Reactive datasets
@@ -272,7 +273,7 @@ function(input, output) {
             color = ~sex,
             colors = trend_pal,
             text = tooltip_pyr,
-            hoverinfo="text") %>% 
+            hoverinfo = "text") %>% 
       add_bars(orientation = 'h') %>%
       layout(bargap = 0.1,
              barmode = 'overlay',
@@ -281,10 +282,13 @@ function(input, output) {
                           tickvals = brks,
                           ticktext = lbls,
                           showline = TRUE,
-                          title = paste("Number of", input$measure_pyramid))) %>%
+                          title = paste("Number of",
+                                        input$measure_pyramid))) %>%
       
       # Take out plotly logo and collaborate button
-      config(displaylogo = F, collaborate=F, editable =F)
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     
     }
   }) 
@@ -295,39 +299,55 @@ function(input, output) {
               style = 'bootstrap',
               class = 'table-bordered table-condensed',
               rownames = FALSE,
-              options = list(pageLength = 20, dom = 'tip'),
-              colnames = c("Location", "Quarter", "Type of activity", "Age", "Sex", "Number")  
+              options = list(pageLength = 20,
+                             dom = 'tip'),
+              colnames = c("Location",
+                           "Quarter",
+                           "Type of activity",
+                           "Age",
+                           "Sex",
+                           "Number")  
     )
   })
   
   
      
-  # Downloading data ----
+  # Downloading data
   output$download_pyramid <- downloadHandler(
-    filename =  'agesex_data.csv',
+    filename = 'agesex_data.csv',
     content = function(file) {
-      write_csv(data_pyramid_plot(), file) 
+      write_csv(data_pyramid_plot(),
+                file) 
     }
   )
   
-  ##############################################.             
-  ##############Deprivation simd----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+             
+  ### Deprivation (SIMD) ----   
+  
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_simd <- renderUI({
-    selectInput("geotype_simd", label = "Select the type of location", 
-                choices = geo_types, selected =  "Scotland")
+    selectInput("geotype_simd",
+                label = "Select the type of location", 
+                choices = geo_type,
+                selected = "Scotland")
   })
   
   output$locname_ui_simd <- renderUI({
-    selectInput("locname_simd", "Select the location", 
-                choices = sort(unique(data_simd$loc_name[data_simd$geo_type == input$geotype_simd])),
-                selectize = TRUE, selected = "Scotland")
+    selectInput("locname_simd",
+                "Select the location",
+                choices = data_simd %>%
+                  subset(geo_type == input$geotype_simd) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
-  #Reactive datasets
-  #reactive dataset for the simd plot
+  # Reactive datasets
+  # Reactive dataset for the simd plot
   data_simd_plot <- reactive({data_simd %>% 
       subset(loc_name == input$locname_simd & 
                measure == input$measure_simd &
@@ -335,15 +355,16 @@ function(input, output) {
                quarter_name == input$quarter_simd) 
   })
   
-  #Table data
+  # Table data
   data_table_simd <- reactive({
     data_simd_plot() %>% 
       select(loc_name, quarter_name, measure, simd, count, rate, avlos)
   })
   
-  #Plotting simd bar chart
+  # Plotting simd bar chart
   output$simd_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
+    
+    # If no data available for that quarter then plot message saying data is missing
     if (is.data.frame(data_simd_plot()) && nrow(data_simd_plot()) == 0)
     {
       #plotting empty plot just with text
@@ -352,43 +373,61 @@ function(input, output) {
       
       plot_ly() %>%
         layout(annotations = text_na,
-               #empty layout
+               
+               # Empty layout
                yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
       
-    }
-    else {
+    } else {
     
-    #Text for tooltip
+    # Text for tooltip
     tooltip_simd <- c(paste0("Quintile: ", data_simd_plot()$simd, "<br>",
                             "Number: ", abs(data_simd_plot()$count)))
     
-    plot_ly(data=data_simd_plot(), x=~simd , y=~count,
-            text=tooltip_simd, hoverinfo="text") %>% 
+    plot_ly(data = data_simd_plot(),
+            x = ~simd,
+            y = ~count,
+            text = tooltip_simd,
+            hoverinfo = "text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
              yaxis = list(title = paste("Number of", input$measure_simd)), 
-             xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>% 
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+             xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     }
   }) 
   
-  ######Table
-  output$table_simd <- DT::renderDataTable({
-    DT::datatable(data_table_simd(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "SIMD quintile", 
-                               "Number", "DNA rate", "Mean length of stay")  
-    )
+  # Table
+  output$table_simd <- renderDataTable({
+    datatable(data_table_simd(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20, dom = 'tip'),
+              colnames = c("Location",
+                           "Quarter",
+                           "Type of activity",
+                           "SIMD quintile",
+                           "Number",
+                           "DNA rate",
+                           "Mean length of stay"))
   })
   
-  #####################################.    
-  #### Downloading data ----
+   
+     
+  # Downloading data
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
     content = function(file) {
-      write.csv(data_simd_plot(), file) 
+      write_csv(data_simd_plot(),
+                file) 
     }
   )
   
