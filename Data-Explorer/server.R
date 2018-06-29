@@ -47,7 +47,7 @@ function(input, output) {
   
   
                
-  ### Time trend----   
+  ### Tab 2: Time trend----   
     
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
@@ -186,7 +186,7 @@ function(input, output) {
   
   
              
-  ### Population pyramid----   
+  ### Tab 3: Population pyramid ----   
     
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
@@ -323,7 +323,7 @@ function(input, output) {
   
   
              
-  ### Deprivation (SIMD) ----   
+  ### Tab 4: Deprivation (SIMD) ----   
   
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
@@ -431,12 +431,13 @@ function(input, output) {
     }
   )
   
-  ##############################################.             
-  ##############Map ----   
-  ##############################################.     
-  ###SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
-  #Merging shapefile with dynamic selection of data
-  #First for HB
+  
+              
+  ### Tab 5: Map ----   
+  ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
+  
+  # Merging shapefile with dynamic selection of data
+  # First for HB
 #   hb_pol <- reactive({merge(hb_bound, 
 #                             data_mapipdc %>% subset(quarter_name==input$quarter_map
 #                                                     & measure==input$measure_map
@@ -514,7 +515,7 @@ function(input, output) {
 #   })
 #   
 #   #####################################.    
-#   #### Table ----
+#   #### Table
 #   
 #   #Table data
 #   table_mapdata <- reactive({
@@ -533,7 +534,7 @@ function(input, output) {
 #   })
 #   
 #   #####################################.    
-#   #### Downloading data ----
+#   #### Downloading data
 #   output$download_map <- downloadHandler(
 #     filename =  'map_data.csv',
 #     content = function(file) {
@@ -541,30 +542,47 @@ function(input, output) {
 #     }
 #   )
   
-  ##############################################.             
-  ##############Cross-boundary ----   
-  ##############################################.     
-  #Reactive data
-  #Creating dynamic selection of dataset.
+  
+               
+  ### Tab 6: Cross-boundary ----   
+     
+  # Reactive data
+  # Creating dynamic selection of dataset.
   data_flow <- reactive({switch(input$datatype_flow,
                                 "Inpatients/Day cases" = data_cbf_ip,
                                 "Outpatients" = data_cbf_op
   )})
   
   
-  #For all HB
+  # For all HB
   flow_all <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & count>9 & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & count>9)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 count > 9 & 
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 count > 9)
     }
   })   
   
   # For only selected HB of residence
   flow_res <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 hbres_name == input$hb_flow & 
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 hbres_name==input$hb_flow)
     }
   })   
   
