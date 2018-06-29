@@ -5,13 +5,18 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 15 June 2018
+### Last edited on: 29 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
 ### This script controls what the data explorer *does*
 
 
+
+# NOTE - the subset function is used in the below code on several
+# occasions, rather than using filter
+# This is because filter struggles with the '$' operator
+# Where possible, filter is still preferred
 
 ### TO DO: ----
 

@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 14 June 2018
+### Last edited on: 29 June 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -102,8 +102,9 @@ tabPanel("Introduction", icon = icon("info-circle"),
 ### Section 3: Time trend tab ----   
 
      
-tabPanel("Time trend", icon = icon("line-chart"),
-          style="height: 95%; width: 95%; background-color: #ffffff;
+tabPanel("Time trend",
+         icon = icon("line-chart"),
+         style = "height: 95%; width: 95%; background-color: #ffffff;
           border: 0px solid #ffffff;",
          h3("Time trend"),
          p("This section allows you to see changes over time. You can
@@ -148,17 +149,21 @@ tabPanel("Time trend", icon = icon("line-chart"),
                    HTML("</div>")
          )
 ),
-##############################################.             
-##############Age-sex tab ----   
-##############################################.     
-tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%; 
+
+
+            
+### Section 4: Population pyramid tab ----
+tabPanel("Age/sex",
+         icon = icon("bar-chart"),
+         style="float: top; height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Age/sex"),
-         p("This section allows you to explore the age and sex distribution of the data. 
-           You can use the filters to select the data you are interested in.  To view the 
-           data in a table use the ‘show/hide table’ button. To download your data selection 
-           as a csv file use the ‘download data’ button. If you hover over the chart you 
-           will see a number of buttons which will allow you to select parts of the chart, 
+         p("This section allows you to explore the age and sex distribution
+            of the data. You can use the filters to select the data you are
+            interested in. To view the data in a table use the ‘show/hide table’
+            button. To download your data selection as a csv file use the
+            ‘download data’ button. If you hover over the chart you will see a
+            number of buttons which will allow you to select parts of the chart,
            zoom in or out or save the chart as an image."),
          wellPanel(
                    column(4, uiOutput("geotype_ui_pyramid")),  
