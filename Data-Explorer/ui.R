@@ -107,13 +107,14 @@ tabPanel("Time trend",
          style = "height: 95%; width: 95%; background-color: #ffffff;
           border: 0px solid #ffffff;",
          h3("Time trend"),
-         p("This section allows you to see changes over time. You can
-           use the filters to select the data you are interested in.
-           To view the data in a table use the ‘show/hide table’ button.
-           To download your data selection as a csv file use the
-           ‘download data’ button. If you hover over the chart you will
-           see a number of buttons which will allow you to select parts
-           of the chart, zoom in or out or save the chart as an image."),
+         p("This section allows you to see changes over time.
+            You can use the filters to select the data you are 
+            interested in. To view the data in a table use the 
+            ‘show/hide table’ button. To download your data 
+            selection as a csv file use the ‘download data’ 
+            button. If you hover over the chart you will see a 
+            number of buttons which will allow you to select parts
+            of the chart, zoom in or out or save the chart as an image."),
          wellPanel(tags$style(".well {background-color: #ffffff;
                               border: 0px solid #336699;}"),
                    column(6, uiOutput("geotype_ui_trend")),  
@@ -135,7 +136,7 @@ tabPanel("Time trend",
                    column(6,
                           downloadButton(outputId = 'download_trend',
                                          label = 'Download data',
-                                         width= "95%"))  
+                                         width = "95%"))  
          ),
          mainPanel(width = 12,
                    plotlyOutput("trend_plot"),
@@ -161,13 +162,16 @@ tabPanel("Age/sex",
          style="float: top; height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Age/sex"),
-         p("This section allows you to explore the age and sex distribution
-            of the data. You can use the filters to select the data you are
-            interested in. To view the data in a table use the ‘show/hide table’
-            button. To download your data selection as a csv file use the
-            ‘download data’ button. If you hover over the chart you will see a 
-            number of buttons which will allow you to select parts of the chart,
-            zoom in or out or save the chart as an image."),
+         p("This section allows you to explore the age and 
+            sex distribution of the data. You can use the 
+            filters to select the data you are interested 
+            in. To view the data in a table use the ‘show/hide 
+            table’ button. To download your data selection 
+            as a csv file use the ‘download data’ button. 
+            If you hover over the chart you will see a 
+            number of buttons which will allow you to select
+            parts of the chart, zoom in or out or save the
+            chart as an image."),
          wellPanel(
                    column(4, uiOutput("geotype_ui_pyramid")),  
                    column(4, uiOutput("locname_ui_pyramid")),
@@ -184,7 +188,8 @@ tabPanel("Age/sex",
                                       label = "Select the type of activity",
                                       choices = pyramid_service,
                                       selectize=TRUE,
-                                      selected = c("All inpatients and daycases"))),
+                                      selected = c("All inpatients 
+                                                   and daycases"))),
                    column(3,
                           br(),
                           
@@ -217,13 +222,17 @@ tabPanel("Deprivation",
          style = "float: top; height: 95%; width: 95%;
          background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
-         p("This section allows you to explore the data by different levels of ", 
-           tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", "deprivation"), 
-           ". You can use the filters to select the data you are interested in. 
-           To view the data in a table use the ‘show/hide table’ button. To download 
-           your data selection as a csv file use the ‘download data’ button. If you hover 
-           over the chart you will see a number of buttons which  will allow you to select 
-           parts of the chart, zoom in or out or save the chart as an image."),
+         p("This section allows you to explore the data by 
+            different levels of ",
+            tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", 
+                   "deprivation"),
+            ". You can use the filters to select the data you are 
+            interested in. To view the data in a table use the 
+            ‘show/hide table’ button. To download your data selection 
+            as a csv file use the ‘download data’ button. If you hover 
+            over the chart you will see a number of buttons which will 
+            allow you to select parts of the chart, zoom in or out or 
+            save the chart as an image."),
          wellPanel(
            column(4, uiOutput("geotype_ui_simd")),  
            column(4, uiOutput("locname_ui_simd")),
@@ -240,13 +249,14 @@ tabPanel("Deprivation",
                               label = "Select the type of activity",
                               choices = pyramid_service,
                               selectize = TRUE,
-                              selected = c("All inpatients and daycases"))),
+                              selected = c("All inpatients
+                                           and daycases"))),
            
            # For downloading the data
            column(3,
                   downloadButton(outputId = 'download_simd', 
                                     label = 'Download data',
-                                 width= "95%"))),
+                                 width = "95%"))),
          
          
          mainPanel(width = 12,
@@ -315,16 +325,19 @@ tabPanel("Cross-boundary",
          style = "float: top; height: 95%; width: 95%;
          background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Cross-boundary flow"),
-         p("This section allows you to see where patients are treated. The top chart 
-           shows where patients living in each NHS Board are treated. The bottom charts 
-           show data specific to the NHS Board selected in the ‘Board of interest’ filter. 
-           The left chart shows where patients living in the NHS Board of interest are 
-           treated. The right chart shows where patients treated in the NHS Board of 
-           interest come from. To include patients treated in their own NHS Board in 
-           the charts, use the ‘flows within own Health Board’ tick box." ),
-         p("You can use the filters to select the data you are interested in. To view the 
-           data in a table use the ‘show/hide table’ button. To download your data selection 
-           as a csv use the ‘download data’ button."),
+         p("This section allows you to see where patients are treated.
+            The top chart shows where patients living in each NHS 
+            Board are treated. The bottom charts show data specific to 
+            the NHS Board selected in the ‘Board of interest’ filter. 
+            The left chart shows where patients living in the NHS Board 
+            of interest are treated. The right chart shows where 
+            patients treated in the NHS Board of interest come from. 
+            To include patients treated in their own NHS Board in the 
+            charts, use the ‘flows within own Health Board’ tick box."),
+         p("You can use the filters to select the data you are interested 
+            in. To view the data in a table use the ‘show/hide table’ 
+            button. To download your data selection as a csv use the 
+            ‘download data’ button."),
          wellPanel(
            column(4,
                     selectInput("datatype_flow",
@@ -353,7 +366,7 @@ tabPanel("Cross-boundary",
          ),
          mainPanel(width = 12,
                    htmlOutput("sankey_all", 
-                              width="96%"),
+                              width = "96%"),
                    br(),
              column(6,  
                     htmlOutput("crossb_restext"),

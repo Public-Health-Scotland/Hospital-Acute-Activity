@@ -106,8 +106,12 @@ function(input, output) {
          ))
     {
       # Plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available" ,
+                      xref = "x",
+                      yref = "y",
+                      showarrow = FALSE)
       
       plot_ly() %>%
         layout(annotations = text_na,
@@ -167,7 +171,8 @@ function(input, output) {
               style = 'bootstrap',
               class = 'table-bordered table-condensed',
               rownames = FALSE,
-              options = list(pageLength = 16, dom = 'tip'),
+              options = list(pageLength = 16,
+                             dom = 'tip'),
               colnames = c("Location", "Quarter", "Type of activity",
                            "Number", "DNA rate",
                            "Total length of stay", "Mean length of stay")  
@@ -217,7 +222,9 @@ function(input, output) {
                quarter_name == input$quarter_pyramid) %>%
       
       # So the graph plots correctly with no stacked bars
-      mutate(count = ifelse(sex == "Male", -(count), count))
+      mutate(count = ifelse(sex == "Male",
+                            -(count),
+                            count))
   })
   
   # Table data
@@ -232,20 +239,30 @@ function(input, output) {
   # Plotting pyramid population chart
   output$pyramid_plot <- renderPlotly({
     
-    # If no data available for that quarter then plot message saying data is missing
-    if (is.data.frame(data_pyramid_plot()) && nrow(data_pyramid_plot()) == 0)
+    # If no data available for that quarter then plot message
+    # saying data is missing
+    if (is.data.frame(data_pyramid_plot()) &&
+        nrow(data_pyramid_plot()) == 0)
     {
       
     # Plotting empty plot just with text
-    text_na <- list(x = 5, y = 5, text = "No data available",
-      xref = "x", yref = "y",  showarrow = FALSE)
+    text_na <- list(x = 5,
+                    y = 5,
+                    text = "No data available",
+                    xref = "x",
+                    yref = "y", 
+                    showarrow = FALSE)
     
     plot_ly() %>%
       layout(annotations = text_na,
              
              # empty layout
-             yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-             xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>%
+             yaxis = list(showline = FALSE,
+                          showticklabels = FALSE,
+                          showgrid = FALSE),
+             xaxis = list(showline = FALSE,
+                          showticklabels = FALSE,
+                          showgrid = FALSE)) %>%
       
       # Take out plotly logo and collaborate button
       config(displayModeBar = FALSE)
@@ -257,7 +274,8 @@ function(input, output) {
     max <- round(max(abs(data_pyramid_plot()$count)))
     
     # Calculate breaks and labels for x axis
-    brks <- c(seq(-max, 0, breaks), seq(breaks, max, breaks))
+    brks <- c(seq(-max, 0, breaks),
+              seq(breaks, max, breaks))
     lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
                                   seq(breaks, max, breaks))))
     
@@ -364,19 +382,30 @@ function(input, output) {
   # Plotting simd bar chart
   output$simd_plot <- renderPlotly({
     
-    # If no data available for that quarter then plot message saying data is missing
-    if (is.data.frame(data_simd_plot()) && nrow(data_simd_plot()) == 0)
+    # If no data available for that quarter then plot message
+    # saying data is missing
+    if (is.data.frame(data_simd_plot()) &&
+        nrow(data_simd_plot()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
+      
+      # Plotting empty plot just with text
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available" ,
+                      xref = "x",
+                      yref = "y",
+                      showarrow = FALSE)
       
       plot_ly() %>%
         layout(annotations = text_na,
                
                # Empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>%
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
         
         # Take out plotly logo and collaborate button
         config(displayModeBar = FALSE)
@@ -384,8 +413,11 @@ function(input, output) {
     } else {
     
     # Text for tooltip
-    tooltip_simd <- c(paste0("Quintile: ", data_simd_plot()$simd, "<br>",
-                            "Number: ", abs(data_simd_plot()$count)))
+    tooltip_simd <- c(paste0("Quintile: ",
+                             data_simd_plot()$simd,
+                             "<br>",
+                            "Number: ",
+                            abs(data_simd_plot()$count)))
     
     plot_ly(data = data_simd_plot(),
             x = ~simd,
@@ -394,8 +426,10 @@ function(input, output) {
             hoverinfo = "text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
-             yaxis = list(title = paste("Number of", input$measure_simd)), 
-             xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>%
+             yaxis = list(title = paste("Number of",
+                                        input$measure_simd)), 
+             xaxis = list(showline = TRUE,
+                          title = "Deprivation (SIMD) quintile")) %>%
       
       # Take out plotly logo and collaborate button
       config(displaylogo = FALSE,
@@ -553,7 +587,6 @@ function(input, output) {
                                 "Outpatients" = data_cbf_op
   )})
   
-  
   # For all HB
   flow_all <- reactive({
     if(input$checkbox_flow == FALSE) {
@@ -582,103 +615,166 @@ function(input, output) {
       
       data_flow() %>% 
         subset(quarter_name == input$quarter_flow & 
-                 hbres_name==input$hb_flow)
+                 hbres_name == input$hb_flow)
     }
   })   
   
   # For only selected HB of treatment
   flow_treat <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow &
+                 hbtreat_name == input$hb_flow &
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>%
+        subset(quarter_name == input$quarter_flow &
+                 hbtreat_name==input$hb_flow)
     }
   })   
   
-  ############################.
+  
   # Text
   output$crossb_restext <- renderText({
     flow_textres <- data_flow() %>% 
-      subset(quarter_name == input$quarter_flow & hbres_name == input$hb_flow)
-    #Percentage of people treated in their own hb
-    value_res <- round(flow_textres$count[flow_textres$boundary_ind == 0] / 
-                         sum(flow_textres$count) * 100, 1)
-
-  paste0("<b>", value_res, "</b>", "% of the patients from ", input$hb_flow, 
-         " were treated in their own health board area.")
+      subset(quarter_name == input$quarter_flow &
+               hbres_name == input$hb_flow)
+    
+    # Percentage of people treated in their own health board
+    # value_res <- round(flow_textres$count[flow_textres$boundary_ind == 0] / 
+    #                      sum(flow_textres$count) * 100, 1)
+    
+    value_res <- flow_textres %>%
+      summarise(round(count[boundary_ind == 0]
+                      / sum(count) * 100, 1)) %>%
+      pull()
+    
+    paste0("<b>",
+           value_res,
+           "</b>",
+           "% of the patients from ",
+           input$hb_flow,
+           " were treated in their own health board area.")
   })
   
   output$crossb_treattext <- renderText({
     flow_texttreat <- data_flow() %>% 
-      subset(quarter_name == input$quarter_flow & hbtreat_name == input$hb_flow)
-    #Percentage of people treated in this hb coming from other hb
-    value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
-                           sum(flow_texttreat$count) * 100, 1)
+      subset(quarter_name == input$quarter_flow &
+               hbtreat_name == input$hb_flow)
     
-    paste0("<b>", value_treat, "</b>", "% of the patients treated in ",
-           input$hb_flow, " live in other health board areas.")
+    # Percentage of people treated in this hb coming from other hb
+    # value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
+    #                        sum(flow_texttreat$count) * 100, 1)
+    
+    value_treat <- flow_texttreat %>%
+      summarise(round(sum(count[boundary_ind == 1])
+                      / sum(count) * 100, 1)) %>%
+      pull()
+    
+    paste0("<b>",
+           value_treat,
+           "</b>",
+           "% of the patients treated in ",
+           input$hb_flow,
+           " live in other health board areas.")
   })
   
-  ############################.
+  
   # Visualizations
-  # This one with all HB at the same time.
+  
+  # This one has all the health boards at the same time
   output$sankey_all <- renderGvis({
     
-    options(gvis.plot.tag=NULL) #if changed to chart you will get the html code
-    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name2','count')],
-               options = list(width = "automatic", sankey=opts
+    # Note - if this line of code is changed to chart
+    # you will get the html code
+    options(gvis.plot.tag = NULL)
+    
+    gvisSankey(flow_all()[, c('hbres_name',
+                              'hb_treat_space',
+                              'count')],
+               options = list(width = "automatic",
+                              sankey = opts
                ))
     
   })
   
-  #This one with only the selected hb of residence
+  # This one has only the selected health board of residence
   output$sankey_res <- renderGvis({
     
-    gvisSankey(flow_res()[,c('hbres_name','hbtreat_name2','count')],
+    gvisSankey(flow_res()[, c('hbres_name',
+                              'hb_treat_space',
+                              'count')],
                options = list(width = "automatic",
-                              gvis.plot.tag=NULL))#if changed to chart you will get the html code
+                              
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL))
     
   })
   
-  #This one with only the selected hb of treatment
+  # This one has only the selected health board of treatment
   output$sankey_treat <- renderGvis({
     
-    gvisSankey(flow_treat()[,c('hbres_name','hbtreat_name2','count')],
+    gvisSankey(flow_treat()[, c('hbres_name',
+                                'hb_treat_space',
+                                'count')],
                options = list(width = "automatic",
-                              gvis.plot.tag=NULL))#if changed to chart you will get the html code
-    
+                              
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL))
   })
   
-  #####################################.    
-  ### Table ----
-  
-  #Table data
-  table_cbfdata <- reactive({
-    #This if statement selects what data to show depending on the checkbox status
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow  & boundary_ind == 1
-               & (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
-        select(hbres_name, hbtreat_name, quarter_name, count)
       
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & 
-                                     (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
-        select(hbres_name, hbtreat_name, quarter_name, count)
+  # Table
+  
+  # Selecting the Table data
+  table_cbfdata <- reactive({
+    
+    # This if statement selects what data to show depending on
+    # the checkbox status
+    if(input$checkbox_flow == FALSE){
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow  &
+                 boundary_ind == 1 &
+                 (hbtreat_name == input$hb_flow |
+                    hbres_name == input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name,
+               quarter_name, count)
+      
+    } else {
+      
+      data_flow() %>%
+        subset(quarter_name == input$quarter_flow &
+                 (hbtreat_name == input$hb_flow |
+                    hbres_name == input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name,
+               quarter_name, count)
     }
   })
   
-  #Actual table.
-  output$table_crossb <- DT::renderDataTable({
-    DT::datatable(table_cbfdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 10, dom = 'tip'),
-                  colnames = c("Residence board", "Treatment board",  "Quarter", "Number")  
+  # Creating the table
+  output$table_crossb <- renderDataTable({
+    datatable(table_cbfdata(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 10,
+                             dom = 'tip'),
+              colnames = c("Residence board",
+                           "Treatment board",
+                           "Quarter",
+                           "Number")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+      
+  # Downloading data
   output$download_flow <- downloadHandler(
     filename =  'crossb_flow_data.csv',
     content = function(file) {
-      write.csv(table_cbfdata()(), file) 
+      write_csv(table_cbfdata(),
+                file) 
     }
   )
   
