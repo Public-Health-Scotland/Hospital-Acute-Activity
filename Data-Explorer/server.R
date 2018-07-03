@@ -778,156 +778,173 @@ function(input, output) {
     }
   )
   
-  ##############################################.             
-  ##############Table----   
-  ##############################################.  
-  #Very simple approach, changing file with a switch, there might be better solutions
-  #Formats every dataset to what it requires for the table
-  data_table <- reactive({switch(input$filename_table,
-                                 "Beds" = data_bed %>% 
-                                   rename(Area_name = loc_name,
-                                          Specialty = spec_name,
-                                          Time_period = quarter_name,
-                                          Occupancy_percentage = p_occ,
-                                          All_available_beds = aasb),
-                                "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
-                                  select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-                                  rename(Health_board_residence = hbres_name,
-                                         Health_board_treatment = hbtreat_name,
-                                         Time_period = quarter_name,
-                                         Stays = count),
-                                "Inpatients/Day cases - Time trend" = data_trend %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos), 
-                                "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, sex, age, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Sex = sex,
-                                         Age_group = age,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  mutate(Stays = abs(Stays)) %>% 
-                                  droplevels(),
-                                "Outpatients - Age/sex" = data_pyramid %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, sex, age, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Sex = sex,
-                                         Age_group = age,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  mutate(Appointments = abs(Appointments)) %>% 
-                                  droplevels(),
-                                "Inpatients/Day cases - Specialty" = data_spec %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, specialty, quarter_name, 
-                                         stays, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Specialty = specialty,
-                                         Time_period = quarter_name,
-                                         Stays = stays,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  droplevels(),
-                                "Outpatients - Specialty" = data_spec %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, specialty, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Specialty = specialty,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  droplevels(), 
-                                "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, simd, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         SIMD_quintile = simd,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  droplevels(),
-                                "Outpatients - Deprivation (SIMD)" = data_simd %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, simd, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         SIMD_quintile = simd,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  droplevels(), 
-                                "Outpatients - Cross boundary flow" = data_cbfop %>% 
-                                  select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-                                  rename(Health_board_residence=hbres_name,
-                                         Health_board_treatment=hbtreat_name,
-                                         Time_period=quarter_name,
-                                         Appointments=count),
-                                "Outpatients - Time trend" = data_trend %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type,loc_name, quarter_name, measure, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Time_period = quarter_name,
-                                         Type_case = measure,
-                                         Appointments = count,
-                                         DNA_rate = rate)
-
+  
+             
+  ### Tab 7: Table----   
+    
+  # Switch function is used to select correct dataset based on
+  # user input
+  # Each dataset is formatted to make it suitable to be
+  # presented in the data table
+  data_table <- reactive({switch(
+    input$filename_table,
+    
+    # 7.1 - Beds Data
+    "Beds" = data_bed %>% 
+      rename(Area_name = loc_name,
+             Specialty = specname,
+             Time_period = quarter_name,
+             Occupancy_percentage = p_occ,
+             All_available_beds = aasb),
+    
+    
+    "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
+      select(hbres_name, hbtreat_name, quarter_name, count) %>% 
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Stays = count),
+    "Inpatients/Day cases - Time trend" = data_trend %>% 
+      subset(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, quarter_name, 
+             count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos), 
+    "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
+      subset(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, sex, age, quarter_name, 
+             count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>% 
+      mutate(Stays = abs(Stays)) %>% 
+      droplevels(),
+    "Outpatients - Age/sex" = data_pyramid %>% 
+      subset(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, sex, age, quarter_name, 
+             count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>% 
+      mutate(Appointments = abs(Appointments)) %>% 
+      droplevels(),
+    "Inpatients/Day cases - Specialty" = data_spec %>% 
+      subset(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, specialty, quarter_name, 
+             stays, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = specialty,
+             Time_period = quarter_name,
+             Stays = stays,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>% 
+      droplevels(),
+    "Outpatients - Specialty" = data_spec %>% 
+      subset(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, specialty, quarter_name, 
+             count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = specialty,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>% 
+      droplevels(), 
+    "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
+      subset(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, simd, quarter_name, 
+             count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>% 
+      droplevels(),
+    "Outpatients - Deprivation (SIMD)" = data_simd %>% 
+      subset(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, simd, quarter_name, 
+             count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>% 
+      droplevels(), 
+    "Outpatients - Cross boundary flow" = data_cbfop %>% 
+      select(hbres_name, hbtreat_name, quarter_name, count) %>% 
+      rename(Health_board_residence=hbres_name,
+             Health_board_treatment=hbtreat_name,
+             Time_period=quarter_name,
+             Appointments=count),
+    "Outpatients - Time trend" = data_trend %>% 
+      subset(file == "Outpatients") %>% 
+      select(geo_type,loc_name, quarter_name, measure, 
+             count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Time_period = quarter_name,
+             Type_case = measure,
+             Appointments = count,
+             DNA_rate = rate)
+    
   )})
   
-  #Actual table.
-  output$table_explorer <- DT::renderDataTable({
-    #to take out underscore from column names shown in table.
+  # Creating the table
+  output$table_explorer <- renderDataTable({
+    
+    # Remove the underscore from column names in the table
     table_colnames  <-  gsub("_", " ", colnames(data_table()))
     
-    DT::datatable(data_table(),style = 'bootstrap', class = 'table-bordered table-condensed', 
-                  rownames = FALSE, options = list(pageLength = 20, dom = 'tip'), 
-                  filter = "top", colnames = table_colnames
+    datatable(data_table(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20,
+                             dom = 'tip'),
+              filter = "top",
+              colnames = table_colnames
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
-  #It downloads selection made by user using the datatable filters
+     
+  # Downloading data
+  # The downloaded data are those selected by the user using
+  # the data table filters
   output$download_table <- 
     downloadHandler(filename = "table_data.csv",
                     content = function(file){
-                      write.csv(data_table()[input[["table_explorer_rows_all"]], ],
+                      write_csv(data_table()
+                                [input[["table_explorer_rows_all"]], ],
                                 file)
                     }
     )
   
 }
 
-###END
 
+
+### END OF SCRIPT ###

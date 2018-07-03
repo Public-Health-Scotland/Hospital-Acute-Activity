@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 29 June 2018
+### Last edited on: 03 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -391,35 +391,48 @@ tabPanel("Cross-boundary",
              )
          )
 ),
-##############################################.             
-##############Table tab ----   
-##############################################.     
-tabPanel("Table", icon = icon("table"), style="float: top; height: 95%; width: 95%; 
-          background-color:#ffffff; border: 0px solid #ffffff;",
+
+
+            
+### Tab 7: Table ----   
+     
+tabPanel("Table",
+         icon = icon("table"),
+         style="float: top; height: 95%; width: 95%; 
+         background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Table"),
-         p("This section allows you to view the data in table format. You can use the 
-           filters to select the  data you are interested in. You can also download the 
-           data as a csv using the download buttons."),
+         p("This section allows you to view the data in table format.
+            You can use the filters to select the  data you are
+            interested in. You can also download the data as a csv 
+            using the download buttons."),
          column(8,
-          selectInput("filename_table", label = "Select the data file", 
-                     choices = file_types, width="95%")
+          selectInput("filename_table",
+                      label = "Select the data file",
+                      choices = file_types,
+                      width = "95%")
           ),
          column(4,
-           downloadButton(outputId = 'download_table', label = 'Download data',
-                        style="margin: 25px 10px 25px 10px ")
+           downloadButton(outputId = 'download_table',
+                          label = 'Download data',
+                          style = "margin: 25px 10px 25px 10px ")
          ),  
-        DT::dataTableOutput("table_explorer", width="95%"),
-        #Footnote for Tayside beds data
+        dataTableOutput("table_explorer", width = "95%"),
+        
+        # Insert footnote for Tayside beds data
         conditionalPanel(
           condition = "input.filename_table == 'Beds'",
-          p("Beds data for NHS Tayside from May/June 2016 onwards are inaccurate due to a 
-          system issue with their patient management system. Please bear this in mind when looking 
-            at data. Further detail about this can be found in the ",
-            tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
+          p("Beds data for NHS Tayside from May/June 2016 onwards 
+            are inaccurate due to a system issue with their patient 
+            management system. Please bear this in mind when looking 
+            at the data. Further detail about this can be found in the ",
+            tags$a(href="http://www.isdscotland.org/tpp/data-quality",
+                   "data quality"),
             "section.")
         )
-   )
+    )
   )
 )
 
 
+
+### END OF SCRIPT ###
