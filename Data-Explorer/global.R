@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 03 July 2018
+### Last edited on: 05 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -192,35 +192,6 @@ opts <- paste0("{
                node: { colours: ", colours_node_array ," }
                }" )
 
-
-
-### Section 5: Data Table functions ----
-
-
-# These are functions used in the server script, which
-# is why they're contained in this script, and not in
-# the dedicated functions script (which contains functions
-# used in the data preparation script only)
-
-# These functions relate to the manipulation of the datasets
-# which can be selected as part of the data table in Tab 7
-# of the data explorer
-
-
-# 5.1 - Time Trend
-# table_trend <- function(df, string) {
-#   df %>%
-#     filter_(file == string) %>%
-#     select(geo_type, loc_name, measure, quarter_name, 
-#            count, los, avlos) %>%
-#     rename(Geography_level = geo_type,
-#            Area_name = loc_name,
-#            Type_case = measure,
-#            Time_period = quarter_name,
-#            Stays = count,
-#            Total_length_stay = los,
-#            Mean_length_stay = avlos)
-# }
 
 
 ### END OF SCRIPT ###
