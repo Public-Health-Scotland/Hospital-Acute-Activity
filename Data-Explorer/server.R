@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 29 June 2018
+### Last edited on: 05 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -18,7 +18,7 @@
 # This is because filter struggles with the '$' operator
 # Where possible, filter is still preferred
 
-### TO DO: ----
+### TO DO (Jaime): ----
 
 
 # Fix issues with selection of dates (max date and order)
@@ -643,9 +643,6 @@ function(input, output) {
                hbres_name == input$hb_flow)
     
     # Percentage of people treated in their own health board
-    # value_res <- round(flow_textres$count[flow_textres$boundary_ind == 0] / 
-    #                      sum(flow_textres$count) * 100, 1)
-    
     value_res <- flow_textres %>%
       summarise(round(count[boundary_ind == 0]
                       / sum(count) * 100, 1)) %>%
@@ -665,9 +662,6 @@ function(input, output) {
                hbtreat_name == input$hb_flow)
     
     # Percentage of people treated in this hb coming from other hb
-    # value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
-    #                        sum(flow_texttreat$count) * 100, 1)
-    
     value_treat <- flow_texttreat %>%
       summarise(round(sum(count[boundary_ind == 1])
                       / sum(count) * 100, 1)) %>%
@@ -784,8 +778,12 @@ function(input, output) {
     
   # Switch function is used to select correct dataset based on
   # user input
+  #
   # Each dataset is formatted to make it suitable to be
   # presented in the data table
+  #
+  # Each dataset requires slightly different formatting, so no
+  # custom functions have been created
   data_table <- reactive({switch(
     input$filename_table,
     
@@ -798,56 +796,14 @@ function(input, output) {
              All_available_beds = aasb),
     
     
-    "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
-      select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-      rename(Health_board_residence = hbres_name,
-             Health_board_treatment = hbtreat_name,
-             Time_period = quarter_name,
-             Stays = count),
-    "Inpatients/Day cases - Time trend" = data_trend %>% 
-      subset(file == "Inpatients/Day Cases") %>% 
-      select(geo_type, loc_name, measure, quarter_name, 
-             count, los, avlos) %>% 
-      rename(Geography_level = geo_type,
-             Area_name = loc_name,
-             Type_case = measure,
-             Time_period = quarter_name,
-             Stays = count,
-             Total_length_stay = los,
-             Mean_length_stay = avlos), 
-    "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
-      subset(file == "Inpatients/Day Cases") %>% 
-      select(geo_type, loc_name, measure, sex, age, quarter_name, 
-             count, los, avlos) %>% 
-      rename(Geography_level = geo_type,
-             Area_name = loc_name,
-             Type_case = measure,
-             Sex = sex,
-             Age_group = age,
-             Time_period = quarter_name,
-             Stays = count,
-             Total_length_stay = los,
-             Mean_length_stay = avlos) %>% 
-      mutate(Stays = abs(Stays)) %>% 
-      droplevels(),
-    "Outpatients - Age/sex" = data_pyramid %>% 
-      subset(file == "Outpatients") %>% 
-      select(geo_type, loc_name, measure, sex, age, quarter_name, 
-             count, rate) %>% 
-      rename(Geography_level = geo_type,
-             Area_name = loc_name,
-             Type_case = measure,
-             Sex = sex,
-             Age_group = age,
-             Time_period = quarter_name,
-             Appointments = count,
-             DNA_rate = rate) %>% 
-      mutate(Appointments = abs(Appointments)) %>% 
-      droplevels(),
+    # 7.2 - Specialty Data
+    
+    
+    # 7.2.1 - Inpatient Data
     "Inpatients/Day cases - Specialty" = data_spec %>% 
-      subset(file == "Inpatients/Day Cases") %>% 
-      select(geo_type, loc_name, measure, specialty, quarter_name, 
-             stays, los, avlos) %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, specialty,
+             quarter_name, stays, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -855,24 +811,31 @@ function(input, output) {
              Time_period = quarter_name,
              Stays = stays,
              Total_length_stay = los,
-             Mean_length_stay = avlos) %>% 
-      droplevels(),
+             Mean_length_stay = avlos),
+    
+    
+    # 7.2.2 - Outpatient Data
     "Outpatients - Specialty" = data_spec %>% 
-      subset(file == "Outpatients") %>% 
-      select(geo_type, loc_name, measure, specialty, quarter_name, 
-             count, rate) %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, specialty,
+             quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = specialty,
              Time_period = quarter_name,
              Appointments = count,
-             DNA_rate = rate) %>% 
-      droplevels(), 
+             DNA_rate = rate),
+    
+    
+    # 7.3 - SIMD Data
+    
+    
+    # 7.3.1 - Inpatient Data
     "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
-      subset(file == "Inpatients/Day Cases") %>% 
-      select(geo_type, loc_name, measure, simd, quarter_name, 
-             count, los, avlos) %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -880,38 +843,115 @@ function(input, output) {
              Time_period = quarter_name,
              Stays = count,
              Total_length_stay = los,
-             Mean_length_stay = avlos) %>% 
-      droplevels(),
+             Mean_length_stay = avlos),
+    
+    
+    # 7.3.2 - Outpatient Data
     "Outpatients - Deprivation (SIMD)" = data_simd %>% 
-      subset(file == "Outpatients") %>% 
-      select(geo_type, loc_name, measure, simd, quarter_name, 
-             count, rate) %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              SIMD_quintile = simd,
              Time_period = quarter_name,
              Appointments = count,
-             DNA_rate = rate) %>% 
-      droplevels(), 
-    "Outpatients - Cross boundary flow" = data_cbfop %>% 
-      select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-      rename(Health_board_residence=hbres_name,
-             Health_board_treatment=hbtreat_name,
-             Time_period=quarter_name,
-             Appointments=count),
+             DNA_rate = rate),
+    
+    
+    # 7.4 - Time Trend Data
+    
+    
+    # 7.4.1 - Inpatient Data
+    "Inpatients/Day cases - Time trend" = data_trend %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure,
+             quarter_name, count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos),
+    
+    
+    # 7.4.2 - Outpatient Data
     "Outpatients - Time trend" = data_trend %>% 
-      subset(file == "Outpatients") %>% 
-      select(geo_type,loc_name, quarter_name, measure, 
-             count, rate) %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type,loc_name, quarter_name,
+             measure, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Time_period = quarter_name,
              Type_case = measure,
              Appointments = count,
-             DNA_rate = rate)
+             DNA_rate = rate),
+    
+    
+    # 7.5 - Population Pyramid Data
+    
+    
+    # 7.5.1 - Inpatient Data
+    "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>% 
+      mutate(Stays = abs(Stays)),
+    
+    
+    # 7.5.2 - Outpatient Data
+    "Outpatients - Age/sex" = data_pyramid %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>% 
+      mutate(Appointments = abs(Appointments)),
+    
+    
+    # 7.6 - Cross-Boundary Data
+    
+    
+    # 7.6.1 - Inpatient Data
+    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>% 
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>% 
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Stays = count),
+    
+    
+    # 7.6.2 - Outpatient Data
+    "Outpatients - Cross boundary flow" = data_cbf_op %>% 
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>% 
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Appointments = count)
+    
     
   )})
+  
+  
   
   # Creating the table
   output$table_explorer <- renderDataTable({
