@@ -784,6 +784,11 @@ function(input, output) {
   #
   # Each dataset requires slightly different formatting, so no
   # custom functions have been created
+  #
+  # Note: character variables are converted to factors in each
+  # dataset for use in the table
+  # This is because dropdown prompts on the table filters only
+  # appear for factors
   data_table <- reactive({switch(
     input$filename_table,
     
@@ -793,7 +798,8 @@ function(input, output) {
              Specialty = specname,
              Time_period = quarter_name,
              Occupancy_percentage = p_occ,
-             All_available_beds = aasb),
+             All_available_beds = aasb) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.2 - Specialty Data
@@ -811,7 +817,8 @@ function(input, output) {
              Time_period = quarter_name,
              Stays = stays,
              Total_length_stay = los,
-             Mean_length_stay = avlos),
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.2.2 - Outpatient Data
@@ -825,7 +832,8 @@ function(input, output) {
              Specialty = specialty,
              Time_period = quarter_name,
              Appointments = count,
-             DNA_rate = rate),
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.3 - SIMD Data
@@ -843,7 +851,8 @@ function(input, output) {
              Time_period = quarter_name,
              Stays = count,
              Total_length_stay = los,
-             Mean_length_stay = avlos),
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.3.2 - Outpatient Data
@@ -857,7 +866,8 @@ function(input, output) {
              SIMD_quintile = simd,
              Time_period = quarter_name,
              Appointments = count,
-             DNA_rate = rate),
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.4 - Time Trend Data
@@ -874,7 +884,8 @@ function(input, output) {
              Time_period = quarter_name,
              Stays = count,
              Total_length_stay = los,
-             Mean_length_stay = avlos),
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.4.2 - Outpatient Data
@@ -887,7 +898,8 @@ function(input, output) {
              Time_period = quarter_name,
              Type_case = measure,
              Appointments = count,
-             DNA_rate = rate),
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.5 - Population Pyramid Data
@@ -907,7 +919,8 @@ function(input, output) {
              Stays = count,
              Total_length_stay = los,
              Mean_length_stay = avlos) %>% 
-      mutate(Stays = abs(Stays)),
+      mutate(Stays = abs(Stays)) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.5.2 - Outpatient Data
@@ -923,7 +936,8 @@ function(input, output) {
              Time_period = quarter_name,
              Appointments = count,
              DNA_rate = rate) %>% 
-      mutate(Appointments = abs(Appointments)),
+      mutate(Appointments = abs(Appointments)) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.6 - Cross-Boundary Data
@@ -936,7 +950,8 @@ function(input, output) {
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
-             Stays = count),
+             Stays = count) %>%
+      mutate_if(is.character, as.factor),
     
     
     # 7.6.2 - Outpatient Data
@@ -946,7 +961,8 @@ function(input, output) {
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
-             Appointments = count)
+             Appointments = count) %>%
+      mutate_if(is.character, as.factor)
     
     
   )})

@@ -120,13 +120,22 @@ tabPanel("Time trend",
                    column(6, uiOutput("geotype_ui_trend")),  
                    column(6, uiOutput("locname_ui_trend")),
                    column(6,
-                          selectInput("service_trend",
-                                      label = "Select type of activity",
-                                      multiple = TRUE, 
-                                      choices = trend_service,
-                                      selectize = TRUE,
-                                      selected =
-                                        c("All inpatients and daycases"))
+                          shinyWidgets::pickerInput(
+                            "service_trend",
+                            label = "Select type of activity",
+                            choices = trend_service,
+                            multiple = TRUE,
+                            selected =
+                              c("All inpatients and daycases")
+                            
+                          )
+                          # selectInput("service_trend",
+                          #             label = "Select type of activity",
+                          #             multiple = TRUE, 
+                          #             choices = trend_service,
+                          #             selectize = TRUE,
+                          #             selected =
+                          #               c("All inpatients and daycases"))
                           ),
                    column(6,
                           selectInput("measure_trend",
