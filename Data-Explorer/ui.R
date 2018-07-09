@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 14 June 2018
+### Last edited on: 05 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -15,7 +15,7 @@
 
 
 
-### Section 1: Visual interface ----
+### Visual interface ----
 
 
 fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", 
@@ -36,7 +36,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;",
                      
                      
              
-### Section 2: Introduction tab ----   
+### Tab 1: Introduction ----   
 
      
 tabPanel("Introduction", icon = icon("info-circle"),
@@ -72,9 +72,8 @@ tabPanel("Introduction", icon = icon("info-circle"),
                           data presented. Known issues are summarised
                           in the ", 
                           tags$a(
-                            href = paste("http://www.isdscotland.org",
-                                         "/tpp/data-quality",
-                                         sep = ""),
+                            href = paste0("http://www.isdscotland.org",
+                                         "/tpp/data-quality"),
                             "data quality"), " section."),
                   tags$li("The data for the most recent quarter are
                           provisional. Provisional data are subject
@@ -100,32 +99,43 @@ tabPanel("Introduction", icon = icon("info-circle"),
 
 
 
-### Section 3: Time trend tab ----   
+### Tab 2: Time trend ----   
 
      
-tabPanel("Time trend", icon = icon("line-chart"),
-          style="height: 95%; width: 95%; background-color: #ffffff;
+tabPanel("Time trend",
+         icon = icon("line-chart"),
+         style = "height: 95%; width: 95%; background-color: #ffffff;
           border: 0px solid #ffffff;",
          h3("Time trend"),
-         p("This section allows you to see changes over time. You can
-           use the filters to select the data you are interested in.
-           To view the data in a table use the ‘show/hide table’ button.
-           To download your data selection as a csv file use the
-           ‘download data’ button. If you hover over the chart you will
-           see a number of buttons which will allow you to select parts
-           of the chart, zoom in or out or save the chart as an image."),
+         p("This section allows you to see changes over time.
+            You can use the filters to select the data you are 
+            interested in. To view the data in a table use the 
+            ‘show/hide table’ button. To download your data 
+            selection as a csv file use the ‘download data’ 
+            button. If you hover over the chart you will see a 
+            number of buttons which will allow you to select parts
+            of the chart, zoom in or out or save the chart as an image."),
          wellPanel(tags$style(".well {background-color: #ffffff;
                               border: 0px solid #336699;}"),
                    column(6, uiOutput("geotype_ui_trend")),  
                    column(6, uiOutput("locname_ui_trend")),
                    column(6,
-                          selectInput("service_trend",
-                                      label = "Select type of activity",
-                                      multiple = TRUE, 
-                                      choices = trend_service,
-                                      selectize = TRUE,
-                                      selected =
-                                        c("All inpatients and daycases"))
+                          shinyWidgets::pickerInput(
+                            "service_trend",
+                            label = "Select type of activity",
+                            choices = trend_service,
+                            multiple = TRUE,
+                            selected =
+                              c("All inpatients and daycases")
+                            
+                          )
+                          # selectInput("service_trend",
+                          #             label = "Select type of activity",
+                          #             multiple = TRUE, 
+                          #             choices = trend_service,
+                          #             selectize = TRUE,
+                          #             selected =
+                          #               c("All inpatients and daycases"))
                           ),
                    column(6,
                           selectInput("measure_trend",
@@ -135,7 +145,7 @@ tabPanel("Time trend", icon = icon("line-chart"),
                    column(6,
                           downloadButton(outputId = 'download_trend',
                                          label = 'Download data',
-                                         width= "95%"))  
+                                         width = "95%"))  
          ),
          mainPanel(width = 12,
                    plotlyOutput("trend_plot"),
@@ -145,84 +155,137 @@ tabPanel("Time trend", icon = icon("line-chart"),
                         class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id = 'trend' class = 'collapse'> "),
-                   dataTableOutput("table_trend", width = "95%"),
+                   dataTableOutput("table_trend",
+                                   width = "95%"),
                    HTML("</div>")
          )
 ),
-##############################################.             
-##############Age-sex tab ----   
-##############################################.     
-tabPanel("Age/sex", icon = icon("bar-chart"), style="float: top; height: 95%; 
+
+
+            
+### Tab 3: Population pyramid ----
+
+
+tabPanel("Age/sex",
+         icon = icon("bar-chart"),
+         style="float: top; height: 95%; 
           width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Age/sex"),
-         p("This section allows you to explore the age and sex distribution of the data. 
-           You can use the filters to select the data you are interested in.  To view the 
-           data in a table use the ‘show/hide table’ button. To download your data selection 
-           as a csv file use the ‘download data’ button. If you hover over the chart you 
-           will see a number of buttons which will allow you to select parts of the chart, 
-           zoom in or out or save the chart as an image."),
+         p("This section allows you to explore the age and 
+            sex distribution of the data. You can use the 
+            filters to select the data you are interested 
+            in. To view the data in a table use the ‘show/hide 
+            table’ button. To download your data selection 
+            as a csv file use the ‘download data’ button. 
+            If you hover over the chart you will see a 
+            number of buttons which will allow you to select
+            parts of the chart, zoom in or out or save the
+            chart as an image."),
          wellPanel(
                    column(4, uiOutput("geotype_ui_pyramid")),  
                    column(4, uiOutput("locname_ui_pyramid")),
-                   column(4, selectInput("quarter_pyramid", label = "Select the time period", 
-                               choices = unique(data_pyramid$quarter_name), 
-                               selected = latest_quarter, width= "95%")), 
-                   column(9, selectInput("measure_pyramid", label = "Select the type of activity", 
-                               choices = pyramid_service, selectize=TRUE,
-                               selected = c("All inpatients and daycases"))),
-                   column(3, br(), downloadButton(outputId = 'download_pyramid', 
-                                            label = 'Download data', width= "95%"))  #For downloading the data
+                   column(4,
+                          selectInput("quarter_pyramid",
+                                      label = "Select the time period",
+                                      choices = data_pyramid %>%
+                                        distinct(quarter_name) %>%
+                                        pull(quarter_name),
+                                      selected = latest_quarter,
+                                      width = "95%")), 
+                   column(9,
+                          selectInput("measure_pyramid",
+                                      label = "Select the type of activity",
+                                      choices = pyramid_service,
+                                      selectize=TRUE,
+                                      selected = c("All inpatients 
+                                                   and daycases"))),
+                   column(3,
+                          br(),
+                          
+                          # For downloading the data
+                          downloadButton(outputId = 'download_pyramid',
+                                         label = 'Download data',
+                                         width= "95%"))
          ),
-         mainPanel(width=12,
+         mainPanel(width = 12,
                    plotlyOutput("pyramid_plot"),
-                   #Button to show hide div where data table is
-                   HTML("<button data-toggle='collapse' href='#pyramid' class='btn btn-primary'>
+                   
+                   # Button to show hide div where data table is
+                   HTML("<button data-toggle='collapse' href='#pyramid' 
+                        class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='pyramid' class='collapse'> "),
-                   DT::dataTableOutput("table_pyramid", width="95%"),
+                   dataTableOutput("table_pyramid",
+                                   width = "95%"),
                    HTML("</div>")
-                   )
+         )
 ),
-##############################################.             
-##############Deprivation (SIMD) tab ----   
-##############################################.     
-tabPanel("Deprivation", icon = icon("user-circle-o"), style="float: top; height: 95%; 
-         width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
+
+
+           
+### Tab 4: Deprivation (SIMD) ----   
+   
+
+tabPanel("Deprivation",
+         icon = icon("user-circle-o"),
+         style = "float: top; height: 95%; width: 95%;
+         background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
-         p("This section allows you to explore the data by different levels of ", 
-           tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", "deprivation"), 
-           ". You can use the filters to select the data you are interested in. 
-           To view the data in a table use the ‘show/hide table’ button. To download 
-           your data selection as a csv file use the ‘download data’ button. If you hover 
-           over the chart you will see a number of buttons which  will allow you to select 
-           parts of the chart, zoom in or out or save the chart as an image."),
+         p("This section allows you to explore the data by 
+            different levels of ",
+            tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", 
+                   "deprivation"),
+            ". You can use the filters to select the data you are 
+            interested in. To view the data in a table use the 
+            ‘show/hide table’ button. To download your data selection 
+            as a csv file use the ‘download data’ button. If you hover 
+            over the chart you will see a number of buttons which will 
+            allow you to select parts of the chart, zoom in or out or 
+            save the chart as an image."),
          wellPanel(
            column(4, uiOutput("geotype_ui_simd")),  
            column(4, uiOutput("locname_ui_simd")),
-           column(4, selectInput("quarter_simd", label = "Select the time period", 
-                                 choices = unique(data_simd$quarter_name), 
-                                 selected=latest_quarter, width= "95%")), 
-           column(9, selectInput("measure_simd", label = "Select the type of activity", 
-                                 choices = pyramid_service, selectize=TRUE,
-                                 selected = c("All inpatients and daycases"))),
-           column(3, downloadButton(outputId = 'download_simd', 
-                                    label = 'Download data', width= "95%"))  #For downloading the data
-         ),
-         mainPanel(width=12,
+           column(4,
+                  selectInput("quarter_simd",
+                              label = "Select the time period",
+                              choices = data_simd %>%
+                                distinct(quarter_name) %>%
+                                pull(quarter_name),
+                              selected = latest_quarter,
+                              width = "95%")), 
+           column(9,
+                  selectInput("measure_simd",
+                              label = "Select the type of activity",
+                              choices = pyramid_service,
+                              selectize = TRUE,
+                              selected = c("All inpatients
+                                           and daycases"))),
+           
+           # For downloading the data
+           column(3,
+                  downloadButton(outputId = 'download_simd', 
+                                    label = 'Download data',
+                                 width = "95%"))),
+         
+         
+         mainPanel(width = 12,
                    plotlyOutput("simd_plot"),
-                   #Button to show/hide div where data table is
-                   HTML("<button data-toggle='collapse' href='#simd' class='btn btn-primary'>
+                   
+                   # Button to show/hide div where data table is
+                   HTML("<button data-toggle='collapse' href='#simd' 
+                        class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
                    HTML("<div id='simd' class='collapse'> "),
-                   DT::dataTableOutput("table_simd", width="95%"),
+                   dataTableOutput("table_simd",
+                                   width = "95%"),
                    HTML("</div>")
                    )
 ),
-##############################################.             
-##############Map tab ----   
-##############################################.    
-# 
-###SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
+
+
+            
+### Tab 5: Map ----   
+### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
 # 
 # tabPanel("Map", icon = icon("globe"), style="float: top; height: 95%; width: 95%; 
 #           background-color:#ffffff; border: 0px solid #ffffff;",
@@ -261,90 +324,124 @@ tabPanel("Deprivation", icon = icon("user-circle-o"), style="float: top; height:
 #               width: 100%; height: 100%;'></iframe>")
 #         )
 # ),
-##############################################.             
-##############Cross boundary tab ----   
-##############################################.     
-tabPanel("Cross-boundary", icon = icon("exchange"), style="float: top; height: 95%; 
-          width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
+
+
+             
+### Tab 6: Cross boundary ----   
+     
+tabPanel("Cross-boundary",
+         icon = icon("exchange"),
+         style = "float: top; height: 95%; width: 95%;
+         background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Cross-boundary flow"),
-         p("This section allows you to see where patients are treated. The top chart 
-           shows where patients living in each NHS Board are treated. The bottom charts 
-           show data specific to the NHS Board selected in the ‘Board of interest’ filter. 
-           The left chart shows where patients living in the NHS Board of interest are 
-           treated. The right chart shows where patients treated in the NHS Board of 
-           interest come from. To include patients treated in their own NHS Board in 
-           the charts, use the ‘flows within own Health Board’ tick box." ),
-         p("You can use the filters to select the data you are interested in. To view the 
-           data in a table use the ‘show/hide table’ button. To download your data selection 
-           as a csv use the ‘download data’ button."),
+         p("This section allows you to see where patients are treated.
+            The top chart shows where patients living in each NHS 
+            Board are treated. The bottom charts show data specific to 
+            the NHS Board selected in the ‘Board of interest’ filter. 
+            The left chart shows where patients living in the NHS Board 
+            of interest are treated. The right chart shows where 
+            patients treated in the NHS Board of interest come from. 
+            To include patients treated in their own NHS Board in the 
+            charts, use the ‘flows within own Health Board’ tick box."),
+         p("You can use the filters to select the data you are interested 
+            in. To view the data in a table use the ‘show/hide table’ 
+            button. To download your data selection as a csv use the 
+            ‘download data’ button."),
          wellPanel(
            column(4,
-                    selectInput("datatype_flow", label = "Select the hospital service", 
+                    selectInput("datatype_flow",
+                                label = "Select the hospital service", 
                                 choices = data_type),
-                  checkboxInput("checkbox_flow", label = "Include flows within same board?", value = FALSE)
-             ),
+                  checkboxInput("checkbox_flow",
+                                label = "Include flows within same board?",
+                                value = FALSE)),
              column(4,  
-                    selectInput("hb_flow", label = "Select the board of interest", 
-                                choices = unique(data_cbf_ip$hbres_name)),
-                    downloadButton(outputId = 'download_flow', label = 'Download data') 
+                    selectInput("hb_flow",
+                                label = "Select the board of interest", 
+                                choices = data_cbf_ip %>%
+                                  distinct(hbres_name) %>%
+                                  pull(hbres_name)),
+                    downloadButton(outputId = 'download_flow',
+                                   label = 'Download data') 
              ),
              column(4,
-                    selectInput("quarter_flow", label = "Select the time period", 
-                                choices = unique(data_cbf_ip$quarter_name), 
+                    selectInput("quarter_flow", 
+                                label = "Select the time period", 
+                                choices = data_cbf_ip %>%
+                                  distinct(quarter_name) %>%
+                                  pull(quarter_name),
                                 selected = latest_quarter) 
              )
          ),
-         mainPanel(width=12,
-                   htmlOutput("sankey_all", width="96%"),
+         mainPanel(width = 12,
+                   htmlOutput("sankey_all", 
+                              width = "96%"),
                    br(),
              column(6,  
                     htmlOutput("crossb_restext"),
-                    htmlOutput("sankey_res", width="48%")
+                    htmlOutput("sankey_res", 
+                               width = "48%")
              ),
              column(6,
                     htmlOutput("crossb_treattext"),
-                    htmlOutput("sankey_treat", width="48%")
+                    htmlOutput("sankey_treat", 
+                               width = "48%")
              ),
-         div(style="width:95%; height:5%",
-             #Button to show/hide div where data table is
+         div(style = "width:95%; height:5%",
+             
+             # Button to show/hide div where data table is
              HTML("<button data-toggle='collapse' data-target='#crossb' 
                   class='btn btn-primary' style=padding: 6px 12px;>
                   <strong>Show/hide table</strong></button>"),
              HTML("<div id='crossb' class='collapse'> "),
-             DT::dataTableOutput("table_crossb", width="95%"),
+             dataTableOutput("table_crossb",
+                             width = "95%"),
              HTML("</div>")
              )
          )
 ),
-##############################################.             
-##############Table tab ----   
-##############################################.     
-tabPanel("Table", icon = icon("table"), style="float: top; height: 95%; width: 95%; 
-          background-color:#ffffff; border: 0px solid #ffffff;",
+
+
+            
+### Tab 7: Table ----   
+     
+tabPanel("Table",
+         icon = icon("table"),
+         style="float: top; height: 95%; width: 95%; 
+         background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Table"),
-         p("This section allows you to view the data in table format. You can use the 
-           filters to select the  data you are interested in. You can also download the 
-           data as a csv using the download buttons."),
+         p("This section allows you to view the data in table format.
+            You can use the filters to select the  data you are
+            interested in. You can also download the data as a csv 
+            using the download buttons."),
          column(8,
-          selectInput("filename_table", label = "Select the data file", 
-                     choices = file_types, width="95%")
+          selectInput("filename_table",
+                      label = "Select the data file",
+                      choices = file_types,
+                      width = "95%")
           ),
          column(4,
-           downloadButton(outputId = 'download_table', label = 'Download data',
-                        style="margin: 25px 10px 25px 10px ")
+           downloadButton(outputId = 'download_table',
+                          label = 'Download data',
+                          style = "margin: 25px 10px 25px 10px ")
          ),  
-        DT::dataTableOutput("table_explorer", width="95%"),
-        #Footnote for Tayside beds data
+        dataTableOutput("table_explorer", width = "95%"),
+        
+        # Insert footnote for Tayside beds data
         conditionalPanel(
           condition = "input.filename_table == 'Beds'",
-          p("Beds data for NHS Tayside from May/June 2016 onwards are inaccurate due to a 
-          system issue with their patient management system. Please bear this in mind when looking 
-            at data. Further detail about this can be found in the ",
-            tags$a(href="http://www.isdscotland.org/tpp/data-quality", "data quality"),
+          p("Beds data for NHS Tayside from May/June 2016 onwards 
+            are inaccurate due to a system issue with their patient 
+            management system. Please bear this in mind when looking 
+            at the data. Further detail about this can be found in the ",
+            tags$a(href="http://www.isdscotland.org/tpp/data-quality",
+                   "data quality"),
             "section.")
         )
-   )
+    )
   )
 )
 
 
+
+### END OF SCRIPT ###

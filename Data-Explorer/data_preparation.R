@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 14 June 2018
+### Last edited on: 05 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -69,34 +69,30 @@ library(stringi)
 
 
 # 1.2 - Define base filepath
-base_filepath <- paste("//stats/pub_incubator/01 Acute Activity",
-                       "/wrangling/data/base_files/",
-                       sep = "")
+base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
+                        "/wrangling/data/base_files/")
 
 
 # 1.3 - Load functions script
 # TO DO - change this when files are moved to the TP folder
-source(paste("C:\\Users\\jackha03\\Documents\\Rshiny",
-             "\\Data-Explorer\\functions.R",
-             sep = ""))
+source(paste0("C:\\Users\\jackha03\\Documents\\Rshiny",
+              "\\Data-Explorer\\functions.R"))
 
 
 
 ### Section 2: Beds Data ----
 
 
-data_bed <- read_csv(paste(
+data_bed <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_beds.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_beds.csv")) %>%
   select(-c(quarter_date, hb_code, hb_name, loc_code)) %>%
   mutate_at(c("asb", "aob", "p_occ"), funs(round(., 1)))
 
 # Save file
-saveRDS(data_bed, paste(
+saveRDS(data_bed, paste0(
   base_filepath,
-  "R files/beds.rds",
-  sep = ""))
+  "R files/beds.rds"))
 
 
 
@@ -107,18 +103,16 @@ saveRDS(data_bed, paste(
 
 
 # 3.1.1 - Residence data
-data_spec_ip_res <- read_csv(paste(
+data_spec_ip_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_res_spec.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_res_spec.csv")) %>%
   res()
 
 
 # 3.1.2 - Treatment data
-data_spec_ip_treat <- read_csv(paste(
+data_spec_ip_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_treat_spec.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_treat_spec.csv")) %>%
   treat()
 
 
@@ -131,19 +125,17 @@ data_spec_ip <- comb_inp(data_spec_ip_treat,
 
 
 # 3.2.1 - Residence data
-data_spec_op_res <- read_csv(paste(
+data_spec_op_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_res_spec.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_res_spec.csv")) %>%
   res() %>%
   convert_dates()
 
 
 # 3.2.2 - Treatment data
-data_spec_op_treat <- read_csv(paste(
+data_spec_op_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_treat_spec.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_treat_spec.csv")) %>%
   treat()
 
 
@@ -161,10 +153,9 @@ data_spec <- comb_all(data_spec_op,
   filter(geo_type != "Other")
 
 # Save file
-saveRDS(data_spec, paste(
+saveRDS(data_spec, paste0(
   base_filepath,
-  "R files/spec.rds",
-  sep = ""))
+  "R files/spec.rds"))
 
 
 # 3.4 - Delete all intermediate files
@@ -181,18 +172,16 @@ rm(data_spec_ip_res, data_spec_ip_treat,
 
 
 # 4.1.1 - Residence data
-data_simd_ip_res <- read_csv(paste(
+data_simd_ip_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_res_simd.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_res_simd.csv")) %>%
   res()
 
 
 # 4.1.2 - Treatment data
-data_simd_ip_treat <- read_csv(paste(
+data_simd_ip_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_treat_simd.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_treat_simd.csv")) %>%
   treat()
 
 
@@ -206,19 +195,17 @@ data_simd_ip <- comb_inp(data_simd_ip_res,
 
 
 # 4.2.1 - Residence data
-data_simd_op_res <- read_csv(paste(
+data_simd_op_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_res_simd.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_res_simd.csv")) %>%
   res() %>%
   convert_dates()
 
 
 # 4.2.2 - Treatment data
-data_simd_op_treat <- read_csv(paste(
+data_simd_op_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_treat_simd.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_treat_simd.csv")) %>%
   
   # Exclude three location codes which have no name
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
@@ -247,10 +234,9 @@ data_simd <- comb_all(data_simd_op,
     ))
 
 # Save file
-saveRDS(data_simd, paste(
+saveRDS(data_simd, paste0(
   base_filepath,
-  "R files/simd.rds",
-  sep = ""))
+  "R files/simd.rds"))
 
 
 # 4.4 - Delete all intermediate files
@@ -267,18 +253,16 @@ rm(data_simd_ip_res, data_simd_ip_treat,
 
 
 # 5.1.1 - Residence data
-data_trend_ip_res <- read_csv(paste(
+data_trend_ip_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_res_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_res_all.csv")) %>%
   res()
 
 
 # 5.1.2 - Treatment data
-data_trend_ip_treat <- read_csv(paste(
+data_trend_ip_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_treat_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_treat_all.csv")) %>%
   treat()
 
 
@@ -292,19 +276,17 @@ data_trend_ip <- comb_inp(data_trend_ip_treat,
 
 
 # 5.2.1 - Residence data
-data_trend_op_res <- read_csv(paste(
+data_trend_op_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_res_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_res_all.csv")) %>%
   res() %>%
   convert_dates()
 
 
 # 5.2.2 - Treatment data
-data_trend_op_treat <- read_csv(paste(
+data_trend_op_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_treat_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_treat_all.csv")) %>%
   treat()
 
 
@@ -332,10 +314,9 @@ data_trend <- comb_all(data_trend_op,
   arrange(quarter_date_last)
 
 # Save file
-saveRDS(data_trend, paste(
+saveRDS(data_trend, paste0(
   base_filepath,
-  "R files/trend.rds",
-  sep = ""))
+  "R files/trend.rds"))
 
 
 # 5.4 - Delete all intermediate files
@@ -352,10 +333,9 @@ rm(data_trend_ip_res, data_trend_ip_treat,
 
 
 # 6.1.1 - Residence data
-data_pyramid_ip_res <- read_csv(paste(
+data_pyramid_ip_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_res_agesex.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_res_agesex.csv")) %>%
   res() %>%
   
   # Split sex and age into two columns
@@ -364,10 +344,9 @@ data_pyramid_ip_res <- read_csv(paste(
 
 
 # 6.1.2 - Treatment data
-data_pyramid_ip_treat <- read_csv(paste(
+data_pyramid_ip_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_treat_agesex.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_treat_agesex.csv")) %>%
   treat() %>%
   
   # Split sex and age into two columns
@@ -385,10 +364,9 @@ data_pyramid_ip <- comb_inp(data_pyramid_ip_treat,
 
 
 # 6.2.1 - Residence data
-data_pyramid_op_res <- read_csv(paste(
+data_pyramid_op_res <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_res_agesex.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_res_agesex.csv")) %>%
   res() %>%
   convert_dates() %>%
   
@@ -398,10 +376,9 @@ data_pyramid_op_res <- read_csv(paste(
 
 
 # 6.2.2 - Treatment data
-data_pyramid_op_treat <- read_csv(paste(
+data_pyramid_op_treat <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_treat_agesex.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_treat_agesex.csv")) %>%
   treat() %>%
   convert_dates() %>%
   
@@ -428,10 +405,9 @@ data_pyramid <- comb_all(data_pyramid_op,
                                         "%d/%m/%Y"))
 
 # Save file
-saveRDS(data_pyramid, paste(
+saveRDS(data_pyramid, paste0(
   base_filepath,
-  "R files/pyramid.rds",
-  sep = ""))
+  "R files/pyramid.rds"))
 
 
 # 6.4 - Delete all intermediate files
@@ -445,10 +421,9 @@ rm(data_pyramid_ip_res, data_pyramid_ip_treat,
 
 
 # 7.1 - Inpatient data
-data_map_ipdc <- read_csv(paste(
+data_map_ipdc <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_stays_res_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_stays_res_all.csv")) %>%
   
   # Exclude Scotland, Golden Jubilee and
   # non-territorial codes
@@ -477,17 +452,15 @@ data_map_ipdc <- read_csv(paste(
   ))
 
 # Save file
-saveRDS(data_map_ipdc, paste(
+saveRDS(data_map_ipdc, paste0(
   base_filepath,
-  "R files/map_ipdc.rds",
-  sep = ""))
+  "R files/map_ipdc.rds"))
 
 
 # 7.2 - Outpatient data
-data_map_op <- read_csv(paste(
+data_map_op <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_OP_res_all.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_OP_res_all.csv")) %>%
   convert_dates() %>%
   
   # Exclude Scotland, Golden Jubilee and
@@ -516,10 +489,9 @@ data_map_op <- read_csv(paste(
   ))
 
 # Save file
-saveRDS(data_map_op, paste(
+saveRDS(data_map_op, paste0(
   base_filepath,
-  "R files/map_op.rds",
-  sep = ""))
+  "R files/map_op.rds"))
 
 
 
@@ -527,10 +499,9 @@ saveRDS(data_map_op, paste(
 
 
 # 8.1 - Inpatient data
-data_cbf_ip <- read_csv(paste(
+data_cbf_ip <- read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_IPDC_cbf.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_IPDC_cbf.csv")) %>%
   
   # Select health boards only
   filter(hbtreat_name != "Non-NHS Provider" &
@@ -552,17 +523,15 @@ data_cbf_ip <- read_csv(paste(
             funs(stri_replace_first_fixed(., "NHS ", "")))
 
 # Save file
-saveRDS(data_cbf_ip, paste(
+saveRDS(data_cbf_ip, paste0(
   base_filepath,
-  "R files/cbf_ip.rds",
-  sep = ""))
+  "R files/cbf_ip.rds"))
 
 
 # 8.2 - Outpatient data
-data_cbf_op <-  read_csv(paste(
+data_cbf_op <-  read_csv(paste0(
   base_filepath,
-  "QAcute_Dec17_outpats_cbf.csv",
-  sep = "")) %>%
+  "QAcute_Dec17_outpats_cbf.csv")) %>%
   convert_dates() %>%
   
   # Select health boards only
@@ -584,10 +553,9 @@ data_cbf_op <-  read_csv(paste(
             funs(stri_replace_first_fixed(., "NHS ", "")))
 
 # Save file
-saveRDS(data_cbf_op, paste(
+saveRDS(data_cbf_op, paste0(
   base_filepath,
-  "R files/cbf_op.rds",
-  sep = ""))
+  "R files/cbf_op.rds"))
 
 
 
