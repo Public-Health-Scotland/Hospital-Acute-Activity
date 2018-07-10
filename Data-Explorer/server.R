@@ -98,7 +98,6 @@ function(input, output) {
     
     # If no data are available for that quarter then plot message
     # saying data are missing
-    # The same if measure DNA rate and no DNA select as service
     if ((is.data.frame(data_trend_plot()) &&
          nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
@@ -240,7 +239,7 @@ function(input, output) {
   output$pyramid_plot <- renderPlotly({
     
     # If no data available for that quarter then plot message
-    # saying data is missing
+    # saying data are missing
     if (is.data.frame(data_pyramid_plot()) &&
         nrow(data_pyramid_plot()) == 0)
     {
@@ -383,7 +382,7 @@ function(input, output) {
   output$simd_plot <- renderPlotly({
     
     # If no data available for that quarter then plot message
-    # saying data is missing
+    # saying data are missing
     if (is.data.frame(data_simd_plot()) &&
         nrow(data_simd_plot()) == 0)
     {
