@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 05 July 2018
+### Last edited on: 10 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -125,6 +125,9 @@ tabPanel("Time trend",
                             label = "Select type of activity",
                             choices = trend_service,
                             multiple = TRUE,
+                            options = list(
+                              `selected-text-format` = "count > 1"
+                            ),
                             selected =
                               c("All inpatients and daycases")
                             
