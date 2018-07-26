@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 05 July 2018
+### Last edited on: 16 July 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -436,7 +436,7 @@ data_map_ipdc <- read_csv(paste0(
   
   # Create a dummy variable for crude rate, and
   # labels for the map tooltip
-  mutate(crude_rate = seq(1:5799),
+  mutate(crude_rate = seq(1:nrow(.)),
          labs = paste0(
            loc_name, '</br>', 'Admissions: ',
            stays, '</br>', 'Crude rate: ',
@@ -470,7 +470,7 @@ data_map_op <- read_csv(paste0(
   
   # Create a dummy variable for crude rate, and
   # labels for the map tooltip
-  mutate(crude_rate = seq(1:1932),
+  mutate(crude_rate = seq(1:nrow(.)),
          labs = paste0(
            loc_name, '</br>', 'Appointments: ',
            count, '</br>', 'Rate: ',
