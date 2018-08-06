@@ -1,99 +1,198 @@
-#Syntax to create the data explorer
-#In this file include packages, datasets and anyting that will be used both by UI and server
-#Jaime Villacampa October 17
+################################################################
+### Global
+### Data Explorer script 3 of 5
+###
+### Original Author: Jaime Villacampa
+### Original Date: October 2017
+### Last edited by: Jack Hannah
+### Last edited on: 16 July 2018
+###
+### Written to be run on RStudio Desktop
+###
+### Packages required:
+### shiny (for the interactive framework);
+### DT (for data tables);
+### googleVis (for Sankey charts);
+### htmltools (for tooltips);
+### leaflet (for maps);
+### plotly (for interactive plots);
+### rgdal (for reading shapefiles);
+### dplyr and tidyr (for data manipulation);
+### readr (for writing csv files);
+### zoo (for dates)
+###
+### This script includes all packages, datasets and other
+### values used by both the UI and server files
 
-#TODO:
-#see server syntax
 
-############################.
-##Packages ----
-############################.
-library(DT) #data tables
-library(googleVis) #charts - sankey
-library(htmltools) #tooltips
-library(leaflet) # mapping package
-library(plotly) #interactive visualizations
-#library (rgdal) #reading shapefiles. Only needed for map, not in use at the moment
-library(reshape2) #for melting and dcast
-library(shiny) #interactive framework
-library(stringr) #manipulation strings
-library(tidyverse) #data manipulation, etc
-library (zoo) #for dates
 
-############################.
-##Data ----
-############################.
-##############Beds data 
-data_bed <- readRDS("./data/beds.rds") 
+### Section 1: Housekeeping ----
 
-##############Specialty data  
-data_spec <- readRDS("./data/spec_IPOP.rds") 
 
-##############SIMD data   
-data_simd <- readRDS("./data/SIMD_IPOP.rds")
+# 1.1 - Load libraries
+library(shiny)
+library(DT)
+library(googleVis)
+library(htmltools)
+library(leaflet)
+library(plotly)
+# library(rgdal) (Only needed for mapping - not in use at present)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(zoo)
 
-##############Time trend data  
-data_trend <- readRDS("./data/trend_IPOP.rds") 
 
-##############Population pyramid data   
-data_pyramid <- readRDS("./data/pyramid_IPOP.rds")
+# 1.2 - Define base filepath
+base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
+                        "/wrangling/data/base_files/")
 
-##############Map data  
+
+
+### Section 2: Loading Data ----
+
+
+# Beds data
+data_bed <- readRDS(paste0(
+  base_filepath,
+  "R files/beds.rds"))
+
+# Specialty data
+data_spec <- readRDS(paste0(
+  base_filepath,
+  "R files/spec.rds"))
+
+# SIMD data
+data_simd <- readRDS(paste0(
+  base_filepath,
+  "R files/simd.rds"))
+
+# Time Trend data
+data_trend <- readRDS(paste0(
+  base_filepath,
+  "R files/trend.rds"))
+
+# Population Pyramid data
+data_pyramid <- readRDS(paste0(
+  base_filepath,
+  "R files/pyramid.rds"))
+
+# Map data (outpatients)
 # Not in use at the moment
-# data_mapop <- readRDS("./data/op_map.rds") 
-# 
-# ##########.
-# #Shapefile data
-# ca_bound<-readOGR("./shapefiles","CA_simpl") #Reading file with council shapefiles
-# hb_bound<-readOGR("./shapefiles","HB_simpl") #Reading file with health board shapefiles
+# data_map_op <- readRDS(paste0(
+#   base_filepath,
+#   "R files/map_op.rds"))
 
-##############Cross-boundary data    
-data_cbfip <- readRDS("./data/ipdc_crossbf.rds") #inpatients
-data_cbfop <- readRDS("./data/op_crossbf.rds") #outpatients
+# Cross-Boundary data
 
-##############Others 
-#All of these are for dropdown selections in different parts of the app.
-#Used in the crossboundary diagram
-data_type <- c("Outpatients", "Inpatients/Day cases")
+# Inpatients
+data_cbf_ip <- readRDS(paste0(
+  base_filepath,
+  "R files/cbf_ip.rds"))
 
-#So selected quarter is the latest available. Needs to be automated.
-latest_quarter <- c("Jul - Sep-17")
-  
-  #for table selection (table tab)
-  file_types <-  c("Beds", "Inpatients/Day cases - Age/sex", 
-                   "Inpatients/Day cases - Cross boundary flow", "Inpatients/Day cases - Time trend", 
-                   "Inpatients/Day cases - Specialty", "Inpatients/Day cases - Deprivation (SIMD)", 
-                   "Outpatients - Age/sex", "Outpatients - Cross boundary flow", 
-                   "Outpatients - Time trend", "Outpatients - Specialty", 
-                   "Outpatients - Deprivation (SIMD)")
+# Outpatients
+data_cbf_op <- readRDS(paste0(
+  base_filepath,
+  "R files/cbf_op.rds"))
 
-#Used in most tabs  
-geo_types <- c("Scotland", "Health board of treatment", "Health board of residence", 
-               "Council area of residence", "Hospital of treatment", "Other")
 
-#Used in trend as at the moment Other not included in time trend
-geo_types_trend <- c("Scotland", "Health board of treatment", "Health board of residence", 
-               "Council area of residence", "Hospital of treatment")
 
-trend_service <- c(as.character(unique(data_trend$measure)))
-trend_measure <- c("Number of stays/appointments", "Total length of stay (days)", "Mean length of stay (days)", "Did not attend rate (%)")
-pyramid_service <- c(as.character(unique(data_pyramid$measure)))
+### Section 3: Other Values ----
 
-############################.
-##Plot parameters ----
-############################.
-##Time trend ----
-trend_pal <- c("#004785", "#4c7ea9", "#99b5ce", "#00a2e5", "#4cbeed", "#99daf5")  
 
-##Cross-boundary----
-#Defining colors for sankey diagram
-colors_node <- c('CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 
-                 "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue",
-                 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', 'CornflowerBlue', "CornflowerBlue", "CornflowerBlue", 
-                 "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue", "CornflowerBlue")
-colors_node_array <- paste0("[", paste0("'", colors_node,"'", collapse = ','), "]")
+# All of these values are used for dropdown selections in different
+# parts of the app
+
+
+# 3.1 - Cross-Boundary diagram
+# Time trend data is used to get the two types of patients, but any
+# of the datasets with a 'file' column could have been used
+data_type <- data_trend %>%
+  distinct(file) %>%
+  pull(file)
+
+
+# 3.2 - Latest financial quarter
+# Again use time trend data
+latest_quarter <- data_trend %>%
+  filter(quarter_date_last == max(quarter_date_last)) %>%
+  distinct(quarter_date_last, quarter_name) %>%
+  pull(quarter_name)
+
+
+# 3.3 - Dropdown choices in 'Table' tab
+file_types <-  c("Beds",
+                 "Inpatients/Day cases - Age/sex", 
+                 "Inpatients/Day cases - Cross boundary flow",
+                 "Inpatients/Day cases - Time trend", 
+                 "Inpatients/Day cases - Specialty",
+                 "Inpatients/Day cases - Deprivation (SIMD)", 
+                 "Outpatients - Age/sex",
+                 "Outpatients - Cross boundary flow", 
+                 "Outpatients - Time trend",
+                 "Outpatients - Specialty", 
+                 "Outpatients - Deprivation (SIMD)")
+
+
+# 3.4 - Geography types
+
+
+# 3.4.1 - Including 'Other'
+# Used in most tabs
+# Use SIMD dataset, as this contains 'Other' type
+geo_type <- data_simd %>%
+  distinct(geo_type) %>%
+  pull(geo_type)
+
+
+# 3.4.2 - Excluding 'Other'
+# Used in 'Time Trend' tab, as, at present, 'Other' is not
+# included as part of the time trend data
+geo_type_trend <- data_trend %>%
+  distinct(geo_type) %>%
+  pull(geo_type)
+
+
+# 3.5 - Time Trend services
+trend_service <- data_trend %>%
+  distinct(measure) %>%
+  pull(measure)
+
+
+# 3.6 - Time Trend measures
+trend_measure <- c("Number of stays / appointments",
+                   "Total length of stay (days)",
+                   "Mean length of stay (days)",
+                   "Did not attend rate (%)")
+
+
+# 3.7 - Pyramid services
+pyramid_service <- data_pyramid %>%
+  distinct(measure) %>%
+  pull(measure)
+
+
+
+### Section 4: Plot Parameters ----
+
+
+# 4.1 - Time Trend colour palette
+trend_pal <- c("#004785", "#4c7ea9", "#99b5ce",
+               "#00a2e5", "#4cbeed", "#99daf5")
+
+
+# 4.2 - Cross-Boundary colour palette for Sankey diagram
+# in the Cross-boundary tab
+colours_node <- rep("CornflowerBlue", times = 28)
+
+colours_node_array <- paste0("[", paste0("'", colours_node,
+                                         "'", collapse = ','),
+                             "]")
 
 opts <- paste0("{
-               node: { colors: ", colors_node_array ," }
+               node: { colours: ", colours_node_array ," }
                }" )
-##END
+
+
+
+### END OF SCRIPT ###

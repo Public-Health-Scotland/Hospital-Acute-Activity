@@ -1,239 +1,370 @@
-#Syntax to create the data explorer
-#Jaime Villacampa October 17
+################################################################
+### Server
+### Data Explorer script 5 of 5
+###
+### Original Author: Jaime Villacampa
+### Original Date: October 2017
+### Last edited by: Jack Hannah
+### Last edited on: 09 July 2018
+###
+### Written to be run on RStudio Desktop
+###
+### This script controls what the data explorer *does*
 
-#TODO:
-#Fix issues with selection of dates (max date and order)
-#Order quarter variable in tables based on date (use date variable instead?)
-#Add visualization for specialty (time trend, bar chart)
 
-#Figure out colors scale for map/fix legend image
-# Make map outpatients work (need to check raw data, add switch or merge datasets)
+
+# NOTE - the subset function is used in the below code on several
+# occasions, rather than using filter
+# This is because filter struggles with the '$' operator
+# Where possible, filter is still preferred
+
+### TO DO (Jaime): ----
+
+
+# Fix issues with selection of dates (max date and order)
+# Order quarter variable in tables based on date (use date variable instead?)
+# Add visualization for specialty (time trend, bar chart)
+
+# Figure out colors scale for map/fix legend image
+# Make map outpatients work (need to check raw data, add switch or
+# merge datasets)
 # Include los, dna rate and avlos in map, deprivation, age-sex?
 
 # Include bed time trend might require merging datasets
-#Fix formatting numbers tooltip
-#Set labels for time trend (to avoid cases with decimals)
+# Fix formatting numbers tooltip
+# Set labels for time trend (to avoid cases with decimals)
 
-#Alignment download boxes
-#Think about color palette for trend
-#include functionality to save cross-boundary plots
+# Alignment download boxes
+# Think about color palette for trend
+# Include functionality to save cross-boundary plots
 
-############################.
-## Server ----
-############################.
+
+
+### Server ----
+
 
 function(input, output) {
   
-  ##############################################.             
-  ##############Time trend----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+               
+  ### Tab 2: Time trend----   
+    
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_trend <- renderUI({
-    selectInput("geotype_trend", label = "Select the type of location", 
-                choices = geo_types_trend, selected =  "Scotland")
+    selectInput("geotype_trend",
+                label = "Select the type of location", 
+                choices = geo_type_trend,
+                selected =  "Scotland")
   })
   
   output$locname_ui_trend <- renderUI({
-    selectInput("locname_trend", "Select the location", 
-                choices = sort(unique(data_trend$loc_name[data_trend$geo_type == input$geotype_trend])),
-                selectize = TRUE, selected = "Scotland")
+    selectInput("locname_trend",
+                "Select the location",
+                choices = data_trend %>%
+                  subset(geo_type == input$geotype_trend) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
-  #Reactive datasets
-  #reactive dataset for the trend plot
+  # Reactive datasets
+  # Reactive dataset for the trend plot
 
   data_trend_plot <- reactive({
     data_trend %>% 
-      subset(loc_name == input$locname_trend & measure %in% input$service_trend &
+      subset(loc_name == input$locname_trend &
+               measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
-      rename("Total length of stay (days)" = los, "Mean length of stay (days)" = avlos,
-             "Number of stays/appointments" = count, "Did not attend rate (%)" = rate)
-      
-    })
+      rename("Total length of stay (days)" = los,
+             "Mean length of stay (days)" = avlos,
+             "Number of stays / appointments" = count,
+             "Did not attend rate (%)" = rate)
+      })
 
-  #Table data
-  table_trenddata <- reactive({
+  # Table data
+  table_trend_data <- reactive({
     data_trend %>% 
-      subset(loc_name == input$locname_trend & measure %in% input$service_trend &
+      subset(loc_name == input$locname_trend &
+               measure %in% input$service_trend &
                geo_type == input$geotype_trend) %>% 
-      select(c(loc_name, quarter_name, measure, count, rate, los, avlos))
-
-    
+      select(loc_name, quarter_name, measure, count, rate, los, avlos)
   })
 
-    #Plotting 
+    # Plotting 
   output$trend_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
-    #The same if measure DNA rate and no DNA select as service
-    if ((is.data.frame(data_trend_plot()) && nrow(data_trend_plot()) == 0) |
+    
+    # If no data are available for that quarter then plot message
+    # saying data are missing
+    if ((is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
-         !("Did not attend outpatient appointments" %in% input$service_trend )))
+         !("Did not attend outpatient appointments" %in% input$service_trend)
+         ))
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
+      # Plotting empty plot just with text
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available" ,
+                      xref = "x",
+                      yref = "y",
+                      showarrow = FALSE)
       
       plot_ly() %>%
         layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+               
+               # Empty layout
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
       
-    }
-    else {
+    } else {
 
-    #Text for tooltip
+    # Text for tooltip
     tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
                         data_trend_plot()$quarter_name, "<br>",
-                        input$measure_trend, ": ", data_trend_plot()[[input$measure_trend]]))
+                        input$measure_trend, ": ",
+                        data_trend_plot()[[input$measure_trend]]))
 
-    #Plotting time trend
-    plot_ly(data=data_trend_plot(), x=~quarter_date2, 
+    # Plotting time trend
+    plot_ly(data = data_trend_plot(),
+            x = ~quarter_date_last, 
             y = ~get(input$measure_trend), 
-            text=tooltip, hoverinfo="text",
-            type = 'scatter', mode = 'lines+markers',
-            color=~measure, colors = trend_pal) %>% 
-      #Layout
-      layout(annotations = list(), #It needs this because of a buggy behaviour
-             yaxis = list(title = input$measure_trend, rangemode="tozero"), 
-             xaxis = list(title = "Time period"),  #axis parameter
-             hovermode = 'false') %>%  # to get hover compare mode as default
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+            text = tooltip,
+            hoverinfo = "text",
+            type = 'scatter',
+            mode = 'lines+markers',
+            color = ~measure,
+            colors = trend_pal) %>%
+      
+      # Layout
+      layout(annotations = list(), # It needs this due to a buggy behaviour
+             yaxis = list(title = input$measure_trend,
+                          rangemode = "tozero"),
+             
+             # Axis parameter
+             xaxis = list(title = "Time period"),
+             
+             # To get hover compare mode as default
+             hovermode = 'false') %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     }
     
     }) 
 
-  ######Table
-  output$table_trend <- DT::renderDataTable({
-    DT::datatable(table_trenddata(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 16, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "Number", "DNA rate",
-                               "Total length of stay", "Mean length of stay")  
+  # Table
+  output$table_trend <- renderDataTable({
+    datatable(table_trend_data(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 16,
+                             dom = 'tip'),
+              colnames = c("Location", "Quarter", "Type of activity",
+                           "Number", "DNA rate",
+                           "Total length of stay", "Mean length of stay")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+
+      
+  # Downloading data
   output$download_trend <- downloadHandler(
     filename =  'trend_data.csv',
     content = function(file) {
-      write.csv(data_trend_plot(), file) 
+      write_csv(data_trend_plot(), file) 
     }
   )
   
-  ##############################################.             
-  ##############Population pyramid----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+             
+  ### Tab 3: Population pyramid ----   
+    
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_pyramid <- renderUI({
-    selectInput("geotype_pyramid", label = "Select the type of location", 
-                choices = geo_types, selected =  "Scotland")
+    selectInput("geotype_pyramid",
+                label = "Select the type of location", 
+                choices = geo_type,
+                selected =  "Scotland")
   })
   
   output$locname_ui_pyramid <- renderUI({
-    selectInput("locname_pyramid", "Select the location", 
-                choices = sort(unique(data_pyramid$loc_name[data_pyramid$geo_type == input$geotype_pyramid])),
-                selectize = TRUE, selected = "Scotland")
+    selectInput("locname_pyramid",
+                "Select the location",
+                choices = data_pyramid %>%
+                  subset(geo_type == input$geotype_pyramid) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
-  #Reactive datasets
+  # Reactive datasets
   data_pyramid_plot <- reactive({data_pyramid %>% 
       subset(loc_name == input$locname_pyramid & 
                measure == input$measure_pyramid &
                geo_type == input$geotype_pyramid &
-               quarter_name == input$quarter_pyramid) %>% 
-      mutate(count = ifelse(sex=="Male", -(count), count)) # so it plots correcttly and no stacked bars
+               quarter_name == input$quarter_pyramid) %>%
+      
+      # So the graph plots correctly with no stacked bars
+      mutate(count = ifelse(sex == "Male",
+                            -(count),
+                            count))
   })
   
-  #Table data
+  # Table data
   data_table_pyramid <- reactive({
     data_pyramid_plot() %>% 
-      select(loc_name, quarter_name, measure, age, sex, count) %>% 
-      mutate(count = abs(count)) #to go back to positive values
+      select(loc_name, quarter_name, measure, age, sex, count) %>%
+      
+      # To go back to positive values
+      mutate(count = abs(count))
   })
   
-  #Plotting pyramid population chart
+  # Plotting pyramid population chart
   output$pyramid_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
-    if (is.data.frame(data_pyramid_plot()) && nrow(data_pyramid_plot()) == 0)
+    
+    # If no data available for that quarter then plot message
+    # saying data are missing
+    if (is.data.frame(data_pyramid_plot()) &&
+        nrow(data_pyramid_plot()) == 0)
     {
-    #plotting empty plot just with text
-    text_na <- list(x = 5, y = 5, text = "No data available" ,
-      xref = "x", yref = "y",  showarrow = FALSE)
+      
+    # Plotting empty plot just with text
+    text_na <- list(x = 5,
+                    y = 5,
+                    text = "No data available",
+                    xref = "x",
+                    yref = "y", 
+                    showarrow = FALSE)
     
     plot_ly() %>%
       layout(annotations = text_na,
-             #empty layout
-             yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-             xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-      config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+             
+             # empty layout
+             yaxis = list(showline = FALSE,
+                          showticklabels = FALSE,
+                          showgrid = FALSE),
+             xaxis = list(showline = FALSE,
+                          showticklabels = FALSE,
+                          showgrid = FALSE)) %>%
       
-    }
-    else {
-    #Breaks and labels for plot
-    breaks <- round(max(abs(data_pyramid_plot()$count))/3)
+      # Take out plotly logo and collaborate button
+      config(displayModeBar = FALSE)
+      
+    } else {
+    
+    # Breaks and labels for plot
+    breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
     max <- round(max(abs(data_pyramid_plot()$count)))
     
-    #Calculate breaks and labels for x axis
-    brks <- c(seq(-max, 0, breaks), seq(breaks, max, breaks))
+    # Calculate breaks and labels for x axis
+    brks <- c(seq(-max, 0, breaks),
+              seq(breaks, max, breaks))
     lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
                                   seq(breaks, max, breaks))))
     
-    #Text for tooltip
-    tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ", data_pyramid_plot()$age, "<br>",
-                           "Number: ", abs(data_pyramid_plot()$count)))
+    # Text for tooltip
+    tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ",
+                            data_pyramid_plot()$age, "<br>",
+                           "Number: ",
+                           abs(data_pyramid_plot()$count)))
     
-    plot_ly(data=data_pyramid_plot(), x= ~count, y=~age, color=~sex, colors = trend_pal,
-            text=tooltip_pyr, hoverinfo="text") %>% 
+    plot_ly(data=data_pyramid_plot(),
+            x = ~count,
+            y = ~age,
+            color = ~sex,
+            colors = trend_pal,
+            text = tooltip_pyr,
+            hoverinfo = "text") %>% 
       add_bars(orientation = 'h') %>%
-      layout(bargap = 0.1, barmode = 'overlay',
+      layout(bargap = 0.1,
+             barmode = 'overlay',
              yaxis = list(title = "Age"), 
-             xaxis = list(tickmode = 'array', tickvals = brks,
-                          ticktext = lbls, showline = TRUE,
-                          title = paste("Number of", input$measure_pyramid))) %>% 
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+             xaxis = list(tickmode = 'array',
+                          tickvals = brks,
+                          ticktext = lbls,
+                          showline = TRUE,
+                          title = paste("Number of",
+                                        input$measure_pyramid))) %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     
     }
   }) 
 
-  ######Table
-  output$table_pyramid <- DT::renderDataTable({
-    DT::datatable(data_table_pyramid(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "Age", "Sex", "Number")  
+  # Table
+  output$table_pyramid <- renderDataTable({
+    datatable(data_table_pyramid(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20,
+                             dom = 'tip'),
+              colnames = c("Location",
+                           "Quarter",
+                           "Type of activity",
+                           "Age",
+                           "Sex",
+                           "Number")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+  
+     
+  # Downloading data
   output$download_pyramid <- downloadHandler(
-    filename =  'agesex_data.csv',
+    filename = 'agesex_data.csv',
     content = function(file) {
-      write.csv(data_pyramid_plot(), file) 
+      write_csv(data_pyramid_plot(),
+                file) 
     }
   )
   
-  ##############################################.             
-  ##############Deprivation simd----   
-  ##############################################.  
-  #Reactive dropdowns for this tab
-  #They will provide a list of locations filtered by geography type
+  
+             
+  ### Tab 4: Deprivation (SIMD) ----   
+  
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
   output$geotype_ui_simd <- renderUI({
-    selectInput("geotype_simd", label = "Select the type of location", 
-                choices = geo_types, selected =  "Scotland")
+    selectInput("geotype_simd",
+                label = "Select the type of location", 
+                choices = geo_type,
+                selected = "Scotland")
   })
   
   output$locname_ui_simd <- renderUI({
-    selectInput("locname_simd", "Select the location", 
-                choices = sort(unique(data_simd$loc_name[data_simd$geo_type == input$geotype_simd])),
-                selectize = TRUE, selected = "Scotland")
+    selectInput("locname_simd",
+                "Select the location",
+                choices = data_simd %>%
+                  subset(geo_type == input$geotype_simd) %>%
+                  distinct(loc_name) %>%
+                  arrange(loc_name) %>%
+                  pull(loc_name),
+                selectize = TRUE,
+                selected = "Scotland")
   })
   
-  #Reactive datasets
-  #reactive dataset for the simd plot
+  # Reactive datasets
+  # Reactive dataset for the simd plot
   data_simd_plot <- reactive({data_simd %>% 
       subset(loc_name == input$locname_simd & 
                measure == input$measure_simd &
@@ -241,69 +372,105 @@ function(input, output) {
                quarter_name == input$quarter_simd) 
   })
   
-  #Table data
+  # Table data
   data_table_simd <- reactive({
     data_simd_plot() %>% 
       select(loc_name, quarter_name, measure, simd, count, rate, avlos)
   })
   
-  #Plotting simd bar chart
+  # Plotting simd bar chart
   output$simd_plot <- renderPlotly({
-    #If no data available for that quarter then plot message saying data is missing
-    if (is.data.frame(data_simd_plot()) && nrow(data_simd_plot()) == 0)
+    
+    # If no data available for that quarter then plot message
+    # saying data are missing
+    if (is.data.frame(data_simd_plot()) &&
+        nrow(data_simd_plot()) == 0)
     {
-      #plotting empty plot just with text
-      text_na <- list(x = 5, y = 5, text = "No data available" ,
-                      xref = "x", yref = "y",  showarrow = FALSE)
+      
+      # Plotting empty plot just with text
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available" ,
+                      xref = "x",
+                      yref = "y",
+                      showarrow = FALSE)
       
       plot_ly() %>%
         layout(annotations = text_na,
-               #empty layout
-               yaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE),
-               xaxis = list(showline = FALSE, showticklabels = FALSE, showgrid = FALSE)) %>% 
-        config( displayModeBar = FALSE) # taking out plotly logo and collaborate button
+               
+               # Empty layout
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
       
-    }
-    else {
+    } else {
     
-    #Text for tooltip
-    tooltip_simd <- c(paste0("Quintile: ", data_simd_plot()$simd, "<br>",
-                            "Number: ", abs(data_simd_plot()$count)))
+    # Text for tooltip
+    tooltip_simd <- c(paste0("Quintile: ",
+                             data_simd_plot()$simd,
+                             "<br>",
+                            "Number: ",
+                            abs(data_simd_plot()$count)))
     
-    plot_ly(data=data_simd_plot(), x=~simd , y=~count,
-            text=tooltip_simd, hoverinfo="text") %>% 
+    plot_ly(data = data_simd_plot(),
+            x = ~simd,
+            y = ~count,
+            text = tooltip_simd,
+            hoverinfo = "text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
-             yaxis = list(title = paste("Number of", input$measure_simd)), 
-             xaxis = list(showline = TRUE, title = "Deprivation (SIMD) quintile")) %>% 
-      config(displaylogo = F, collaborate=F, editable =F) # taking out plotly logo and collaborate button
+             yaxis = list(title = paste("Number of",
+                                        input$measure_simd)), 
+             xaxis = list(showline = TRUE,
+                          title = "Deprivation (SIMD) quintile")) %>%
+      
+      # Take out plotly logo and collaborate button
+      config(displaylogo = FALSE,
+             collaborate = FALSE,
+             editable = FALSE)
     }
   }) 
   
-  ######Table
-  output$table_simd <- DT::renderDataTable({
-    DT::datatable(data_table_simd(), style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 20, dom = 'tip'),
-                  colnames = c("Location", "Quarter", "Type of activity", "SIMD quintile", 
-                               "Number", "DNA rate", "Mean length of stay")  
-    )
+  # Table
+  output$table_simd <- renderDataTable({
+    datatable(data_table_simd(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20, dom = 'tip'),
+              colnames = c("Location",
+                           "Quarter",
+                           "Type of activity",
+                           "SIMD quintile",
+                           "Number",
+                           "DNA rate",
+                           "Mean length of stay"))
   })
   
-  #####################################.    
-  #### Downloading data ----
+   
+     
+  # Downloading data
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
     content = function(file) {
-      write.csv(data_simd_plot(), file) 
+      write_csv(data_simd_plot(),
+                file) 
     }
   )
   
-  ##############################################.             
-  ##############Map ----   
-  ##############################################.     
-  ###SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
-  #Merging shapefile with dynamic selection of data
-  #First for HB
+  
+              
+  ### Tab 5: Map ----   
+  ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
+  
+  # Merging shapefile with dynamic selection of data
+  # First for HB
 #   hb_pol <- reactive({merge(hb_bound, 
 #                             data_mapipdc %>% subset(quarter_name==input$quarter_map
 #                                                     & measure==input$measure_map
@@ -381,7 +548,7 @@ function(input, output) {
 #   })
 #   
 #   #####################################.    
-#   #### Table ----
+#   #### Table
 #   
 #   #Table data
 #   table_mapdata <- reactive({
@@ -400,7 +567,7 @@ function(input, output) {
 #   })
 #   
 #   #####################################.    
-#   #### Downloading data ----
+#   #### Downloading data
 #   output$download_map <- downloadHandler(
 #     filename =  'map_data.csv',
 #     content = function(file) {
@@ -408,279 +575,431 @@ function(input, output) {
 #     }
 #   )
   
-  ##############################################.             
-  ##############Cross-boundary ----   
-  ##############################################.     
-  #Reactive data
-  #Creating dynamic selection of dataset.
+  
+               
+  ### Tab 6: Cross-boundary ----   
+     
+  # Reactive data
+  # Creating dynamic selection of dataset.
   data_flow <- reactive({switch(input$datatype_flow,
-                                "Inpatients/Day cases" = data_cbfip,
-                                "Outpatients" = data_cbfop
+                                "Inpatients/Day cases" = data_cbf_ip,
+                                "Outpatients" = data_cbf_op
   )})
   
-  
-  #For all HB
+  # For all HB
   flow_all <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & count>9 & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & count>9)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 count > 9 & 
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 count > 9)
     }
   })   
   
   # For only selected HB of residence
   flow_res <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbres_name==input$hb_flow)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 hbres_name == input$hb_flow & 
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow & 
+                 hbres_name == input$hb_flow)
     }
   })   
   
   # For only selected HB of treatment
   flow_treat <- reactive({
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow & boundary_ind == 1)
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & hbtreat_name==input$hb_flow)
+    if(input$checkbox_flow == FALSE) {
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow &
+                 hbtreat_name == input$hb_flow &
+                 boundary_ind == 1)
+      
+    } else {
+      
+      data_flow() %>%
+        subset(quarter_name == input$quarter_flow &
+                 hbtreat_name==input$hb_flow)
     }
   })   
   
-  ############################.
+  
   # Text
   output$crossb_restext <- renderText({
     flow_textres <- data_flow() %>% 
-      subset(quarter_name == input$quarter_flow & hbres_name == input$hb_flow)
-    #Percentage of people treated in their own hb
-    value_res <- round(flow_textres$count[flow_textres$boundary_ind == 0] / 
-                         sum(flow_textres$count) * 100, 1)
-
-  paste0("<b>", value_res, "</b>", "% of the patients from ", input$hb_flow, 
-         " were treated in their own health board area.")
+      subset(quarter_name == input$quarter_flow &
+               hbres_name == input$hb_flow)
+    
+    # Percentage of people treated in their own health board
+    value_res <- flow_textres %>%
+      summarise(round(count[boundary_ind == 0]
+                      / sum(count) * 100, 1)) %>%
+      pull()
+    
+    paste0("<b>",
+           value_res,
+           "</b>",
+           "% of the patients from ",
+           input$hb_flow,
+           " were treated in their own health board area.")
   })
   
   output$crossb_treattext <- renderText({
     flow_texttreat <- data_flow() %>% 
-      subset(quarter_name == input$quarter_flow & hbtreat_name == input$hb_flow)
-    #Percentage of people treated in this hb coming from other hb
-    value_treat <- round(sum(flow_texttreat$count[flow_texttreat$boundary_ind == 1]) / 
-                           sum(flow_texttreat$count) * 100, 1)
+      subset(quarter_name == input$quarter_flow &
+               hbtreat_name == input$hb_flow)
     
-    paste0("<b>", value_treat, "</b>", "% of the patients treated in ",
-           input$hb_flow, " live in other health board areas.")
+    # Percentage of people treated in this hb coming from other hb
+    value_treat <- flow_texttreat %>%
+      summarise(round(sum(count[boundary_ind == 1])
+                      / sum(count) * 100, 1)) %>%
+      pull()
+    
+    paste0("<b>",
+           value_treat,
+           "</b>",
+           "% of the patients treated in ",
+           input$hb_flow,
+           " live in other health board areas.")
   })
   
-  ############################.
+  
   # Visualizations
-  # This one with all HB at the same time.
+  
+  # This one has all the health boards at the same time
   output$sankey_all <- renderGvis({
     
-    options(gvis.plot.tag=NULL) #if changed to chart you will get the html code
-    gvisSankey(flow_all()[,c('hbres_name','hbtreat_name2','count')],
-               options = list(width = "automatic", sankey=opts
+    # Note - if this line of code is changed to chart
+    # you will get the html code
+    options(gvis.plot.tag = NULL)
+    
+    gvisSankey(flow_all()[, c('hbres_name',
+                              'hb_treat_space',
+                              'count')],
+               options = list(width = "automatic",
+                              sankey = opts
                ))
     
   })
   
-  #This one with only the selected hb of residence
+  # This one has only the selected health board of residence
   output$sankey_res <- renderGvis({
     
-    gvisSankey(flow_res()[,c('hbres_name','hbtreat_name2','count')],
+    gvisSankey(flow_res()[, c('hbres_name',
+                              'hb_treat_space',
+                              'count')],
                options = list(width = "automatic",
-                              gvis.plot.tag=NULL))#if changed to chart you will get the html code
+                              
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL))
     
   })
   
-  #This one with only the selected hb of treatment
+  # This one has only the selected health board of treatment
   output$sankey_treat <- renderGvis({
     
-    gvisSankey(flow_treat()[,c('hbres_name','hbtreat_name2','count')],
+    gvisSankey(flow_treat()[, c('hbres_name',
+                                'hb_treat_space',
+                                'count')],
                options = list(width = "automatic",
-                              gvis.plot.tag=NULL))#if changed to chart you will get the html code
-    
+                              
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL))
   })
   
-  #####################################.    
-  ### Table ----
-  
-  #Table data
-  table_cbfdata <- reactive({
-    #This if statement selects what data to show depending on the checkbox status
-    if(input$checkbox_flow == FALSE) {data_flow() %>% 
-        subset(quarter_name==input$quarter_flow  & boundary_ind == 1
-               & (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
-        select(hbres_name, hbtreat_name, quarter_name, count)
       
-    } else {data_flow() %>% subset(quarter_name==input$quarter_flow & 
-                                     (hbtreat_name==input$hb_flow | hbres_name==input$hb_flow)) %>% 
-        select(hbres_name, hbtreat_name, quarter_name, count)
+  # Table
+  
+  # Selecting the Table data
+  table_cbfdata <- reactive({
+    
+    # This if statement selects what data to show depending on
+    # the checkbox status
+    if(input$checkbox_flow == FALSE){
+      data_flow() %>% 
+        subset(quarter_name == input$quarter_flow  &
+                 boundary_ind == 1 &
+                 (hbtreat_name == input$hb_flow |
+                    hbres_name == input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name,
+               quarter_name, count)
+      
+    } else {
+      
+      data_flow() %>%
+        subset(quarter_name == input$quarter_flow &
+                 (hbtreat_name == input$hb_flow |
+                    hbres_name == input$hb_flow)) %>% 
+        select(hbres_name, hbtreat_name,
+               quarter_name, count)
     }
   })
   
-  #Actual table.
-  output$table_crossb <- DT::renderDataTable({
-    DT::datatable(table_cbfdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-                  options = list(pageLength = 10, dom = 'tip'),
-                  colnames = c("Residence board", "Treatment board",  "Quarter", "Number")  
+  # Creating the table
+  output$table_crossb <- renderDataTable({
+    datatable(table_cbfdata(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 10,
+                             dom = 'tip'),
+              colnames = c("Residence board",
+                           "Treatment board",
+                           "Quarter",
+                           "Number")  
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
+      
+  # Downloading data
   output$download_flow <- downloadHandler(
     filename =  'crossb_flow_data.csv',
     content = function(file) {
-      write.csv(table_cbfdata()(), file) 
+      write_csv(table_cbfdata(),
+                file) 
     }
   )
   
-  ##############################################.             
-  ##############Table----   
-  ##############################################.  
-  #Very simple approach, changing file with a switch, there might be better solutions
-  #Formats every dataset to what it requires for the table
-  data_table <- reactive({switch(input$filename_table,
-                                 "Beds" = data_bed %>% 
-                                   rename(Area_name = loc_name,
-                                          Specialty = spec_name,
-                                          Time_period = quarter_name,
-                                          Occupancy_percentage = p_occ,
-                                          All_available_beds = aasb),
-                                "Inpatients/Day cases - Cross boundary flow" = data_cbfip %>% 
-                                  select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-                                  rename(Health_board_residence = hbres_name,
-                                         Health_board_treatment = hbtreat_name,
-                                         Time_period = quarter_name,
-                                         Stays = count),
-                                "Inpatients/Day cases - Time trend" = data_trend %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos), 
-                                "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, sex, age, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Sex = sex,
-                                         Age_group = age,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  mutate(Stays = abs(Stays)) %>% 
-                                  droplevels(),
-                                "Outpatients - Age/sex" = data_pyramid %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, sex, age, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Sex = sex,
-                                         Age_group = age,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  mutate(Appointments = abs(Appointments)) %>% 
-                                  droplevels(),
-                                "Inpatients/Day cases - Specialty" = data_spec %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, specialty, quarter_name, 
-                                         stays, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Specialty = specialty,
-                                         Time_period = quarter_name,
-                                         Stays = stays,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  droplevels(),
-                                "Outpatients - Specialty" = data_spec %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, specialty, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         Specialty = specialty,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  droplevels(), 
-                                "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
-                                  subset(file == "Inpatients/Day Cases") %>% 
-                                  select(geo_type, loc_name, measure, simd, quarter_name, 
-                                         count, los, avlos) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         SIMD_quintile = simd,
-                                         Time_period = quarter_name,
-                                         Stays = count,
-                                         Total_length_stay = los,
-                                         Mean_length_stay = avlos) %>% 
-                                  droplevels(),
-                                "Outpatients - Deprivation (SIMD)" = data_simd %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type, loc_name, measure, simd, quarter_name, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Type_case = measure,
-                                         SIMD_quintile = simd,
-                                         Time_period = quarter_name,
-                                         Appointments = count,
-                                         DNA_rate = rate) %>% 
-                                  droplevels(), 
-                                "Outpatients - Cross boundary flow" = data_cbfop %>% 
-                                  select(hbres_name, hbtreat_name, quarter_name, count) %>% 
-                                  rename(Health_board_residence=hbres_name,
-                                         Health_board_treatment=hbtreat_name,
-                                         Time_period=quarter_name,
-                                         Appointments=count),
-                                "Outpatients - Time trend" = data_trend %>% 
-                                  subset(file == "Outpatients") %>% 
-                                  select(geo_type,loc_name, quarter_name, measure, 
-                                         count, rate) %>% 
-                                  rename(Geography_level = geo_type,
-                                         Area_name = loc_name,
-                                         Time_period = quarter_name,
-                                         Type_case = measure,
-                                         Appointments = count,
-                                         DNA_rate = rate)
-
+  
+             
+  ### Tab 7: Table----   
+    
+  # Switch function is used to select correct dataset based on
+  # user input
+  #
+  # Each dataset is formatted to make it suitable to be
+  # presented in the data table
+  #
+  # Each dataset requires slightly different formatting, so no
+  # custom functions have been created
+  #
+  # Note: character variables are converted to factors in each
+  # dataset for use in the table
+  # This is because dropdown prompts on the table filters only
+  # appear for factors
+  data_table <- reactive({switch(
+    input$filename_table,
+    
+    # 7.1 - Beds Data
+    "Beds" = data_bed %>% 
+      rename(Area_name = loc_name,
+             Specialty = specname,
+             Time_period = quarter_name,
+             Occupancy_percentage = p_occ,
+             All_available_beds = aasb) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.2 - Specialty Data
+    
+    
+    # 7.2.1 - Inpatient Data
+    "Inpatients/Day cases - Specialty" = data_spec %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, specialty,
+             quarter_name, stays, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = specialty,
+             Time_period = quarter_name,
+             Stays = stays,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.2.2 - Outpatient Data
+    "Outpatients - Specialty" = data_spec %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, specialty,
+             quarter_name, count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = specialty,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.3 - SIMD Data
+    
+    
+    # 7.3.1 - Inpatient Data
+    "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.3.2 - Outpatient Data
+    "Outpatients - Deprivation (SIMD)" = data_simd %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.4 - Time Trend Data
+    
+    
+    # 7.4.1 - Inpatient Data
+    "Inpatients/Day cases - Time trend" = data_trend %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure,
+             quarter_name, count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.4.2 - Outpatient Data
+    "Outpatients - Time trend" = data_trend %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type,loc_name, quarter_name,
+             measure, count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Time_period = quarter_name,
+             Type_case = measure,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.5 - Population Pyramid Data
+    
+    
+    # 7.5.1 - Inpatient Data
+    "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
+      filter(file == "Inpatients/Day Cases") %>% 
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, los, avlos) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>% 
+      mutate(Stays = abs(Stays)) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.5.2 - Outpatient Data
+    "Outpatients - Age/sex" = data_pyramid %>% 
+      filter(file == "Outpatients") %>% 
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, rate) %>% 
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>% 
+      mutate(Appointments = abs(Appointments)) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.6 - Cross-Boundary Data
+    
+    
+    # 7.6.1 - Inpatient Data
+    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>% 
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>% 
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Stays = count) %>%
+      mutate_if(is.character, as.factor),
+    
+    
+    # 7.6.2 - Outpatient Data
+    "Outpatients - Cross boundary flow" = data_cbf_op %>% 
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>% 
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Appointments = count) %>%
+      mutate_if(is.character, as.factor)
+    
+    
   )})
   
-  #Actual table.
-  output$table_explorer <- DT::renderDataTable({
-    #to take out underscore from column names shown in table.
+  
+  
+  # Creating the table
+  output$table_explorer <- renderDataTable({
+    
+    # Remove the underscore from column names in the table
     table_colnames  <-  gsub("_", " ", colnames(data_table()))
     
-    DT::datatable(data_table(),style = 'bootstrap', class = 'table-bordered table-condensed', 
-                  rownames = FALSE, options = list(pageLength = 20, dom = 'tip'), 
-                  filter = "top", colnames = table_colnames
+    datatable(data_table(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 20,
+                             dom = 'tip'),
+              filter = "top",
+              colnames = table_colnames
     )
   })
   
-  #####################################.    
-  #### Downloading data ----
-  #It downloads selection made by user using the datatable filters
+     
+  # Downloading data
+  # The downloaded data are those selected by the user using
+  # the data table filters
   output$download_table <- 
     downloadHandler(filename = "table_data.csv",
                     content = function(file){
-                      write.csv(data_table()[input[["table_explorer_rows_all"]], ],
+                      write_csv(data_table()
+                                [input[["table_explorer_rows_all"]], ],
                                 file)
                     }
     )
   
 }
 
-###END
 
+
+### END OF SCRIPT ###
