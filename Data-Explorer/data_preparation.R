@@ -75,8 +75,8 @@ base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
 
 # 1.3 - Load functions script
 # TO DO - change this when files are moved to the TP folder
-source(paste0("C:\\Users\\jackha03\\Documents\\Rshiny",
-              "\\Data-Explorer\\functions.R"))
+source(paste0("C:\\Users\\jackha03\\Documents\\GitHub\\TP\\Secondary Care",
+              "\\Shiny\\Data-Explorer\\functions.R"))
 
 
 
