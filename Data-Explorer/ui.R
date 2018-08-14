@@ -129,17 +129,8 @@ tabPanel("Time trend",
                               `selected-text-format` = "count > 1"
                             ),
                             selected =
-                              c("All inpatients and daycases")
-                            
-                          )
-                          # selectInput("service_trend",
-                          #             label = "Select type of activity",
-                          #             multiple = TRUE, 
-                          #             choices = trend_service,
-                          #             selectize = TRUE,
-                          #             selected =
-                          #               c("All inpatients and daycases"))
-                          ),
+                              c("All inpatients and daycases")  
+                          )),
                    column(6,
                           selectInput("measure_trend",
                                       label = "Select measure", 
