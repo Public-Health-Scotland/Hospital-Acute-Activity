@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 16 July 2018
+### Last edited on: 27 August 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -44,8 +44,8 @@ library(zoo)
 
 
 # 1.2 - Define base filepath
-base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
-                        "/wrangling/data/base_files/")
+base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
+                        "/1_Dec17/data/output/")
 
 
 
