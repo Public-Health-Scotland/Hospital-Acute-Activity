@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 10 July 2018
+### Last edited on: 27 August 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -129,17 +129,8 @@ tabPanel("Time trend",
                               `selected-text-format` = "count > 1"
                             ),
                             selected =
-                              c("All inpatients and daycases")
-                            
-                          )
-                          # selectInput("service_trend",
-                          #             label = "Select type of activity",
-                          #             multiple = TRUE, 
-                          #             choices = trend_service,
-                          #             selectize = TRUE,
-                          #             selected =
-                          #               c("All inpatients and daycases"))
-                          ),
+                              c("All inpatients and daycases")  
+                          )),
                    column(6,
                           selectInput("measure_trend",
                                       label = "Select measure", 
