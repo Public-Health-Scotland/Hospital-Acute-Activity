@@ -795,7 +795,7 @@ function(input, output) {
     input$filename_table,
     
     # 7.1 - Beds Data
-    "Beds" = data_bed %>% 
+    "Beds" = data_bed %>%
       rename(Area_name = loc_name,
              Specialty = specname,
              Time_period = quarter_name,
@@ -809,7 +809,10 @@ function(input, output) {
     
     # 7.2.1 - Inpatient Data
     "Inpatients/Day cases - Specialty" = data_spec %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, stays, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -825,7 +828,10 @@ function(input, output) {
     
     # 7.2.2 - Outpatient Data
     "Outpatients - Specialty" = data_spec %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -843,7 +849,10 @@ function(input, output) {
     
     # 7.3.1 - Inpatient Data
     "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -859,7 +868,10 @@ function(input, output) {
     
     # 7.3.2 - Outpatient Data
     "Outpatients - Deprivation (SIMD)" = data_simd %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -895,7 +907,10 @@ function(input, output) {
     
     # 7.4.2 - Outpatient Data
     "Outpatients - Time trend" = data_trend %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type,loc_name, quarter_name,
              measure, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -912,7 +927,10 @@ function(input, output) {
     
     # 7.5.1 - Inpatient Data
     "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure, sex, age,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -930,7 +948,10 @@ function(input, output) {
     
     # 7.5.2 - Outpatient Data
     "Outpatients - Age/sex" = data_pyramid %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure, sex, age,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -949,7 +970,10 @@ function(input, output) {
     
     
     # 7.6.1 - Inpatient Data
-    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>% 
+    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(hbres_name, hbtreat_name,
              quarter_name, count) %>% 
       rename(Health_board_residence = hbres_name,
@@ -960,7 +984,10 @@ function(input, output) {
     
     
     # 7.6.2 - Outpatient Data
-    "Outpatients - Cross boundary flow" = data_cbf_op %>% 
+    "Outpatients - Cross boundary flow" = data_cbf_op %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, as.Date(quarter_date)
+      )) %>%
       select(hbres_name, hbtreat_name,
              quarter_name, count) %>% 
       rename(Health_board_residence = hbres_name,
