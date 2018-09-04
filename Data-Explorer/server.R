@@ -103,7 +103,29 @@ function(input, output) {
          nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
          !("Did not attend outpatient appointments" %in% input$service_trend)
-         ))
+         )|
+         (is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) | 
+         (input$measure_trend == "Total length of stay (days)" & 
+         !("Elective inpatients" %in% input$service_trend) & 
+         !("Emergency inpatients" %in% input$service_trend) & 
+         !("Inpatient transfers" %in% input$service_trend) &
+         !("All Inpatients and daycases" %in% input$service_trend) &
+         !("All Inpatients" %in% input$service_trend) &
+         !("All daycases" %in% input$service_trend)
+         )|
+         (is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) | 
+         (input$measure_trend == "Mean length of stay (days)" & 
+         !("Elective inpatients" %in% input$service_trend) & 
+         !("Emergency inpatients" %in% input$service_trend) & 
+         !("Inpatient transfers" %in% input$service_trend) &
+         !("All Inpatients and daycases" %in% input$service_trend) &
+         !("All Inpatients" %in% input$service_trend) &
+         !("All daycases" %in% input$service_trend)
+         )
+          
+       )
     {
       # Plotting empty plot just with text
       text_na <- list(x = 5,
