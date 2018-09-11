@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 27 August 2018
+### Last edited by: Marios Alexandropoulos
+### Last edited on: 11 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -107,22 +107,22 @@ function(input, output) {
          (is.data.frame(data_trend_plot()) &&
          nrow(data_trend_plot()) == 0) | 
          (input$measure_trend == "Total length of stay (days)" & 
-         !("Elective inpatients" %in% input$service_trend) & 
-         !("Emergency inpatients" %in% input$service_trend) & 
-         !("Inpatient transfers" %in% input$service_trend) &
-         !("All Inpatients and daycases" %in% input$service_trend) &
-         !("All Inpatients" %in% input$service_trend) &
-         !("All daycases" %in% input$service_trend)
+          !(any(c("Elective inpatients",
+                  "Emergency inpatients",
+                  "Inpatient transfers",
+                  "All inpatients and daycases",
+                  "All inpatients",
+                  "All daycases") %in% input$service_trend ))
          )|
          (is.data.frame(data_trend_plot()) &&
          nrow(data_trend_plot()) == 0) | 
          (input$measure_trend == "Mean length of stay (days)" & 
-         !("Elective inpatients" %in% input$service_trend) & 
-         !("Emergency inpatients" %in% input$service_trend) & 
-         !("Inpatient transfers" %in% input$service_trend) &
-         !("All Inpatients and daycases" %in% input$service_trend) &
-         !("All Inpatients" %in% input$service_trend) &
-         !("All daycases" %in% input$service_trend)
+          !(any(c("Elective inpatients",
+                  "Emergency inpatients",
+                  "Inpatient transfers",
+                  "All inpatients and daycases",
+                  "All inpatients",
+                  "All daycases") %in% input$service_trend ))
          )
           
        )
@@ -819,6 +819,10 @@ function(input, output) {
     
     # 7.1 - Beds Data
     "Beds" = data_bed %>%
+      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
+             quarter_name = forcats::fct_reorder(
+               quarter_name, quarter
+             ))%>%
       rename(Area_name = loc_name,
              Specialty = specname,
              Time_period = quarter_name,
@@ -834,7 +838,7 @@ function(input, output) {
     "Inpatients/Day cases - Specialty" = data_spec %>% 
       filter(file == "Inpatients/Day Cases") %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, stays, los, avlos) %>% 
@@ -853,7 +857,7 @@ function(input, output) {
     "Outpatients - Specialty" = data_spec %>% 
       filter(file == "Outpatients") %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, count, rate) %>% 
@@ -874,7 +878,7 @@ function(input, output) {
     "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
       filter(file == "Inpatients/Day Cases") %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, los, avlos) %>% 
@@ -893,7 +897,7 @@ function(input, output) {
     "Outpatients - Deprivation (SIMD)" = data_simd %>% 
       filter(file == "Outpatients") %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, rate) %>% 
@@ -995,7 +999,7 @@ function(input, output) {
     # 7.6.1 - Inpatient Data
     "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(hbres_name, hbtreat_name,
              quarter_name, count) %>% 
@@ -1009,7 +1013,7 @@ function(input, output) {
     # 7.6.2 - Outpatient Data
     "Outpatients - Cross boundary flow" = data_cbf_op %>%
       mutate(quarter_name = forcats::fct_reorder(
-        quarter_name, as_date(quarter_date)
+        quarter_name, dmy(quarter_date)
       )) %>%
       select(hbres_name, hbtreat_name,
              quarter_name, count) %>% 
