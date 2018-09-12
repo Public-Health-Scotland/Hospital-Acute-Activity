@@ -313,6 +313,8 @@ function(input, output) {
                            prettyNum(abs(data_pyramid_plot()$count), 
                                      big.mark = ",")))
     
+    
+    
     plot_ly(data=data_pyramid_plot(),
             x = ~count,
             y = ~age,
@@ -323,8 +325,10 @@ function(input, output) {
       add_bars(orientation = 'h') %>%
       layout(bargap = 0.1,
              barmode = 'overlay',
-             yaxis = list(title = "Age"), 
-             xaxis = list(tickmode = 'array',
+             yaxis = list(fixedrange = TRUE,
+                          title = "Age"), 
+             xaxis = list(fixedrange = TRUE,
+                          tickmode = 'array',
                           tickvals = brks,
                           ticktext = lbls,
                           showline = TRUE,
@@ -448,6 +452,7 @@ function(input, output) {
                             PrettyNum(abs(data_simd_plot()$count),
                                       big.mark = ",")))
     
+  
     
     plot_ly(data = data_simd_plot(),
             x = ~simd,
