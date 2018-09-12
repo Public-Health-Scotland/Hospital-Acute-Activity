@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Marios Alexandropoulos
-### Last edited on: 11 September 2018
+### Last edited by: Jack Hannah
+### Last edited on: 12 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -171,6 +171,7 @@ function(input, output) {
       
       # Layout
       layout(annotations = list(), # It needs this due to a buggy behaviour
+             showlegend = TRUE,
              yaxis = list(fixedrange = TRUE,
                           title = input$measure_trend,
                           rangemode = "tozero"),
@@ -819,15 +820,22 @@ function(input, output) {
     
     # 7.1 - Beds Data
     "Beds" = data_bed %>%
+      
+      # Create temporary year quarter variable to allow time period dropdown
+      # to be displayed chronologically
       mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
              quarter_name = forcats::fct_reorder(
                quarter_name, quarter
-             ))%>%
+             )) %>%
+      select(-quarter) %>%
       rename(Area_name = loc_name,
              Specialty = specname,
              Time_period = quarter_name,
              Occupancy_percentage = p_occ,
-             All_available_beds = aasb) %>%
+             All_available_beds = aasb,
+             Total_occupied_beds = tobd,
+             Average_available_staffed_beds = asb,
+             Average_occupied_beds = aob) %>%
       mutate_if(is.character, as.factor),
     
     
@@ -1002,7 +1010,8 @@ function(input, output) {
         quarter_name, dmy(quarter_date)
       )) %>%
       select(hbres_name, hbtreat_name,
-             quarter_name, count) %>% 
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
@@ -1016,7 +1025,8 @@ function(input, output) {
         quarter_name, dmy(quarter_date)
       )) %>%
       select(hbres_name, hbtreat_name,
-             quarter_name, count) %>% 
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
