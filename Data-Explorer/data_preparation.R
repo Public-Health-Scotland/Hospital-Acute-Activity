@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 27 August 2018
+### Last edited on: 12 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -85,6 +85,7 @@ data_bed <- read_csv(paste0(
   base_filepath,
   "QAcute_Dec17_beds.csv")) %>%
   select(-c(quarter_date, hb_code, hb_name, loc_code)) %>%
+  mutate_at(c("aasb", "tobd"), funs(round(.))) %>%
   mutate_at(c("asb", "aob", "p_occ"), funs(round(., 1)))
 
 # Save file
