@@ -305,11 +305,13 @@ function(input, output) {
     lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
                                   seq(breaks, max, breaks))))
     
+    
     # Text for tooltip
     tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ",
                             data_pyramid_plot()$age, "<br>",
                            "Number: ",
-                           abs(data_pyramid_plot()$count)))
+                           prettyNum(abs(data_pyramid_plot()$count), 
+                                     big.mark = ",")))
     
     plot_ly(data=data_pyramid_plot(),
             x = ~count,
@@ -443,7 +445,9 @@ function(input, output) {
                              data_simd_plot()$simd,
                              "<br>",
                             "Number: ",
-                            abs(data_simd_plot()$count)))
+                            PrettyNum(abs(data_simd_plot()$count),
+                                      big.mark = ",")))
+    
     
     plot_ly(data = data_simd_plot(),
             x = ~simd,
