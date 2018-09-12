@@ -45,7 +45,7 @@ library(lubridate)
 
 # 1.2 - Define base filepath
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
-                        "/1_Dec17/data/output/")
+                        "/3_Jun18/data/output/")
 
 
 
