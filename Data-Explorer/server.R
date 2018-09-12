@@ -829,7 +829,7 @@ function(input, output) {
              )) %>%
       select(-quarter) %>%
       rename(Area_name = loc_name,
-             Specialty = specname,
+             Specialty = spec_name,
              Time_period = quarter_name,
              Occupancy_percentage = p_occ,
              All_available_beds = aasb,
