@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 27 August 2018
+### Last edited on: 12 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -19,7 +19,7 @@
 ### rgdal (for reading shapefiles);
 ### dplyr and tidyr (for data manipulation);
 ### readr (for writing csv files);
-### zoo (for dates)
+### zoo and lubridate (for dates)
 ###
 ### This script includes all packages, datasets and other
 ### values used by both the UI and server files
@@ -45,7 +45,7 @@ library(lubridate)
 
 # 1.2 - Define base filepath
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
-                        "/1_Dec17/data/output/")
+                        "/3_Jun18/data/output/")
 
 
 
