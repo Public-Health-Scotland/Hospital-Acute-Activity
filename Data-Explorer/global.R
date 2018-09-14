@@ -11,6 +11,7 @@
 ###
 ### Packages required:
 ### shiny (for the interactive framework);
+### shinyWidgets (for the interactive framework);
 ### DT (for data tables);
 ### googleVis (for Sankey charts);
 ### htmltools (for tooltips);
@@ -42,6 +43,7 @@ library(tidyr)
 library(readr)
 library(zoo)
 library(lubridate)
+library(shinyWidgets)
 
 # 1.2 - Define base filepath
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",

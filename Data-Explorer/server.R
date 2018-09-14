@@ -41,13 +41,13 @@
 
 
 
+
 ### Server ----
 
 
 function(input, output) {
   
-  
-               
+
   ### Tab 2: Time trend----   
     
   # Reactive dropdowns for this tab
@@ -60,14 +60,16 @@ function(input, output) {
   })
   
   output$locname_ui_trend <- renderUI({
-    selectInput("locname_trend",
+    pickerInput("locname_trend",
                 "Select the location",
                 choices = data_trend %>%
                   subset(geo_type == input$geotype_trend) %>%
                   distinct(loc_name) %>%
                   arrange(loc_name) %>%
                   pull(loc_name),
-                selectize = TRUE,
+                multiple = TRUE,
+                options = list("max-options" = 2),
+                #selectize = TRUE,
                 selected = "Scotland")
   })
   
@@ -449,7 +451,7 @@ function(input, output) {
                              data_simd_plot()$simd,
                              "<br>",
                             "Number: ",
-                            PrettyNum(abs(data_simd_plot()$count),
+                            prettyNum(abs(data_simd_plot()$count),
                                       big.mark = ",")))
     
   
@@ -461,9 +463,9 @@ function(input, output) {
             hoverinfo = "text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
-             yaxis = list(title = paste("Number of",
+             yaxis = list(fixedrange = TRUE, title = paste("Number of",
                                         input$measure_simd)), 
-             xaxis = list(showline = TRUE,
+             xaxis = list(fixedrange = TRUE, showline = TRUE,
                           title = "Deprivation (SIMD) quintile")) %>%
       
       # Take out plotly logo and collaborate button
@@ -728,6 +730,8 @@ function(input, output) {
                ))
     
   })
+  
+    
   
   # This one has only the selected health board of residence
   output$sankey_res <- renderGvis({
