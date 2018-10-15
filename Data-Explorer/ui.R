@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 10 July 2018
+### Last edited by: Roisin Farrell
+### Last edited on: 15 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -110,8 +110,8 @@ tabPanel("Time trend",
          p("This section allows you to see changes over time.
             You can use the filters to select the data you are 
             interested in. To view the data in a table use the 
-            ‘show/hide table’ button. To download your data 
-            selection as a csv file use the ‘download data’ 
+            âshow/hide tableâ button. To download your data 
+            selection as a csv file use the âdownload dataâ 
             button. If you hover over the chart you will see a 
             number of buttons which will allow you to select parts
             of the chart, zoom in or out or save the chart as an image."),
@@ -129,17 +129,8 @@ tabPanel("Time trend",
                               `selected-text-format` = "count > 1"
                             ),
                             selected =
-                              c("All inpatients and daycases")
-                            
-                          )
-                          # selectInput("service_trend",
-                          #             label = "Select type of activity",
-                          #             multiple = TRUE, 
-                          #             choices = trend_service,
-                          #             selectize = TRUE,
-                          #             selected =
-                          #               c("All inpatients and daycases"))
-                          ),
+                              c("All inpatients and daycases")  
+                          )),
                    column(6,
                           selectInput("measure_trend",
                                       label = "Select measure", 
@@ -177,9 +168,9 @@ tabPanel("Age/sex",
          p("This section allows you to explore the age and 
             sex distribution of the data. You can use the 
             filters to select the data you are interested 
-            in. To view the data in a table use the ‘show/hide 
-            table’ button. To download your data selection 
-            as a csv file use the ‘download data’ button. 
+            in. To view the data in a table use the âshow/hide 
+            tableâ button. To download your data selection 
+            as a csv file use the âdownload dataâ button. 
             If you hover over the chart you will see a 
             number of buttons which will allow you to select
             parts of the chart, zoom in or out or save the
@@ -240,8 +231,8 @@ tabPanel("Deprivation",
                    "deprivation"),
             ". You can use the filters to select the data you are 
             interested in. To view the data in a table use the 
-            ‘show/hide table’ button. To download your data selection 
-            as a csv file use the ‘download data’ button. If you hover 
+            âshow/hide tableâ button. To download your data selection 
+            as a csv file use the âdownload dataâ button. If you hover 
             over the chart you will see a number of buttons which will 
             allow you to select parts of the chart, zoom in or out or 
             save the chart as an image."),
@@ -340,27 +331,27 @@ tabPanel("Cross-boundary",
          p("This section allows you to see where patients are treated.
             The top chart shows where patients living in each NHS 
             Board are treated. The bottom charts show data specific to 
-            the NHS Board selected in the ‘Board of interest’ filter. 
+            the NHS Board selected in the NHS âBoard of interestâ filter. 
             The left chart shows where patients living in the NHS Board 
             of interest are treated. The right chart shows where 
             patients treated in the NHS Board of interest come from. 
             To include patients treated in their own NHS Board in the 
-            charts, use the ‘flows within own Health Board’ tick box."),
+            charts, use the âflows within own NHS Boardâ tick box."),
          p("You can use the filters to select the data you are interested 
-            in. To view the data in a table use the ‘show/hide table’ 
+            in. To view the data in a table use the âshow/hide tableâ 
             button. To download your data selection as a csv use the 
-            ‘download data’ button."),
+            âdownload dataâ button."),
          wellPanel(
            column(4,
                     selectInput("datatype_flow",
                                 label = "Select the hospital service", 
                                 choices = data_type),
                   checkboxInput("checkbox_flow",
-                                label = "Include flows within same board?",
+                                label = "Include flows within same NHS Board?",
                                 value = FALSE)),
              column(4,  
                     selectInput("hb_flow",
-                                label = "Select the board of interest", 
+                                label = "Select the NHS Board of interest", 
                                 choices = data_cbf_ip %>%
                                   distinct(hbres_name) %>%
                                   pull(hbres_name)),
