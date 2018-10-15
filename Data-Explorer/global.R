@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 16 July 2018
+### Last edited by: Roisin Farrell
+### Last edited on: 15 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -27,7 +27,12 @@
 
 
 ### Section 1: Housekeeping ----
-
+#install.packages("shiny",type="binary")
+#install.packages("DT",type="binary")
+#install.packages("googleVis",type="binary")
+#install.packages("htmltools",type="binary")
+#install.packages("leaflet",type="binary")
+#install.packages("plotly",type="binary")
 
 # 1.1 - Load libraries
 library(shiny)
@@ -43,11 +48,13 @@ library(readr)
 library(zoo)
 
 
+pub_month  <- "Oct18"
+pub_number <- 4
+pub_date   <- "20181030"
+
+
 # 1.2 - Define base filepath
-base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
-                        "/wrangling/data/base_files/")
-
-
+base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP/", pub_number, "_", pub_month, "/data/output/")
 
 ### Section 2: Loading Data ----
 
@@ -182,7 +189,6 @@ trend_pal <- c("#004785", "#4c7ea9", "#99b5ce",
 
 
 # 4.2 - Cross-Boundary colour palette for Sankey diagram
-# in the Cross-boundary tab
 colours_node <- rep("CornflowerBlue", times = 28)
 
 colours_node_array <- paste0("[", paste0("'", colours_node,
