@@ -49,7 +49,7 @@ res <- function(df) {
       substr(loc_code, 1, 3) == "S12"
       ~ "Council area of residence",
       TRUE
-      ~ "Health board of residence"
+      ~ "NHS Board of residence"
     ))
 }
 
@@ -62,7 +62,9 @@ treat <- function(df) {
   df %>%
     mutate(geo_type = case_when(
       substr(loc_code, 1, 3) == "S08"
-      ~ "Health board of treatment",
+      ~ "NHS Board of treatment",
+      substr(loc_code, 1, 2) == "SB"
+      ~ "NHS Board of treatment",
       loc_code == "scot"
       ~ "Scotland",
       hb_name %in% c("Other", "Null") | loc_name == "Other"
@@ -83,8 +85,13 @@ comb_inp <- function(df_1, df_2) {
            file = "Inpatients/Day Cases") %>%
     
     # Remove a few random null measure cases
-    drop_na(measure)
+    drop_na(measure) #%>%
+  #mutate(geo_type = recode(
+   # "Health board of treatment" = "NHS Board of treatment",
+    #"Health board of residence" = "NHS Board of residence"
+  #))
 }
+
 
 
 
@@ -95,7 +102,12 @@ comb_outp <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     rename(measure = appt_type) %>%
     mutate(file = "Outpatients",
-           rate = round(rate, 1))
+           rate = round(rate, 1)) %>%
+  mutate(geo_type = recode (
+    geo_type,
+    "Health board of treatment" = "NHS Board of treatment",
+    "Health board of residence" = "NHS Board of residence"
+  ))
 }
 
 
@@ -122,6 +134,11 @@ comb_all <- function(df_1, df_2) {
       "All Daycases" = "All daycases",
       "Emergency Inpatients" = "Emergency inpatients",
       "Elective Inpatients" = "Elective inpatients"
+    )) %>%
+    mutate(geo_type = recode (
+      geo_type,
+      "Health board of treatment" = "NHS Board of treatment",
+      "Health board of residence" = "NHS Board of residence"
     ))
 }
 
