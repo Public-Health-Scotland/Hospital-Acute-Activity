@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 09 July 2018
+### Last edited by: Roisin Farrell
+### Last edited on: 15 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -132,7 +132,8 @@ function(input, output) {
     tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
                         data_trend_plot()$quarter_name, "<br>",
                         input$measure_trend, ": ",
-                        data_trend_plot()[[input$measure_trend]]))
+                        prettyNum(data_trend_plot()[[input$measure_trend]],
+                                  big.mark = ",")))
 
     # Plotting time trend
     plot_ly(data = data_trend_plot(),
@@ -147,14 +148,16 @@ function(input, output) {
       
       # Layout
       layout(annotations = list(), # It needs this due to a buggy behaviour
-             yaxis = list(title = input$measure_trend,
+             yaxis = list(fixedrange = TRUE,
+                          title = input$measure_trend,
                           rangemode = "tozero"),
              
              # Axis parameter
-             xaxis = list(title = "Time period"),
+             xaxis = list(fixedrange = TRUE,
+                          title = "Time period"),
              
              # To get hover compare mode as default
-             hovermode = 'false') %>%
+             hovermode = 'closest') %>%
       
       # Take out plotly logo and collaborate button
       config(displaylogo = FALSE,
@@ -630,7 +633,7 @@ function(input, output) {
       
       data_flow() %>%
         subset(quarter_name == input$quarter_flow &
-                 hbtreat_name==input$hb_flow)
+                 hbtreat_name == input$hb_flow)
     }
   })   
   
@@ -652,7 +655,7 @@ function(input, output) {
            "</b>",
            "% of the patients from ",
            input$hb_flow,
-           " were treated in their own health board area.")
+           " were treated in their own NHS Board.")
   })
   
   output$crossb_treattext <- renderText({
@@ -671,7 +674,7 @@ function(input, output) {
            "</b>",
            "% of the patients treated in ",
            input$hb_flow,
-           " live in other health board areas.")
+           " live in other NHS Boards.")
   })
   
   
@@ -754,8 +757,8 @@ function(input, output) {
               rownames = FALSE,
               options = list(pageLength = 10,
                              dom = 'tip'),
-              colnames = c("Residence board",
-                           "Treatment board",
+              colnames = c("NHS Board of residence",
+                           "NHS Board of treatment",
                            "Quarter",
                            "Number")  
     )
@@ -874,7 +877,10 @@ function(input, output) {
     
     # 7.4.1 - Inpatient Data
     "Inpatients/Day cases - Time trend" = data_trend %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -979,7 +985,8 @@ function(input, output) {
               class = 'table-bordered table-condensed',
               rownames = FALSE,
               options = list(pageLength = 20,
-                             dom = 'tip'),
+                             dom = 'tip',
+                             autoWidth = TRUE),
               filter = "top",
               colnames = table_colnames
     )
