@@ -54,14 +54,14 @@ function(input, output)  {
   # They will provide a list of locations filtered by geography type
   output$geotype_ui_trend <- renderUI({
     shinyWidgets::pickerInput("geotype_trend",
-                              label = "Select the type of location", 
+                              label = "Select type of location", 
                               choices = geo_type_trend,
                               selected =  "Scotland")
   })
   
   output$locname_ui_trend <- renderUI({
     shinyWidgets::pickerInput("locname_trend",
-                              label = "Select the location (multiple selections allowed)",
+                              label = "Select location (multiple selections allowed)",
                               choices = sort(unique(
                                 data_trend$loc_name
                                 [data_trend$geo_type %in% input$geotype_trend]
@@ -70,13 +70,17 @@ function(input, output)  {
                               options = list( 
                                 `selected-text-format` = "count > 1"
                               ),
-                              #selectize = TRUE,
-                              #selected = "Scotland"
-                              selected = if(input$geotype_trend == "Scotland") 
-                              { print("Scotland") } else if (input$geotype_trend == "Council area of residence")
-                              { print("Aberdeen City")} else if (input$geotype_trend == "Hospital of treatment")
-                              { print("Aberdeen Royal Infirmary")} else
-                              { print("NHS Ayrshire & Arran")})
+                              selected = case_when(
+                                input$geotype_trend == "Scotland" 
+                                ~ "Scotland",
+                                input$geotype_trend == "Council area of residence" 
+                                ~ "Aberdeen City",
+                                input$geotype_trend == "Hospital of treatment" 
+                                ~ "Aberdeen Royal Infirmary",
+                                input$geotype_trend %in% c("NHS Board of residence", 
+                                                           "NHS Board of treatment") 
+                                ~ "NHS Ayrshire & Arran"
+                              ))
   })
   
   # Reactive datasets
@@ -84,7 +88,7 @@ function(input, output)  {
   
   data_trend_plot <- reactive({
     data_trend %>% 
-      filter(loc_name %in% input$locname_trend &
+      subset(loc_name %in% input$locname_trend &
                measure %in% input$service_trend &
                geo_type %in% input$geotype_trend) %>% 
       rename("Total length of stay (days)" = los,
@@ -170,7 +174,7 @@ function(input, output)  {
               colors = trend_pal) %>%
         
         # Layout
-        layout(annotations = list(), # It needs this due to a buggy behaviour
+        layout(
                showlegend = TRUE,
                yaxis = list(fixedrange = FALSE,
                             title = input$measure_trend,
@@ -178,10 +182,12 @@ function(input, output)  {
                
                # Axis parameter
                xaxis = list(fixedrange = TRUE,
-                            title = "Time period"),
+                            title = "Time period")
                
-               # To get hover compare mode as default
-               hovermode = 'closest') %>%
+               
+                 )%>% 
+      
+        
         
         # Take out plotly logo and collaborate button
         # config(displaylogo = FALSE,
@@ -204,6 +210,16 @@ function(input, output)  {
   })
 
   # Table
+  # Table data 
+  table_trend_data <- reactive({ 
+    data_trend %>%  
+      subset(loc_name %in% input$locname_trend & 
+               measure %in% input$service_trend & 
+               geo_type %in% input$geotype_trend) %>%  
+      select(loc_name, quarter_name, measure, count, rate, los, avlos)
+  }) 
+  
+  
   output$table_trend <- renderDataTable({
     datatable(table_trend_data(),
               style = 'bootstrap',
@@ -220,10 +236,15 @@ function(input, output)  {
 
 
   # Downloading data
+  # Downloading data
   output$download_trend <- downloadHandler(
-    filename =  'trend_data.csv',
-     content = function(file) {
-      write_csv(data_trend_plot(), file)
+    filename =  'trend_data_multiple_location.csv',
+    content = function(file) {
+      write.table(table_trend_data(), file, row.names = FALSE, 
+                  col.names = c("Location", "Quarter", "Type of activity",
+                                "Number", "DNA rate",
+                                "Total length of stay", "Mean length of stay"), 
+                  sep = ",")
     }
   )
   
@@ -245,17 +266,17 @@ function(input, output)  {
                                 data_trend$loc_name
                                 [data_trend$geo_type %in% input$geotype_trend_2]
                               )),
-                              # multiple = TRUE,
-                              # options = list( 
-                              #   `selected-text-format` = "count > 1"
-                              # ),
-                              #selectize = TRUE,
-                              #selected = "Scotland"
-                              selected = if(input$geotype_trend_2 == "Scotland") 
-                              { print("Scotland") } else if (input$geotype_trend_2 == "Council area of residence")
-                              { print("Aberdeen City")} else if (input$geotype_trend_2 == "Hospital of treatment")
-                              { print("Aberdeen Royal Infirmary")} else
-                              { print("NHS Ayrshire & Arran")})
+                              selected = case_when(
+                                input$geotype_trend == "Scotland" 
+                                ~ "Scotland",
+                                input$geotype_trend == "Council area of residence" 
+                                ~ "Aberdeen City",
+                                input$geotype_trend == "Hospital of treatment" 
+                                ~ "Aberdeen Royal Infirmary",
+                                input$geotype_trend %in% c("NHS Board of residence", 
+                                                           "NHS Board of treatment") 
+                                ~ "NHS Ayrshire & Arran"
+                              ))
   })
   
   # Reactive datasets
@@ -349,7 +370,7 @@ function(input, output)  {
               colors = trend_pal) %>%
         
         # Layout
-        layout(annotations = list(), # It needs this due to a buggy behaviour
+        layout(
                showlegend = TRUE,
                yaxis = list(fixedrange = TRUE,
                             title = input$measure_trend,
@@ -357,10 +378,10 @@ function(input, output)  {
                
                # Axis parameter
                xaxis = list(fixedrange = FALSE,
-                            title = "Time period"),
+                            title = "Time period")
                
-               # To get hover compare mode as default
-               hovermode = 'closest') %>%
+               
+               ) %>%
         
         # Take out plotly logo and collaborate button
         # config(displaylogo = FALSE,
@@ -384,30 +405,41 @@ function(input, output)  {
   }) 
 
   # Table
-  output$table_pyramid <- renderDataTable({
-    datatable(data_table_pyramid(),
+  # Table data 
+  table_trend_data_2 <- reactive({ 
+    data_trend %>%  
+      subset(loc_name %in% input$locname_trend_2 & 
+               measure %in% input$service_trend_2 & 
+               geo_type %in% input$geotype_trend_2) %>%  
+      select(loc_name, quarter_name, measure, count, rate, los, avlos) 
+      
+  }) 
+  
+  
+  output$table_trend_2 <- renderDataTable({
+    datatable(table_trend_data_2(),
               style = 'bootstrap',
               class = 'table-bordered table-condensed',
               rownames = FALSE,
-              options = list(pageLength = 20,
+              options = list(pageLength = 16,
                              dom = 'tip'),
-              colnames = c("Location",
-                           "Quarter",
-                           "Type of activity",
-                           "Age",
-                           "Sex",
-                           "Number")  
+              colnames = c("Location", "Quarter", "Type of activity",
+                           "Number", "DNA rate",
+                           "Total length of stay", "Mean length of stay")
     )
   })
   
   
-     
+  
   # Downloading data
-  output$download_pyramid <- downloadHandler(
-    filename = 'agesex_data.csv',
+  output$download_trend_2 <- downloadHandler(
+    filename =  'trend_data_multiple_activity.csv',
     content = function(file) {
-      write_csv(data_pyramid_plot(),
-                file) 
+      write.table(table_trend_data_2(), file, row.names = FALSE, 
+                  col.names = c("Location", "Quarter", "Type of activity",
+                                "Number", "DNA rate",
+                                "Total length of stay", "Mean length of stay"), 
+                  sep = ",")
     }
   )
   

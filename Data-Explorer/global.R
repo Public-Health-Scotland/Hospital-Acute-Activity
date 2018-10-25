@@ -48,35 +48,37 @@ library(shinyWidgets)
 # 1.2 - Define base filepath
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                         "/4_Oct18/data/output/")
+ 
 
-
+RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
+                       "/4_Oct18/data_explorer/")
 
 ### Section 2: Loading Data ----
 
 
 # Beds data
 data_bed <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/beds.rds"))
 
 # Specialty data
 data_spec <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/spec.rds"))
 
 # SIMD data
 data_simd <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/simd.rds"))
 
 # Time Trend data
 data_trend <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/trend.rds"))
 
 # Population Pyramid data
 data_pyramid <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/pyramid.rds"))
 
 # Map data (outpatients)
@@ -89,12 +91,12 @@ data_pyramid <- readRDS(paste0(
 
 # Inpatients
 data_cbf_ip <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_ip.rds"))
 
 # Outpatients
 data_cbf_op <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_op.rds"))
 
 

@@ -30,8 +30,35 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;",
             ) 
           ),
           
+  #The following chunk of code does three things: 
+    # 1. Paints the ribbon that contains the tab headers white. 
+    # 2. Highlights the header of the active tab in blue. 
+    # 3. Sets the font size for the sentence that appears above the... 
+    # cross-boundary flow diagram. 
+       
+    tags$style(HTML(".tabbable > .nav > li > a {  
+                                color: #000000;  
+                                                } 
+                                                     
+                                  .tabbable > .nav > li[class = active] > a { 
+                                  background-color: #0072B2; 
+                                  color: #FFFFFF; 
+                                                        } 
+                                                         
+                                  #flow_text { 
+                                  font-size: 15px; 
+                                  }")) 
+          #)
+, 
+     #We are going to divide our UI into discrete sections, called tab panels. 
+#To do this, we need the layout "tabsetPanel()". 
+     
+tabsetPanel( 
+  id = "Panels", 
+  
+          
           # Create a navigation bar
-          navbarPage("",
+          #navbarPage("",
                      
                      
                      
@@ -149,10 +176,7 @@ tabPanel(    "Time trend
                             "service_trend",
                             label = "Select type of activity",
                             choices = trend_service,
-                            # multiple = TRUE,
-                            # options = list(
-                            #   `selected-text-format` = "count > 1"
-                            # ),
+                            
                             selected =
                               c("All inpatients and daycases")  
                           )),
@@ -247,10 +271,10 @@ tabPanel(    "Time trend
                    plotlyOutput("trend_plot_2"),
                    
                    # Button to show / hide div where data table is
-                   HTML("<button data-toggle = 'collapse' href = '#trend' 
+                   HTML("<button data-toggle = 'collapse' href = '#trend2' 
                         class='btn btn-primary'>
                         <strong>Show/hide table</strong></button>"),
-                   HTML("<div id = 'trend' class = 'collapse'> "),
+                   HTML("<div id = 'trend2' class = 'collapse'> "),
                    dataTableOutput("table_trend_2",
                                    width = "95%"),
                    HTML("</div>")
@@ -345,7 +369,7 @@ tabPanel("Deprivation",
          background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
          p("This section allows you to explore the data by 
-            different levels of ",
+            different levels of",
             tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", 
                    "deprivation"),
             ". You can use the filters to select the data you are 

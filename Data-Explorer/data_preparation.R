@@ -72,6 +72,9 @@ library(stringi)
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                         "/4_Oct18/data/output/")
 
+RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
+                       "/4_Oct18/data_explorer/")
+
 
 # 1.3 - Load functions script
 source("//stats/SecondaryCare/Quarterly Publication/TPP/functions.R")
@@ -95,7 +98,7 @@ data_bed <- read_csv(paste0(
 
 # Save file
 saveRDS(data_bed, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/beds.rds"))
 
 
@@ -158,7 +161,7 @@ data_spec <- comb_all(data_spec_op,
 
 # Save file
 saveRDS(data_spec, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/spec.rds"))
 
 
@@ -239,7 +242,7 @@ data_simd <- comb_all(data_simd_op,
 
 # Save file
 saveRDS(data_simd, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/simd.rds"))
 
 
@@ -319,7 +322,7 @@ data_trend <- comb_all(data_trend_op,
 
 # Save file
 saveRDS(data_trend, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/trend.rds"))
 
 
@@ -410,7 +413,7 @@ data_pyramid <- comb_all(data_pyramid_op,
 
 # Save file
 saveRDS(data_pyramid, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/pyramid.rds"))
 
 
@@ -453,7 +456,7 @@ data_map_ipdc <- read_csv(paste0(
 
 # Save file
 saveRDS(data_map_ipdc, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/map_ipdc.rds"))
 
 
@@ -490,7 +493,7 @@ data_map_op <- read_csv(paste0(
 
 # Save file
 saveRDS(data_map_op, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/map_op.rds"))
 
 
@@ -524,7 +527,7 @@ data_cbf_ip <- read_csv(paste0(
 
 # Save file
 saveRDS(data_cbf_ip, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_ip.rds"))
 
 
@@ -554,7 +557,7 @@ data_cbf_op <-  read_csv(paste0(
 
 # Save file
 saveRDS(data_cbf_op, paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_op.rds"))
 
 
