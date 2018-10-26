@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 10 July 2018
+### Last edited on: 27 August 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -30,8 +30,35 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;",
             ) 
           ),
           
+  #The following chunk of code does three things: 
+    # 1. Paints the ribbon that contains the tab headers white. 
+    # 2. Highlights the header of the active tab in blue. 
+    # 3. Sets the font size for the sentence that appears above the... 
+    # cross-boundary flow diagram. 
+       
+    tags$style(HTML(".tabbable > .nav > li > a {  
+                                color: #000000;  
+                                                } 
+                                                     
+                                  .tabbable > .nav > li[class = active] > a { 
+                                  background-color: #0072B2; 
+                                  color: #FFFFFF; 
+                                                        } 
+                                                         
+                                  #flow_text { 
+                                  font-size: 15px; 
+                                  }")) 
+          #)
+, 
+     #We are going to divide our UI into discrete sections, called tab panels. 
+#To do this, we need the layout "tabsetPanel()". 
+     
+tabsetPanel( 
+  id = "Panels", 
+  
+          
           # Create a navigation bar
-          navbarPage("",
+          #navbarPage("",
                      
                      
                      
@@ -48,10 +75,13 @@ tabPanel("Introduction", icon = icon("info-circle"),
          column(10,
                 p("The data explorer allows you to find the data you want
                   and visualise it in different ways. Within each of the
-                  following five sections there are filters that let you
-                  select the data you are interested in:"),
+                  following six sections there are filters that let you
+                  select the data you are interested in:
+                  "),
                 tags$ul( 
-                  tags$li(tags$b("Time trend"),
+                  tags$li(tags$b("Time trend (location comparison)"),
+                          " - shows the data over time."),
+                  tags$li(tags$b("Time trend (activity comparison)"),
                           " - shows the data over time."),
                   tags$li(tags$b("Age/sex"),
                           " - shows the age and sex distribution of
@@ -99,22 +129,44 @@ tabPanel("Introduction", icon = icon("info-circle"),
 
 
 
-### Tab 2: Time trend ----   
+### Tab 2: Time trend for multiple location ----   
 
-     
-tabPanel("Time trend",
+
+tabPanel(    "Time trend 
+         (location comparison)",
          icon = icon("line-chart"),
          style = "height: 95%; width: 95%; background-color: #ffffff;
-          border: 0px solid #ffffff;",
+         border: 0px solid #ffffff;",
          h3("Time trend"),
          p("This section allows you to see changes over time.
-            You can use the filters to select the data you are 
-            interested in. To view the data in a table use the 
-            ‘show/hide table’ button. To download your data 
-            selection as a csv file use the ‘download data’ 
-            button. If you hover over the chart you will see a 
-            number of buttons which will allow you to select parts
-            of the chart, zoom in or out or save the chart as an image."),
+           You can use the filters to select the data you are 
+           interested in. You can visualise multiple locations
+           at the same time.To view the data in a table use the 
+           ‘show/hide table’ button.To download your data 
+           selection as a csv file use the ‘download data’ 
+           button. 
+           "),
+         tags$ul( 
+           tags$li(tags$b("Download plot as a png"),  
+                    icon("camera"),  
+                    " - click this button to save the graph as an image  
+                    (please note that Internet Explorer does not support this  
+                    function)."), 
+           tags$li(tags$b("Zoom"),  
+                   icon("search"),  
+                   " - zoom into the graph by clicking this button and then  
+                   clicking and dragging your mouse over the area of the  
+                   graph you are interested in."),   
+           tags$li(tags$b("Pan"),  
+                   icon("move", lib = "glyphicon"),  
+                   " - adjust the axes of the graph by clicking this button  
+                   and then clicking and moving your mouse in any direction 
+                   you want."),   
+           tags$li(tags$b("Reset axes"),  
+                  icon("home"),  
+                  " - click this button to return the axes to their  
+                  default range.") 
+                ),
          wellPanel(tags$style(".well {background-color: #ffffff;
                               border: 0px solid #336699;}"),
                    column(6, uiOutput("geotype_ui_trend")),  
@@ -124,27 +176,15 @@ tabPanel("Time trend",
                             "service_trend",
                             label = "Select type of activity",
                             choices = trend_service,
-                            multiple = TRUE,
-                            options = list(
-                              `selected-text-format` = "count > 1"
-                            ),
-                            selected =
-                              c("All inpatients and daycases")
                             
-                          )
-                          # selectInput("service_trend",
-                          #             label = "Select type of activity",
-                          #             multiple = TRUE, 
-                          #             choices = trend_service,
-                          #             selectize = TRUE,
-                          #             selected =
-                          #               c("All inpatients and daycases"))
-                          ),
+                            selected =
+                              c("All inpatients and daycases")  
+                          )),
                    column(6,
-                          selectInput("measure_trend",
-                                      label = "Select measure", 
-                                      choices = trend_measure,
-                                      selected = "Number")),
+                          shinyWidgets::pickerInput("measure_trend",
+                                                    label = "Select measure", 
+                                                    choices = trend_measure,
+                                                    selected = "Number")),
                    column(6,
                           downloadButton(outputId = 'download_trend',
                                          label = 'Download data',
@@ -161,12 +201,88 @@ tabPanel("Time trend",
                    dataTableOutput("table_trend",
                                    width = "95%"),
                    HTML("</div>")
-         )
-),
+                   )
+         ),
 
+### Tab 3: Time trend for multiple activity ----   
+
+
+tabPanel(    "Time trend 
+         (activity comparison)",
+         icon = icon("line-chart"),
+         style = "height: 95%; width: 95%; background-color: #ffffff;
+         border: 0px solid #ffffff;",
+         h3("Time trend"),
+         p("This section allows you to see changes over time.
+           You can use the filters to select the data you are 
+           interested in.You can visualise multiple activities
+           at the same time. To view the data in a table use the 
+           ‘show/hide table’ button. To download your data 
+           selection as a csv file use the ‘download data’ 
+           button."),
+         tags$ul( 
+           tags$li(tags$b("Download plot as a png"),  
+                   icon("camera"),  
+                   " - click this button to save the graph as an image  
+                   (please note that Internet Explorer does not support this  
+                   function)."), 
+           tags$li(tags$b("Zoom"),  
+                   icon("search"),  
+                   " - zoom into the graph by clicking this button and then  
+                   clicking and dragging your mouse over the area of the  
+                   graph you are interested in."),   
+           tags$li(tags$b("Pan"),  
+                   icon("move", lib = "glyphicon"),  
+                   " - adjust the axes of the graph by clicking this button  
+                   and then clicking and moving your mouse in any direction 
+                   you want."),   
+           tags$li(tags$b("Reset axes"),  
+                   icon("home"),  
+                   " - click this button to return the axes to their  
+                   default range.") 
+           ),
+         wellPanel(tags$style(".well {background-color: #ffffff;
+                              border: 0px solid #336699;}"),
+                   column(6, uiOutput("geotype_ui_trend_2")),  
+                   column(6, uiOutput("locname_ui_trend_2")),
+                   column(6,
+                          shinyWidgets::pickerInput(
+                            "service_trend_2",
+                            label = "Select type of activity (multiple selections allowed)",
+                            choices = trend_service,
+                            multiple = TRUE,
+                            options = list(
+                              `selected-text-format` = "count > 1"
+                            ),
+                            selected =
+                              c("All inpatients and daycases")  
+                          )),
+                   column(6,
+                          shinyWidgets::pickerInput("measure_trend_2",
+                                                    label = "Select measure", 
+                                                    choices = trend_measure,
+                                                    selected = "Number")),
+                   column(6,
+                          downloadButton(outputId = 'download_trend_2',
+                                         label = 'Download data',
+                                         width = "95%"))  
+         ),
+         mainPanel(width = 12,
+                   plotlyOutput("trend_plot_2"),
+                   
+                   # Button to show / hide div where data table is
+                   HTML("<button data-toggle = 'collapse' href = '#trend2' 
+                        class='btn btn-primary'>
+                        <strong>Show/hide table</strong></button>"),
+                   HTML("<div id = 'trend2' class = 'collapse'> "),
+                   dataTableOutput("table_trend_2",
+                                   width = "95%"),
+                   HTML("</div>")
+                   )
+         ),
 
             
-### Tab 3: Population pyramid ----
+### Tab 4: Population pyramid ----
 
 
 tabPanel("Age/sex",
@@ -180,10 +296,28 @@ tabPanel("Age/sex",
             in. To view the data in a table use the ‘show/hide 
             table’ button. To download your data selection 
             as a csv file use the ‘download data’ button. 
-            If you hover over the chart you will see a 
-            number of buttons which will allow you to select
-            parts of the chart, zoom in or out or save the
-            chart as an image."),
+            "),
+         tags$ul( 
+           tags$li(tags$b("Download plot as a png"),  
+                   icon("camera"),  
+                   " - click this button to save the graph as an image  
+                    (please note that Internet Explorer does not support this  
+                    function)."), 
+           tags$li(tags$b("Zoom"),  
+                   icon("search"),  
+                   " - zoom into the graph by clicking this button and then  
+                   clicking and dragging your mouse over the area of the  
+                   graph you are interested in."),   
+           tags$li(tags$b("Pan"),  
+                   icon("move", lib = "glyphicon"),  
+                   " - adjust the axes of the graph by clicking this button  
+                   and then clicking and moving your mouse in any direction 
+                   you want."),   
+           tags$li(tags$b("Reset axes"),  
+                   icon("home"),  
+                   " - click this button to return the axes to their  
+                  default range.") 
+         ),
          wellPanel(
                    column(4, uiOutput("geotype_ui_pyramid")),  
                    column(4, uiOutput("locname_ui_pyramid")),
@@ -226,7 +360,7 @@ tabPanel("Age/sex",
 
 
            
-### Tab 4: Deprivation (SIMD) ----   
+### Tab 5: Deprivation (SIMD) ----   
    
 
 tabPanel("Deprivation",
@@ -235,16 +369,35 @@ tabPanel("Deprivation",
          background-color:#ffffff; border: 0px solid #ffffff;",
          h3("Deprivation"),
          p("This section allows you to explore the data by 
-            different levels of ",
+            different levels of",
             tags$a(href="http://www.gov.scot/Topics/Statistics/SIMD", 
                    "deprivation"),
             ". You can use the filters to select the data you are 
             interested in. To view the data in a table use the 
             ‘show/hide table’ button. To download your data selection 
-            as a csv file use the ‘download data’ button. If you hover 
-            over the chart you will see a number of buttons which will 
-            allow you to select parts of the chart, zoom in or out or 
-            save the chart as an image."),
+            as a csv file use the ‘download data’ button.
+           "),
+         tags$ul( 
+           tags$li(tags$b("Download plot as a png"),  
+                   icon("camera"),  
+                   " - click this button to save the graph as an image  
+                   (please note that Internet Explorer does not support this  
+                   function)."), 
+           tags$li(tags$b("Zoom"),  
+                   icon("search"),  
+                   " - zoom into the graph by clicking this button and then  
+                   clicking and dragging your mouse over the area of the  
+                   graph you are interested in."),   
+           tags$li(tags$b("Pan"),  
+                   icon("move", lib = "glyphicon"),  
+                   " - adjust the axes of the graph by clicking this button  
+                   and then clicking and moving your mouse in any direction 
+                   you want."),   
+           tags$li(tags$b("Reset axes"),  
+                   icon("home"),  
+                   " - click this button to return the axes to their  
+                   default range.") 
+           ),
          wellPanel(
            column(4, uiOutput("geotype_ui_simd")),  
            column(4, uiOutput("locname_ui_simd")),
@@ -287,7 +440,7 @@ tabPanel("Deprivation",
 
 
             
-### Tab 5: Map ----   
+### Tab 6: Map ----   
 ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
 # 
 # tabPanel("Map", icon = icon("globe"), style="float: top; height: 95%; width: 95%; 
@@ -330,7 +483,7 @@ tabPanel("Deprivation",
 
 
              
-### Tab 6: Cross boundary ----   
+### Tab 7: Cross boundary ----   
      
 tabPanel("Cross-boundary",
          icon = icon("exchange"),
@@ -406,7 +559,7 @@ tabPanel("Cross-boundary",
 
 
             
-### Tab 7: Table ----   
+### Tab 8: Table ----   
      
 tabPanel("Table",
          icon = icon("table"),

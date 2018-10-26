@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 09 July 2018
+### Last edited by: Marios Alexandropoulos
+### Last edited on: 12 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -40,60 +40,64 @@
 
 
 
+
+
 ### Server ----
 
 
-function(input, output) {
+function(input, output)  {
   
+
+  ### Tab 2: Time trend for multiple location----   
   
-               
-  ### Tab 2: Time trend----   
-    
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
   output$geotype_ui_trend <- renderUI({
-    selectInput("geotype_trend",
-                label = "Select the type of location", 
-                choices = geo_type_trend,
-                selected =  "Scotland")
+    shinyWidgets::pickerInput("geotype_trend",
+                              label = "Select type of location", 
+                              choices = geo_type_trend,
+                              selected =  "Scotland")
   })
   
   output$locname_ui_trend <- renderUI({
-    selectInput("locname_trend",
-                "Select the location",
-                choices = data_trend %>%
-                  subset(geo_type == input$geotype_trend) %>%
-                  distinct(loc_name) %>%
-                  arrange(loc_name) %>%
-                  pull(loc_name),
-                selectize = TRUE,
-                selected = "Scotland")
+    shinyWidgets::pickerInput("locname_trend",
+                              label = "Select location (multiple selections allowed)",
+                              choices = sort(unique(
+                                data_trend$loc_name
+                                [data_trend$geo_type %in% input$geotype_trend]
+                              )),
+                              multiple = TRUE,
+                              options = list( 
+                                `selected-text-format` = "count > 1"
+                              ),
+                              selected = case_when(
+                                input$geotype_trend == "Scotland" 
+                                ~ "Scotland",
+                                input$geotype_trend == "Council area of residence" 
+                                ~ "Aberdeen City",
+                                input$geotype_trend == "Hospital of treatment" 
+                                ~ "Aberdeen Royal Infirmary",
+                                input$geotype_trend %in% c("NHS Board of residence", 
+                                                           "NHS Board of treatment") 
+                                ~ "NHS Ayrshire & Arran"
+                              ))
   })
   
   # Reactive datasets
   # Reactive dataset for the trend plot
-
+  
   data_trend_plot <- reactive({
     data_trend %>% 
-      subset(loc_name == input$locname_trend &
+      subset(loc_name %in% input$locname_trend &
                measure %in% input$service_trend &
-               geo_type == input$geotype_trend) %>% 
+               geo_type %in% input$geotype_trend) %>% 
       rename("Total length of stay (days)" = los,
              "Mean length of stay (days)" = avlos,
              "Number of stays / appointments" = count,
              "Did not attend rate (%)" = rate)
-      })
-
-  # Table data
-  table_trend_data <- reactive({
-    data_trend %>% 
-      subset(loc_name == input$locname_trend &
-               measure %in% input$service_trend &
-               geo_type == input$geotype_trend) %>% 
-      select(loc_name, quarter_name, measure, count, rate, los, avlos)
   })
-
-    # Plotting 
+  
+  # Plotting 
   output$trend_plot <- renderPlotly({
     
     # If no data are available for that quarter then plot message
@@ -102,7 +106,29 @@ function(input, output) {
          nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
          !("Did not attend outpatient appointments" %in% input$service_trend)
-         ))
+        )|
+        (is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) | 
+        (input$measure_trend == "Total length of stay (days)" & 
+         !(any(c("Elective inpatients",
+                 "Emergency inpatients",
+                 "Inpatient transfers",
+                 "All inpatients and daycases",
+                 "All inpatients",
+                 "All daycases") %in% input$service_trend ))
+        )|
+        (is.data.frame(data_trend_plot()) &&
+         nrow(data_trend_plot()) == 0) | 
+        (input$measure_trend == "Mean length of stay (days)" & 
+         !(any(c("Elective inpatients",
+                 "Emergency inpatients",
+                 "Inpatient transfers",
+                 "All inpatients and daycases",
+                 "All inpatients",
+                 "All daycases") %in% input$service_trend ))
+        )
+        
+    )
     {
       # Plotting empty plot just with text
       text_na <- list(x = 5,
@@ -127,44 +153,73 @@ function(input, output) {
         config(displayModeBar = FALSE)
       
     } else {
-
-    # Text for tooltip
-    tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
-                        data_trend_plot()$quarter_name, "<br>",
-                        input$measure_trend, ": ",
-                        data_trend_plot()[[input$measure_trend]]))
-
-    # Plotting time trend
-    plot_ly(data = data_trend_plot(),
-            x = ~quarter_date_last, 
-            y = ~get(input$measure_trend), 
-            text = tooltip,
-            hoverinfo = "text",
-            type = 'scatter',
-            mode = 'lines+markers',
-            color = ~measure,
-            colors = trend_pal) %>%
       
-      # Layout
-      layout(annotations = list(), # It needs this due to a buggy behaviour
-             yaxis = list(title = input$measure_trend,
-                          rangemode = "tozero"),
-             
-             # Axis parameter
-             xaxis = list(title = "Time period"),
-             
-             # To get hover compare mode as default
-             hovermode = 'false') %>%
+      # Text for tooltip
+      tooltip <- c(paste0(data_trend_plot()$measure, "<br>",
+                          data_trend_plot()$quarter_name, "<br>",
+                          data_trend_plot()$loc_name, "<br>",
+                          input$measure_trend, ": ",
+                          prettyNum(data_trend_plot()[[input$measure_trend]],
+                                    big.mark = ",")))
       
-      # Take out plotly logo and collaborate button
-      config(displaylogo = FALSE,
-             collaborate = FALSE,
-             editable = FALSE)
+      # Plotting time trend
+      plot_ly(data = data_trend_plot(),
+              x = ~quarter_date_last, 
+              y = ~get(input$measure_trend), 
+              text = tooltip,
+              hoverinfo = "text",
+              type = 'scatter',
+              mode = 'lines+markers',
+              color = ~loc_name,
+              colors = trend_pal) %>%
+        
+        # Layout
+        layout(
+               showlegend = TRUE,
+               yaxis = list(fixedrange = FALSE,
+                            title = input$measure_trend,
+                            rangemode = "tozero"),
+               
+               # Axis parameter
+               xaxis = list(fixedrange = TRUE,
+                            title = "Time period")
+               
+               
+                 )%>% 
+      
+        
+        
+        # Take out plotly logo and collaborate button
+        # config(displaylogo = FALSE,
+        #        collaborate = FALSE,
+        #        editable = FALSE)
+    
+      #Remove unnecessary buttons from the modebar. 
+                
+               config(displayModeBar = TRUE, 
+                          modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                                        'zoomIn2d',  
+                                                        'zoomOut2d',  
+                                                        'autoScale2d',  
+                                                        'toggleSpikelines',  
+                                                        'hoverCompareCartesian',  
+                                                        'hoverClosestCartesian'),  
+                          displaylogo = F, collaborate = F, editable = F) 
     }
     
-    }) 
+  })
 
   # Table
+  # Table data 
+  table_trend_data <- reactive({ 
+    data_trend %>%  
+      subset(loc_name %in% input$locname_trend & 
+               measure %in% input$service_trend & 
+               geo_type %in% input$geotype_trend) %>%  
+      select(loc_name, quarter_name, measure, count, rate, los, avlos)
+  }) 
+  
+  
   output$table_trend <- renderDataTable({
     datatable(table_trend_data(),
               style = 'bootstrap',
@@ -174,24 +229,222 @@ function(input, output) {
                              dom = 'tip'),
               colnames = c("Location", "Quarter", "Type of activity",
                            "Number", "DNA rate",
-                           "Total length of stay", "Mean length of stay")  
+                           "Total length of stay", "Mean length of stay")
     )
   })
-  
 
-      
+
+
+  # Downloading data
   # Downloading data
   output$download_trend <- downloadHandler(
-    filename =  'trend_data.csv',
+    filename =  'trend_data_multiple_location.csv',
     content = function(file) {
-      write_csv(data_trend_plot(), file) 
+      write.table(table_trend_data(), file, row.names = FALSE, 
+                  col.names = c("Location", "Quarter", "Type of activity",
+                                "Number", "DNA rate",
+                                "Total length of stay", "Mean length of stay"), 
+                  sep = ",")
     }
   )
   
+  ### Tab 3: Time trend for multiple activity----   
   
-             
-  ### Tab 3: Population pyramid ----   
+  # Reactive dropdowns for this tab
+  # They will provide a list of locations filtered by geography type
+  output$geotype_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("geotype_trend_2",
+                              label = "Select the type of location", 
+                              choices = geo_type_trend,
+                              selected =  "Scotland")
+  })
+  
+  output$locname_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("locname_trend_2",
+                              label = "Select the location",
+                              choices = sort(unique(
+                                data_trend$loc_name
+                                [data_trend$geo_type %in% input$geotype_trend_2]
+                              )),
+                              selected = case_when(
+                                input$geotype_trend == "Scotland" 
+                                ~ "Scotland",
+                                input$geotype_trend == "Council area of residence" 
+                                ~ "Aberdeen City",
+                                input$geotype_trend == "Hospital of treatment" 
+                                ~ "Aberdeen Royal Infirmary",
+                                input$geotype_trend %in% c("NHS Board of residence", 
+                                                           "NHS Board of treatment") 
+                                ~ "NHS Ayrshire & Arran"
+                              ))
+  })
+  
+  # Reactive datasets
+  # Reactive dataset for the trend plot
+  
+  data_trend_plot_2 <- reactive({
+    data_trend %>% 
+      filter(loc_name %in% input$locname_trend_2 &
+               measure %in% input$service_trend_2 &
+               geo_type %in% input$geotype_trend_2) %>% 
+      rename("Total length of stay (days)" = los,
+             "Mean length of stay (days)" = avlos,
+             "Number of stays / appointments" = count,
+             "Did not attend rate (%)" = rate)
+  })
+  
+  # Plotting 
+  output$trend_plot_2 <- renderPlotly({
     
+    # If no data are available for that quarter then plot message
+    # saying data are missing
+    if ((is.data.frame(data_trend_plot_2()) &&
+         nrow(data_trend_plot_2()) == 0) |
+        (input$measure_trend_2 == "Did not attend rate (%)" & 
+         !("Did not attend outpatient appointments" %in% input$service_trend_2)
+        )|
+        (is.data.frame(data_trend_plot_2()) &&
+         nrow(data_trend_plot_2()) == 0) | 
+        (input$measure_trend_2 == "Total length of stay (days)" & 
+         !(any(c("Elective inpatients",
+                 "Emergency inpatients",
+                 "Inpatient transfers",
+                 "All inpatients and daycases",
+                 "All inpatients",
+                 "All daycases") %in% input$service_trend_2 ))
+        )|
+        (is.data.frame(data_trend_plot_2()) &&
+         nrow(data_trend_plot_2()) == 0) | 
+        (input$measure_trend_2 == "Mean length of stay (days)" & 
+         !(any(c("Elective inpatients",
+                 "Emergency inpatients",
+                 "Inpatient transfers",
+                 "All inpatients and daycases",
+                 "All inpatients",
+                 "All daycases") %in% input$service_trend_2 ))
+        )
+        
+    )
+    {
+      # Plotting empty plot just with text
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available" ,
+                      xref = "x",
+                      yref = "y",
+                      showarrow = FALSE)
+      
+      plot_ly() %>%
+        layout(annotations = text_na,
+               
+               # Empty layout
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
+      
+    } else {
+      
+      # Text for tooltip
+      tooltip <- c(paste0(data_trend_plot_2()$measure, "<br>",
+                          data_trend_plot_2()$quarter_name, "<br>",
+                          data_trend_plot_2()$loc_name, "<br>",
+                          input$measure_trend_2, ": ",
+                          prettyNum(data_trend_plot_2()[[input$measure_trend_2]],
+                                    big.mark = ",")))
+      
+      # Plotting time trend
+      plot_ly(data = data_trend_plot_2(),
+              x = ~quarter_date_last, 
+              y = ~get(input$measure_trend_2), 
+              text = tooltip,
+              hoverinfo = "text",
+              type = 'scatter',
+              mode = 'lines+markers',
+              color = ~measure,
+              colors = trend_pal) %>%
+        
+        # Layout
+        layout(
+               showlegend = TRUE,
+               yaxis = list(fixedrange = TRUE,
+                            title = input$measure_trend,
+                            rangemode = "tozero"),
+               
+               # Axis parameter
+               xaxis = list(fixedrange = FALSE,
+                            title = "Time period")
+               
+               
+               ) %>%
+        
+        # Take out plotly logo and collaborate button
+        # config(displaylogo = FALSE,
+        #        collaborate = FALSE,
+        #        editable = FALSE)
+      
+      
+      #Remove unnecessary buttons from the modebar. 
+      
+      config(displayModeBar = TRUE, 
+             modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                           'zoomIn2d',  
+                                           'zoomOut2d',  
+                                           'autoScale2d',  
+                                           'toggleSpikelines',  
+                                           'hoverCompareCartesian',  
+                                           'hoverClosestCartesian'),  
+             displaylogo = F, collaborate = F, editable = F) 
+    }
+    
+  }) 
+
+  # Table
+  # Table data 
+  table_trend_data_2 <- reactive({ 
+    data_trend %>%  
+      subset(loc_name %in% input$locname_trend_2 & 
+               measure %in% input$service_trend_2 & 
+               geo_type %in% input$geotype_trend_2) %>%  
+      select(loc_name, quarter_name, measure, count, rate, los, avlos) 
+      
+  }) 
+  
+  
+  output$table_trend_2 <- renderDataTable({
+    datatable(table_trend_data_2(),
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed',
+              rownames = FALSE,
+              options = list(pageLength = 16,
+                             dom = 'tip'),
+              colnames = c("Location", "Quarter", "Type of activity",
+                           "Number", "DNA rate",
+                           "Total length of stay", "Mean length of stay")
+    )
+  })
+  
+  
+  
+  # Downloading data
+  output$download_trend_2 <- downloadHandler(
+    filename =  'trend_data_multiple_activity.csv',
+    content = function(file) {
+      write.table(table_trend_data_2(), file, row.names = FALSE, 
+                  col.names = c("Location", "Quarter", "Type of activity",
+                                "Number", "DNA rate",
+                                "Total length of stay", "Mean length of stay"), 
+                  sep = ",")
+    }
+  )
+  
+  ### Tab 4: Population pyramid ----   
+  
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
   output$geotype_ui_pyramid <- renderUI({
@@ -244,72 +497,90 @@ function(input, output) {
         nrow(data_pyramid_plot()) == 0)
     {
       
-    # Plotting empty plot just with text
-    text_na <- list(x = 5,
-                    y = 5,
-                    text = "No data available",
-                    xref = "x",
-                    yref = "y", 
-                    showarrow = FALSE)
-    
-    plot_ly() %>%
-      layout(annotations = text_na,
-             
-             # empty layout
-             yaxis = list(showline = FALSE,
-                          showticklabels = FALSE,
-                          showgrid = FALSE),
-             xaxis = list(showline = FALSE,
-                          showticklabels = FALSE,
-                          showgrid = FALSE)) %>%
+      # Plotting empty plot just with text
+      text_na <- list(x = 5,
+                      y = 5,
+                      text = "No data available",
+                      xref = "x",
+                      yref = "y", 
+                      showarrow = FALSE)
       
-      # Take out plotly logo and collaborate button
-      config(displayModeBar = FALSE)
+      plot_ly() %>%
+        layout(annotations = text_na,
+               
+               # empty layout
+               yaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE),
+               xaxis = list(showline = FALSE,
+                            showticklabels = FALSE,
+                            showgrid = FALSE)) %>%
+        
+        # Take out plotly logo and collaborate button
+        config(displayModeBar = FALSE)
       
     } else {
-    
-    # Breaks and labels for plot
-    breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
-    max <- round(max(abs(data_pyramid_plot()$count)))
-    
-    # Calculate breaks and labels for x axis
-    brks <- c(seq(-max, 0, breaks),
-              seq(breaks, max, breaks))
-    lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
-                                  seq(breaks, max, breaks))))
-    
-    # Text for tooltip
-    tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ",
-                            data_pyramid_plot()$age, "<br>",
-                           "Number: ",
-                           abs(data_pyramid_plot()$count)))
-    
-    plot_ly(data=data_pyramid_plot(),
-            x = ~count,
-            y = ~age,
-            color = ~sex,
-            colors = trend_pal,
-            text = tooltip_pyr,
-            hoverinfo = "text") %>% 
-      add_bars(orientation = 'h') %>%
-      layout(bargap = 0.1,
-             barmode = 'overlay',
-             yaxis = list(title = "Age"), 
-             xaxis = list(tickmode = 'array',
-                          tickvals = brks,
-                          ticktext = lbls,
-                          showline = TRUE,
-                          title = paste("Number of",
-                                        input$measure_pyramid))) %>%
       
-      # Take out plotly logo and collaborate button
-      config(displaylogo = FALSE,
-             collaborate = FALSE,
-             editable = FALSE)
-    
+      # Breaks and labels for plot
+      breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
+      max <- round(max(abs(data_pyramid_plot()$count)))
+      
+      # Calculate breaks and labels for x axis
+      brks <- c(seq(-max, 0, breaks),
+                seq(breaks, max, breaks))
+      lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
+                                    seq(breaks, max, breaks))))
+      
+      
+      # Text for tooltip
+      tooltip_pyr <- c(paste0(data_pyramid_plot()$sex, " ",
+                              data_pyramid_plot()$age, "<br>",
+                              "Number: ",
+                              prettyNum(abs(data_pyramid_plot()$count), 
+                                        big.mark = ",")))
+      
+      
+      
+      plot_ly(data=data_pyramid_plot(),
+              x = ~count,
+              y = ~age,
+              color = ~sex,
+              colors = trend_pal,
+              text = tooltip_pyr,
+              hoverinfo = "text") %>% 
+        add_bars(orientation = 'h') %>%
+        layout(bargap = 0.1,
+               barmode = 'overlay',
+               yaxis = list(fixedrange = FALSE,
+                            title = "Age"), 
+               xaxis = list(fixedrange = FALSE,
+                            tickmode = 'array',
+                            tickvals = brks,
+                            ticktext = lbls,
+                            showline = TRUE,
+                            title = paste("Number of",
+                                          input$measure_pyramid))) %>%
+        
+        # # Take out plotly logo and collaborate button
+        # config(displaylogo = FALSE,
+        #        collaborate = FALSE,
+        #        editable = FALSE)
+        
+        
+        #Remove unnecessary buttons from the modebar.
+      config(displayModeBar = TRUE, 
+             modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                           'zoomIn2d',  
+                                           'zoomOut2d',  
+                                           'autoScale2d',  
+                                           'toggleSpikelines',  
+                                           'hoverCompareCartesian',  
+                                           'hoverClosestCartesian'),  
+             displaylogo = F, collaborate = F, editable = F) 
+      
     }
   }) 
-
+  
   # Table
   output$table_pyramid <- renderDataTable({
     datatable(data_table_pyramid(),
@@ -328,7 +599,7 @@ function(input, output) {
   })
   
   
-     
+  
   # Downloading data
   output$download_pyramid <- downloadHandler(
     filename = 'agesex_data.csv',
@@ -340,7 +611,7 @@ function(input, output) {
   
   
              
-  ### Tab 4: Deprivation (SIMD) ----   
+  ### Tab 5: Deprivation (SIMD) ----   
   
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
@@ -416,7 +687,10 @@ function(input, output) {
                              data_simd_plot()$simd,
                              "<br>",
                             "Number: ",
-                            abs(data_simd_plot()$count)))
+                            prettyNum(abs(data_simd_plot()$count),
+                                      big.mark = ",")))
+    
+  
     
     plot_ly(data = data_simd_plot(),
             x = ~simd,
@@ -425,15 +699,27 @@ function(input, output) {
             hoverinfo = "text") %>% 
       add_bars(marker = list(color = "#004785")) %>%
       layout(bargap = 0.1, 
-             yaxis = list(title = paste("Number of",
+             yaxis = list(fixedrange = FALSE, title = paste("Number of",
                                         input$measure_simd)), 
-             xaxis = list(showline = TRUE,
+             xaxis = list(fixedrange = FALSE, showline = TRUE,
                           title = "Deprivation (SIMD) quintile")) %>%
       
-      # Take out plotly logo and collaborate button
-      config(displaylogo = FALSE,
-             collaborate = FALSE,
-             editable = FALSE)
+      # # Take out plotly logo and collaborate button
+      # config(displaylogo = FALSE,
+      #        collaborate = FALSE,
+      #        editable = FALSE)
+    
+    
+    #Remove unnecessary buttons from the modebar.
+    config(displayModeBar = TRUE, 
+           modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                         'zoomIn2d',  
+                                         'zoomOut2d',  
+                                         'autoScale2d',  
+                                         'toggleSpikelines',  
+                                         'hoverCompareCartesian',  
+                                         'hoverClosestCartesian'),  
+           displaylogo = F, collaborate = F, editable = F) 
     }
   }) 
   
@@ -466,7 +752,7 @@ function(input, output) {
   
   
               
-  ### Tab 5: Map ----   
+  ### Tab 6: Map ----   
   ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
   
   # Merging shapefile with dynamic selection of data
@@ -577,7 +863,7 @@ function(input, output) {
   
   
                
-  ### Tab 6: Cross-boundary ----   
+  ### Tab 7: Cross-boundary ----   
      
   # Reactive data
   # Creating dynamic selection of dataset.
@@ -630,9 +916,12 @@ function(input, output) {
       
       data_flow() %>%
         subset(quarter_name == input$quarter_flow &
-                 hbtreat_name==input$hb_flow)
+                 hbtreat_name == input$hb_flow)
     }
   })   
+ 
+
+  
   
   
   # Text
@@ -692,6 +981,8 @@ function(input, output) {
                ))
     
   })
+  
+    
   
   # This one has only the selected health board of residence
   output$sankey_res <- renderGvis({
@@ -773,7 +1064,7 @@ function(input, output) {
   
   
              
-  ### Tab 7: Table----   
+  ### Tab 8: Table----   
     
   # Switch function is used to select correct dataset based on
   # user input
@@ -792,12 +1083,23 @@ function(input, output) {
     input$filename_table,
     
     # 7.1 - Beds Data
-    "Beds" = data_bed %>% 
+    "Beds" = data_bed %>%
+      
+      # Create temporary year quarter variable to allow time period dropdown
+      # to be displayed chronologically
+      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
+             quarter_name = forcats::fct_reorder(
+               quarter_name, quarter
+             )) %>%
+      select(-quarter) %>%
       rename(Area_name = loc_name,
-             Specialty = specname,
+             Specialty = spec_name,
              Time_period = quarter_name,
              Occupancy_percentage = p_occ,
-             All_available_beds = aasb) %>%
+             All_available_beds = aasb,
+             Total_occupied_beds = tobd,
+             Average_available_staffed_beds = asb,
+             Average_occupied_beds = aob) %>%
       mutate_if(is.character, as.factor),
     
     
@@ -806,7 +1108,10 @@ function(input, output) {
     
     # 7.2.1 - Inpatient Data
     "Inpatients/Day cases - Specialty" = data_spec %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, stays, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -822,7 +1127,10 @@ function(input, output) {
     
     # 7.2.2 - Outpatient Data
     "Outpatients - Specialty" = data_spec %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, specialty,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -840,7 +1148,10 @@ function(input, output) {
     
     # 7.3.1 - Inpatient Data
     "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -856,7 +1167,10 @@ function(input, output) {
     
     # 7.3.2 - Outpatient Data
     "Outpatients - Deprivation (SIMD)" = data_simd %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(geo_type, loc_name, measure, simd,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -874,7 +1188,10 @@ function(input, output) {
     
     # 7.4.1 - Inpatient Data
     "Inpatients/Day cases - Time trend" = data_trend %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -889,7 +1206,10 @@ function(input, output) {
     
     # 7.4.2 - Outpatient Data
     "Outpatients - Time trend" = data_trend %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type,loc_name, quarter_name,
              measure, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -906,7 +1226,10 @@ function(input, output) {
     
     # 7.5.1 - Inpatient Data
     "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
-      filter(file == "Inpatients/Day Cases") %>% 
+      filter(file == "Inpatients/Day Cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure, sex, age,
              quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
@@ -924,7 +1247,10 @@ function(input, output) {
     
     # 7.5.2 - Outpatient Data
     "Outpatients - Age/sex" = data_pyramid %>% 
-      filter(file == "Outpatients") %>% 
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
       select(geo_type, loc_name, measure, sex, age,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
@@ -943,9 +1269,13 @@ function(input, output) {
     
     
     # 7.6.1 - Inpatient Data
-    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>% 
+    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(hbres_name, hbtreat_name,
-             quarter_name, count) %>% 
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
@@ -954,9 +1284,13 @@ function(input, output) {
     
     
     # 7.6.2 - Outpatient Data
-    "Outpatients - Cross boundary flow" = data_cbf_op %>% 
+    "Outpatients - Cross boundary flow" = data_cbf_op %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
       select(hbres_name, hbtreat_name,
-             quarter_name, count) %>% 
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
@@ -979,7 +1313,8 @@ function(input, output) {
               class = 'table-bordered table-condensed',
               rownames = FALSE,
               options = list(pageLength = 20,
-                             dom = 'tip'),
+                             dom = 'tip',
+                             autoWidth = TRUE),
               filter = "top",
               colnames = table_colnames
     )
@@ -998,7 +1333,8 @@ function(input, output) {
                     }
     )
   
-}
+ 
+  }
 
 
 

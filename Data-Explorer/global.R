@@ -5,12 +5,13 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 16 July 2018
+### Last edited on: 12 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
 ### Packages required:
 ### shiny (for the interactive framework);
+### shinyWidgets (for the interactive framework);
 ### DT (for data tables);
 ### googleVis (for Sankey charts);
 ### htmltools (for tooltips);
@@ -19,7 +20,7 @@
 ### rgdal (for reading shapefiles);
 ### dplyr and tidyr (for data manipulation);
 ### readr (for writing csv files);
-### zoo (for dates)
+### zoo and lubridate (for dates)
 ###
 ### This script includes all packages, datasets and other
 ### values used by both the UI and server files
@@ -41,40 +42,43 @@ library(dplyr)
 library(tidyr)
 library(readr)
 library(zoo)
-
+library(lubridate)
+library(shinyWidgets)
 
 # 1.2 - Define base filepath
-base_filepath <- paste0("//stats/pub_incubator/01 Acute Activity",
-                        "/wrangling/data/base_files/")
+base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
+                        "/4_Oct18/data/output/")
+ 
 
-
+RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
+                       "/4_Oct18/data_explorer/")
 
 ### Section 2: Loading Data ----
 
 
 # Beds data
 data_bed <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/beds.rds"))
 
 # Specialty data
 data_spec <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/spec.rds"))
 
 # SIMD data
 data_simd <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/simd.rds"))
 
 # Time Trend data
 data_trend <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/trend.rds"))
 
 # Population Pyramid data
 data_pyramid <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/pyramid.rds"))
 
 # Map data (outpatients)
@@ -87,12 +91,12 @@ data_pyramid <- readRDS(paste0(
 
 # Inpatients
 data_cbf_ip <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_ip.rds"))
 
 # Outpatients
 data_cbf_op <- readRDS(paste0(
-  base_filepath,
+  RDS_filepath,
   "R files/cbf_op.rds"))
 
 
