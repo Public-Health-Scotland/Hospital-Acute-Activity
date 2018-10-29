@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Marios Alexandropoulos
-### Last edited on: 12 September 2018
+### Last edited by: Jack Hannah
+### Last edited on: 29 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -47,7 +47,7 @@
 
 function(input, output)  {
   
-
+  
   ### Tab 2: Time trend for multiple location----   
   
   # Reactive dropdowns for this tab
@@ -175,40 +175,40 @@ function(input, output)  {
         
         # Layout
         layout(
-               showlegend = TRUE,
-               yaxis = list(fixedrange = FALSE,
-                            title = input$measure_trend,
-                            rangemode = "tozero"),
-               
-               # Axis parameter
-               xaxis = list(fixedrange = TRUE,
-                            title = "Time period")
-               
-               
-                 )%>% 
-      
+          showlegend = TRUE,
+          yaxis = list(fixedrange = FALSE,
+                       title = input$measure_trend,
+                       rangemode = "tozero"),
+          
+          # Axis parameter
+          xaxis = list(fixedrange = TRUE,
+                       title = "Time period")
+          
+          
+        )%>% 
+        
         
         
         # Take out plotly logo and collaborate button
         # config(displaylogo = FALSE,
         #        collaborate = FALSE,
         #        editable = FALSE)
-    
-      #Remove unnecessary buttons from the modebar. 
-                
-               config(displayModeBar = TRUE, 
-                          modeBarButtonsToRemove = list('select2d', 'lasso2d',
-                                                        'zoomIn2d',  
-                                                        'zoomOut2d',  
-                                                        'autoScale2d',  
-                                                        'toggleSpikelines',  
-                                                        'hoverCompareCartesian',  
-                                                        'hoverClosestCartesian'),  
-                          displaylogo = F, collaborate = F, editable = F) 
+        
+        #Remove unnecessary buttons from the modebar. 
+        
+        config(displayModeBar = TRUE, 
+               modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                             'zoomIn2d',  
+                                             'zoomOut2d',  
+                                             'autoScale2d',  
+                                             'toggleSpikelines',  
+                                             'hoverCompareCartesian',  
+                                             'hoverClosestCartesian'),  
+               displaylogo = F, collaborate = F, editable = F) 
     }
     
   })
-
+  
   # Table
   # Table data 
   table_trend_data <- reactive({ 
@@ -232,9 +232,9 @@ function(input, output)  {
                            "Total length of stay", "Mean length of stay")
     )
   })
-
-
-
+  
+  
+  
   # Downloading data
   # Downloading data
   output$download_trend <- downloadHandler(
@@ -371,39 +371,39 @@ function(input, output)  {
         
         # Layout
         layout(
-               showlegend = TRUE,
-               yaxis = list(fixedrange = TRUE,
-                            title = input$measure_trend,
-                            rangemode = "tozero"),
-               
-               # Axis parameter
-               xaxis = list(fixedrange = FALSE,
-                            title = "Time period")
-               
-               
-               ) %>%
+          showlegend = TRUE,
+          yaxis = list(fixedrange = TRUE,
+                       title = input$measure_trend,
+                       rangemode = "tozero"),
+          
+          # Axis parameter
+          xaxis = list(fixedrange = FALSE,
+                       title = "Time period")
+          
+          
+        ) %>%
         
         # Take out plotly logo and collaborate button
         # config(displaylogo = FALSE,
         #        collaborate = FALSE,
         #        editable = FALSE)
-      
-      
-      #Remove unnecessary buttons from the modebar. 
-      
-      config(displayModeBar = TRUE, 
-             modeBarButtonsToRemove = list('select2d', 'lasso2d',
-                                           'zoomIn2d',  
-                                           'zoomOut2d',  
-                                           'autoScale2d',  
-                                           'toggleSpikelines',  
-                                           'hoverCompareCartesian',  
-                                           'hoverClosestCartesian'),  
-             displaylogo = F, collaborate = F, editable = F) 
+        
+        
+        #Remove unnecessary buttons from the modebar. 
+        
+        config(displayModeBar = TRUE, 
+               modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                             'zoomIn2d',  
+                                             'zoomOut2d',  
+                                             'autoScale2d',  
+                                             'toggleSpikelines',  
+                                             'hoverCompareCartesian',  
+                                             'hoverClosestCartesian'),  
+               displaylogo = F, collaborate = F, editable = F) 
     }
     
   }) 
-
+  
   # Table
   # Table data 
   table_trend_data_2 <- reactive({ 
@@ -412,7 +412,7 @@ function(input, output)  {
                measure %in% input$service_trend_2 & 
                geo_type %in% input$geotype_trend_2) %>%  
       select(loc_name, quarter_name, measure, count, rate, los, avlos) 
-      
+    
   }) 
   
   
@@ -568,15 +568,15 @@ function(input, output)  {
         
         
         #Remove unnecessary buttons from the modebar.
-      config(displayModeBar = TRUE, 
-             modeBarButtonsToRemove = list('select2d', 'lasso2d',
-                                           'zoomIn2d',  
-                                           'zoomOut2d',  
-                                           'autoScale2d',  
-                                           'toggleSpikelines',  
-                                           'hoverCompareCartesian',  
-                                           'hoverClosestCartesian'),  
-             displaylogo = F, collaborate = F, editable = F) 
+        config(displayModeBar = TRUE, 
+               modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                             'zoomIn2d',  
+                                             'zoomOut2d',  
+                                             'autoScale2d',  
+                                             'toggleSpikelines',  
+                                             'hoverCompareCartesian',  
+                                             'hoverClosestCartesian'),  
+               displaylogo = F, collaborate = F, editable = F) 
       
     }
   }) 
@@ -610,7 +610,7 @@ function(input, output)  {
   )
   
   
-             
+  
   ### Tab 5: Deprivation (SIMD) ----   
   
   # Reactive dropdowns for this tab
@@ -681,45 +681,45 @@ function(input, output)  {
         config(displayModeBar = FALSE)
       
     } else {
-    
-    # Text for tooltip
-    tooltip_simd <- c(paste0("Quintile: ",
-                             data_simd_plot()$simd,
-                             "<br>",
-                            "Number: ",
-                            prettyNum(abs(data_simd_plot()$count),
-                                      big.mark = ",")))
-    
-  
-    
-    plot_ly(data = data_simd_plot(),
-            x = ~simd,
-            y = ~count,
-            text = tooltip_simd,
-            hoverinfo = "text") %>% 
-      add_bars(marker = list(color = "#004785")) %>%
-      layout(bargap = 0.1, 
-             yaxis = list(fixedrange = FALSE, title = paste("Number of",
-                                        input$measure_simd)), 
-             xaxis = list(fixedrange = FALSE, showline = TRUE,
-                          title = "Deprivation (SIMD) quintile")) %>%
       
-      # # Take out plotly logo and collaborate button
-      # config(displaylogo = FALSE,
-      #        collaborate = FALSE,
-      #        editable = FALSE)
-    
-    
-    #Remove unnecessary buttons from the modebar.
-    config(displayModeBar = TRUE, 
-           modeBarButtonsToRemove = list('select2d', 'lasso2d',
-                                         'zoomIn2d',  
-                                         'zoomOut2d',  
-                                         'autoScale2d',  
-                                         'toggleSpikelines',  
-                                         'hoverCompareCartesian',  
-                                         'hoverClosestCartesian'),  
-           displaylogo = F, collaborate = F, editable = F) 
+      # Text for tooltip
+      tooltip_simd <- c(paste0("Quintile: ",
+                               data_simd_plot()$simd,
+                               "<br>",
+                               "Number: ",
+                               prettyNum(abs(data_simd_plot()$count),
+                                         big.mark = ",")))
+      
+      
+      
+      plot_ly(data = data_simd_plot(),
+              x = ~simd,
+              y = ~count,
+              text = tooltip_simd,
+              hoverinfo = "text") %>% 
+        add_bars(marker = list(color = "#004785")) %>%
+        layout(bargap = 0.1, 
+               yaxis = list(fixedrange = FALSE, title = paste("Number of",
+                                                              input$measure_simd)), 
+               xaxis = list(fixedrange = FALSE, showline = TRUE,
+                            title = "Deprivation (SIMD) quintile")) %>%
+        
+        # # Take out plotly logo and collaborate button
+        # config(displaylogo = FALSE,
+        #        collaborate = FALSE,
+        #        editable = FALSE)
+        
+        
+        #Remove unnecessary buttons from the modebar.
+        config(displayModeBar = TRUE, 
+               modeBarButtonsToRemove = list('select2d', 'lasso2d',
+                                             'zoomIn2d',  
+                                             'zoomOut2d',  
+                                             'autoScale2d',  
+                                             'toggleSpikelines',  
+                                             'hoverCompareCartesian',  
+                                             'hoverClosestCartesian'),  
+               displaylogo = F, collaborate = F, editable = F) 
     }
   }) 
   
@@ -739,8 +739,8 @@ function(input, output)  {
                            "Mean length of stay"))
   })
   
-   
-     
+  
+  
   # Downloading data
   output$download_simd <- downloadHandler(
     filename =  'deprivation_data.csv',
@@ -751,126 +751,129 @@ function(input, output)  {
   )
   
   
-              
+  
   ### Tab 6: Map ----   
   ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA  
   
   # Merging shapefile with dynamic selection of data
   # First for HB
-#   hb_pol <- reactive({merge(hb_bound, 
-#                             data_mapipdc %>% subset(quarter_name==input$quarter_map
-#                                                     & measure==input$measure_map
-#                                                     & value_type == input$value_map
-#                                                     & substr(loc_name,1,3)=="NHS") %>% #selecting only HB 
-#                               droplevels() %>% #dropping missing factor levels to allow merging
-#                               rename(HBCode=loc_code), 
-#                             by='HBCode') 
-#   })   
-#   
-#   #Now for CA
-#   ca_pol <- reactive({merge(ca_bound, 
-#                             data_mapipdc %>% subset(quarter_name==input$quarter_map
-#                                                     & measure==input$measure_map
-#                                                     & value_type == input$value_map
-#                                                     & substr(loc_name,1,3)!="NHS") %>% #selecting only HB 
-#                               droplevels() %>% #dropping missing factor levels to allow merging
-#                               rename(GSS_COD=loc_code) , 
-#                             by='GSS_COD')
-#   }) 
-#   
-#   
-#   #Palettes for map.
-#   pal_hb <- reactive({
-#     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), hb_pol()$value, n=4)
-#   }) 
-#   pal_ca <- reactive({
-#     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), ca_pol()$value, n=4)
-#   }) 
-#   
-#   #title
-#   output$title_map <- renderText(paste("Hospital acute care activity - ", input$measure_map, 
-#                                        " during ", input$quarter_map))
-#   
-#   #Plotting map
-#   
-#   output$map <- renderLeaflet({
-#     leaflet() %>% 
-#       setView(-5, 56.33148888, zoom = 10) %>% # setting initial view point
-#       fitBounds(-7.0, 60.5, 0.25, 55.8)  %>% #limits of map
-#       setMaxBounds(-9.0, 62.5, 2.25, 53)  %>% #limits of map
-#       addProviderTiles(providers$CartoDB.Positron) %>% #background map
-#       #Adding layer control
-#       addLayersControl( 
-#         baseGroups = c("Health Board", "Council Area"),
-#         options = layersControlOptions(collapsed = FALSE)
-#       )
-#   })
-#   #Creating observer to avoid redrawing of map everytime 
-#   #a different option (time, measure) is chosen
-#   observe({
-#     
-#     leafletProxy("map") %>%
-#       clearShapes() %>% 
-#       #Adding polygons with HB
-#       addPolygons(data=hb_pol(),  group="Health Board",
-#                   color = "#444444", weight = 2, smoothFactor = 0.5, 
-#                   label = sprintf(hb_pol()$labs) %>% lapply(HTML), #tooltip for hovering
-#                   labelOptions = labelOptions(direction = "left"),
-#                   opacity = 1.0, fillOpacity = 0.5,
-#                   fillColor = ~pal_hb()(value), # palette
-#                   highlightOptions = highlightOptions(color = "white", weight = 2,
-#                                                       bringToFront = FALSE) #For highlighting the selection while hovering
-#       )%>% 
-#       #Adding polygons with HB rate 
-#       addPolygons(data=ca_pol(), group="Council Area",
-#                   color = "#444444", weight = 2, smoothFactor = 0.5, 
-#                   label = sprintf(ca_pol()$labs) %>% lapply(HTML), #tooltip for hovering
-#                   labelOptions = labelOptions(direction = "left"),
-#                   opacity = 1.0, fillOpacity = 0.5,
-#                   fillColor = ~pal_ca()(value), # palette
-#                   highlightOptions = highlightOptions(color = "white", weight = 2,
-#                                                       bringToFront = FALSE) #For highlighting the selection while hovering
-#       ) 
-#   })
-#   
-#   #####################################.    
-#   #### Table
-#   
-#   #Table data
-#   table_mapdata <- reactive({
-#     data_mapipdc %>% subset(quarter_name==input$quarter_map & measure==input$measure_map) %>% 
-#       select(loc_name, quarter_name, measure, value_type, value) %>% 
-#       dcast(loc_name+quarter_name+measure~value_type, fun.aggregate=sum)
-#     
-#   })
-#   
-#   #Actual table.
-#   output$table_map <- DT::renderDataTable({
-#     DT::datatable(table_mapdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-#                   options = list(pageLength = 14, dom = 'tip'),
-#                   colnames = c("Location", "Quarter", "Measure", "Admissions", "Crude Rate")  
-#     )
-#   })
-#   
-#   #####################################.    
-#   #### Downloading data
-#   output$download_map <- downloadHandler(
-#     filename =  'map_data.csv',
-#     content = function(file) {
-#       write.csv(data_mapipdc, file) 
-#     }
-#   )
+  #   hb_pol <- reactive({merge(hb_bound, 
+  #                             data_mapipdc %>% subset(quarter_name==input$quarter_map
+  #                                                     & measure==input$measure_map
+  #                                                     & value_type == input$value_map
+  #                                                     & substr(loc_name,1,3)=="NHS") %>% #selecting only HB 
+  #                               droplevels() %>% #dropping missing factor levels to allow merging
+  #                               rename(HBCode=loc_code), 
+  #                             by='HBCode') 
+  #   })   
+  #   
+  #   #Now for CA
+  #   ca_pol <- reactive({merge(ca_bound, 
+  #                             data_mapipdc %>% subset(quarter_name==input$quarter_map
+  #                                                     & measure==input$measure_map
+  #                                                     & value_type == input$value_map
+  #                                                     & substr(loc_name,1,3)!="NHS") %>% #selecting only HB 
+  #                               droplevels() %>% #dropping missing factor levels to allow merging
+  #                               rename(GSS_COD=loc_code) , 
+  #                             by='GSS_COD')
+  #   }) 
+  #   
+  #   
+  #   #Palettes for map.
+  #   pal_hb <- reactive({
+  #     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), hb_pol()$value, n=4)
+  #   }) 
+  #   pal_ca <- reactive({
+  #     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), ca_pol()$value, n=4)
+  #   }) 
+  #   
+  #   #title
+  #   output$title_map <- renderText(paste("Hospital acute care activity - ", input$measure_map, 
+  #                                        " during ", input$quarter_map))
+  #   
+  #   #Plotting map
+  #   
+  #   output$map <- renderLeaflet({
+  #     leaflet() %>% 
+  #       setView(-5, 56.33148888, zoom = 10) %>% # setting initial view point
+  #       fitBounds(-7.0, 60.5, 0.25, 55.8)  %>% #limits of map
+  #       setMaxBounds(-9.0, 62.5, 2.25, 53)  %>% #limits of map
+  #       addProviderTiles(providers$CartoDB.Positron) %>% #background map
+  #       #Adding layer control
+  #       addLayersControl( 
+  #         baseGroups = c("Health Board", "Council Area"),
+  #         options = layersControlOptions(collapsed = FALSE)
+  #       )
+  #   })
+  #   #Creating observer to avoid redrawing of map everytime 
+  #   #a different option (time, measure) is chosen
+  #   observe({
+  #     
+  #     leafletProxy("map") %>%
+  #       clearShapes() %>% 
+  #       #Adding polygons with HB
+  #       addPolygons(data=hb_pol(),  group="Health Board",
+  #                   color = "#444444", weight = 2, smoothFactor = 0.5, 
+  #                   label = sprintf(hb_pol()$labs) %>% lapply(HTML), #tooltip for hovering
+  #                   labelOptions = labelOptions(direction = "left"),
+  #                   opacity = 1.0, fillOpacity = 0.5,
+  #                   fillColor = ~pal_hb()(value), # palette
+  #                   highlightOptions = highlightOptions(color = "white", weight = 2,
+  #                                                       bringToFront = FALSE) #For highlighting the selection while hovering
+  #       )%>% 
+  #       #Adding polygons with HB rate 
+  #       addPolygons(data=ca_pol(), group="Council Area",
+  #                   color = "#444444", weight = 2, smoothFactor = 0.5, 
+  #                   label = sprintf(ca_pol()$labs) %>% lapply(HTML), #tooltip for hovering
+  #                   labelOptions = labelOptions(direction = "left"),
+  #                   opacity = 1.0, fillOpacity = 0.5,
+  #                   fillColor = ~pal_ca()(value), # palette
+  #                   highlightOptions = highlightOptions(color = "white", weight = 2,
+  #                                                       bringToFront = FALSE) #For highlighting the selection while hovering
+  #       ) 
+  #   })
+  #   
+  #   #####################################.    
+  #   #### Table
+  #   
+  #   #Table data
+  #   table_mapdata <- reactive({
+  #     data_mapipdc %>% subset(quarter_name==input$quarter_map & measure==input$measure_map) %>% 
+  #       select(loc_name, quarter_name, measure, value_type, value) %>% 
+  #       dcast(loc_name+quarter_name+measure~value_type, fun.aggregate=sum)
+  #     
+  #   })
+  #   
+  #   #Actual table.
+  #   output$table_map <- DT::renderDataTable({
+  #     DT::datatable(table_mapdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
+  #                   options = list(pageLength = 14, dom = 'tip'),
+  #                   colnames = c("Location", "Quarter", "Measure", "Admissions", "Crude Rate")  
+  #     )
+  #   })
+  #   
+  #   #####################################.    
+  #   #### Downloading data
+  #   output$download_map <- downloadHandler(
+  #     filename =  'map_data.csv',
+  #     content = function(file) {
+  #       write.csv(data_mapipdc, file) 
+  #     }
+  #   )
   
   
-               
+  
   ### Tab 7: Cross-boundary ----   
-     
+  
   # Reactive data
   # Creating dynamic selection of dataset.
-  data_flow <- reactive({switch(input$datatype_flow,
-                                "Inpatients/Day cases" = data_cbf_ip,
-                                "Outpatients" = data_cbf_op
-  )})
+  data_flow <- reactive({data_cbf %>%
+      subset(file == input$datatype_flow) %>%
+      select(-file)})
+  # data_flow <- reactive({switch(input$datatype_flow,
+  #                               "Inpatients/Day cases" = data_cbf_ip,
+  #                               "Outpatients" = data_cbf_op
+  # )})
   
   # For all HB
   flow_all <- reactive({
@@ -919,8 +922,8 @@ function(input, output)  {
                  hbtreat_name == input$hb_flow)
     }
   })   
- 
-
+  
+  
   
   
   
@@ -982,7 +985,7 @@ function(input, output)  {
     
   })
   
-    
+  
   
   # This one has only the selected health board of residence
   output$sankey_res <- renderGvis({
@@ -1009,7 +1012,7 @@ function(input, output)  {
                               gvis.plot.tag = NULL))
   })
   
-      
+  
   # Table
   
   # Selecting the Table data
@@ -1052,7 +1055,7 @@ function(input, output)  {
     )
   })
   
-      
+  
   # Downloading data
   output$download_flow <- downloadHandler(
     filename =  'crossb_flow_data.csv',
@@ -1063,9 +1066,9 @@ function(input, output)  {
   )
   
   
-             
+  
   ### Tab 8: Table----   
-    
+  
   # Switch function is used to select correct dataset based on
   # user input
   #
@@ -1320,7 +1323,7 @@ function(input, output)  {
     )
   })
   
-     
+  
   # Downloading data
   # The downloaded data are those selected by the user using
   # the data table filters
@@ -1333,8 +1336,8 @@ function(input, output)  {
                     }
     )
   
- 
-  }
+  
+}
 
 
 
