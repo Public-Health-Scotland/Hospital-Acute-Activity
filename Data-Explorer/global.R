@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 12 September 2018
+### Last edited on: 29 September 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -48,7 +48,7 @@ library(shinyWidgets)
 # 1.2 - Define base filepath
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                         "/4_Oct18/data/output/")
- 
+
 
 RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                        "/4_Oct18/data_explorer/")
@@ -198,5 +198,9 @@ opts <- paste0("{
                }" )
 
 
+
+# Temp fix for cbf
+data_cbf <- bind_rows(data_cbf_ip %>% mutate(file = "Inpatients/Day Cases"),
+                      data_cbf_op %>% mutate(file = "Outpatients"))
 
 ### END OF SCRIPT ###
