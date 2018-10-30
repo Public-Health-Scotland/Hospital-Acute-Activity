@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 29 September 2018
+### Last edited on: 30 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -514,7 +514,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;",
                        column(4,  
                               selectInput("hb_flow",
                                           label = "Select the board of interest", 
-                                          choices = data_cbf_ip %>%
+                                          choices = data_cbf %>%
                                             distinct(hbres_name) %>%
                                             pull(hbres_name)),
                               downloadButton(outputId = 'download_flow',
@@ -523,7 +523,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;",
                        column(4,
                               selectInput("quarter_flow", 
                                           label = "Select the time period", 
-                                          choices = data_cbf_ip %>%
+                                          choices = data_cbf %>%
                                             arrange(dmy(quarter_date)) %>%
                                             distinct(quarter_name) %>%
                                             pull(quarter_name),
