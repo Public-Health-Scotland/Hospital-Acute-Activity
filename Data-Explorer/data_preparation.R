@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 12 September 2018
+### Last edited on: 30 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -51,7 +51,7 @@
 ### X.4 - Delete all intermediate files
 ###
 ###
-### The Beds data isn't split by inpatient and outpatient
+### The Beds data aren't split by inpatient and outpatient
 ### (or residence and treatment), and the Map and Cross-
 ### Boundary data aren't split by residence and treatment
 
@@ -68,7 +68,7 @@ library(zoo)
 library(stringi)
 
 
-# 1.2 - Define base filepath
+# 1.2 - Define filepaths
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                         "/4_Oct18/data/output/")
 
@@ -77,7 +77,7 @@ RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
 
 
 # 1.3 - Load functions script
-source("//stats/SecondaryCare/Quarterly Publication/TPP/functions.R")
+source("./Data-Explorer/functions.R")
 
 
 
@@ -212,7 +212,7 @@ data_simd_op_res <- read_csv(paste0(
 # 4.2.2 - Treatment data
 data_simd_op_treat <- read_csv(paste0(
   base_filepath,
-  "20181030_Outpatients_by_Health_Board_of_Treatment_and_SIMD")) %>%
+  "20181030_Outpatients_by_Health_Board_of_Treatment_and_SIMD.csv")) %>%
   
   # Exclude three location codes which have no name
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
@@ -505,6 +505,7 @@ saveRDS(data_map_op, paste0(
 data_cbf_ip <- read_csv(paste0(
   base_filepath,
   "20181030_Inpatient_and_Daycase_Cross_Boundary_Flow.csv")) %>%
+  mutate(file = "Inpatients/Day Cases") %>%
   
   # Select health boards only
   filter(hbtreat_name != "Non-NHS Provider" &
@@ -525,17 +526,13 @@ data_cbf_ip <- read_csv(paste0(
   mutate_at(vars(contains("hb")),
             funs(stri_replace_first_fixed(., "NHS ", "")))
 
-# Save file
-saveRDS(data_cbf_ip, paste0(
-  RDS_filepath,
-  "R files/cbf_ip.rds"))
-
 
 # 8.2 - Outpatient data
 data_cbf_op <-  read_csv(paste0(
   base_filepath,
   "20181030_Outpatients_Cross_Boundary_Flow.csv")) %>%
   convert_dates() %>%
+  mutate(file = "Outpatients") %>%
   
   # Select health boards only
   filter(!(hbtreat_name %in% c("Non-NHS Provider", "Null")) &
@@ -555,10 +552,18 @@ data_cbf_op <-  read_csv(paste0(
   mutate_at(vars(contains("hb")),
             funs(stri_replace_first_fixed(., "NHS ", "")))
 
+
+# 8.3 - Combine inpatient and outpatient files
+data_cbf <- bind_rows(data_cbf_ip, data_cbf_op)
+
 # Save file
-saveRDS(data_cbf_op, paste0(
+saveRDS(data_cbf, paste0(
   RDS_filepath,
-  "R files/cbf_op.rds"))
+  "R files/cbf.rds"))
+
+
+# 8.4 - Delete intermediate files
+rm(data_cbf_ip, data_cbf_op)
 
 
 
