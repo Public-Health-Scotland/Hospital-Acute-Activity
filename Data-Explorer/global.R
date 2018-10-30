@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 29 September 2018
+### Last edited on: 30 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -45,13 +45,13 @@ library(zoo)
 library(lubridate)
 library(shinyWidgets)
 
-# 1.2 - Define base filepath
+# 1.2 - Define filepaths
 base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                         "/4_Oct18/data/output/")
 
-
 RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
                        "/4_Oct18/data_explorer/")
+
 
 ### Section 2: Loading Data ----
 
@@ -88,16 +88,9 @@ data_pyramid <- readRDS(paste0(
 #   "R files/map_op.rds"))
 
 # Cross-Boundary data
-
-# Inpatients
-data_cbf_ip <- readRDS(paste0(
+data_cbf <- readRDS(paste0(
   RDS_filepath,
-  "R files/cbf_ip.rds"))
-
-# Outpatients
-data_cbf_op <- readRDS(paste0(
-  RDS_filepath,
-  "R files/cbf_op.rds"))
+  "R files/cbf.rds"))
 
 
 
@@ -198,9 +191,5 @@ opts <- paste0("{
                }" )
 
 
-
-# Temp fix for cbf
-data_cbf <- bind_rows(data_cbf_ip %>% mutate(file = "Inpatients/Day Cases"),
-                      data_cbf_op %>% mutate(file = "Outpatients"))
 
 ### END OF SCRIPT ###
