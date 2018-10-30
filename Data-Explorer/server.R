@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 29 September 2018
+### Last edited on: 30 October 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -868,12 +868,7 @@ function(input, output)  {
   # Reactive data
   # Creating dynamic selection of dataset.
   data_flow <- reactive({data_cbf %>%
-      subset(file == input$datatype_flow) %>%
-      select(-file)})
-  # data_flow <- reactive({switch(input$datatype_flow,
-  #                               "Inpatients/Day cases" = data_cbf_ip,
-  #                               "Outpatients" = data_cbf_op
-  # )})
+      subset(file == input$datatype_flow)})
   
   # For all HB
   flow_all <- reactive({
