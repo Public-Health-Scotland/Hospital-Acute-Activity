@@ -126,153 +126,139 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
   ### Tab 2: Time trend for multiple location ----   
   
   
-  tabPanel(    "Time trend 
-                         (location comparison)",
-               icon = icon("line-chart"),
-               style = "height: 95%; width: 95%; background-color: #ffffff;
-                         border: 0px solid #ffffff;",
-               h3("Time trend"),
-               p("This section allows you to see changes over time.
-                           You can use the filters to select the data you are 
-                           interested in. You can visualise multiple locations
-                           at the same time.To view the data in a table use the 
-                           ‘show/hide table’ button.To download your data 
-                           selection as a csv file use the ‘download data’ 
-                           button. 
-                           "),
-               tags$ul( 
-                 tags$li(tags$b("Download plot as a png"),  
-                         icon("camera"),  
-                         " - click this button to save the graph as an image  
-                                   (please note that Internet Explorer does not support this  
-                                   function)."), 
-                 tags$li(tags$b("Zoom"),  
-                         icon("search"),  
-                         " - zoom into the graph by clicking this button and then  
-                                   clicking and dragging your mouse over the area of the  
-                                   graph you are interested in."),   
-                 tags$li(tags$b("Pan"),  
-                         icon("move", lib = "glyphicon"),  
-                         " - adjust the axes of the graph by clicking this button  
-                                   and then clicking and moving your mouse in any direction 
-                                   you want."),   
-                 tags$li(tags$b("Reset axes"),  
-                         icon("home"),  
-                         " - click this button to return the axes to their  
-                                   default range.") 
-               ),
-               wellPanel(tags$style(".well {background-color: #ffffff;
-                                              border: 0px solid #336699;}"),
-                         column(6, uiOutput("geotype_ui_trend")),  
-                         column(6, uiOutput("locname_ui_trend")),
-                         column(6,
-                                shinyWidgets::pickerInput(
-                                  "service_trend",
-                                  label = "Select type of activity",
-                                  choices = trend_service,
-                                  
-                                  selected =
-                                    c("All inpatients and daycases")  
-                                )),
-                         column(6,
-                                shinyWidgets::pickerInput("measure_trend",
-                                                          label = "Select measure", 
-                                                          choices = trend_measure,
-                                                          selected = "Number")),
-                         column(6,
-                                downloadButton(outputId = 'download_trend',
-                                               label = 'Download data',
-                                               width = "95%"))  
-               ),
-               mainPanel(width = 12,
-                         plotlyOutput("trend_plot"),
-                         
-                         # Button to show / hide div where data table is
-                         HTML("<button data-toggle = 'collapse' href = '#trend' 
-                                        class='btn btn-primary'>
-                                        <strong>Show/hide table</strong></button>"),
-                         HTML("<div id = 'trend' class = 'collapse'> "),
-                         dataTableOutput("table_trend",
-                                         width = "95%"),
-                         HTML("</div>")
-               )
+  tabPanel("Time trend (location comparison)",
+           icon = icon("line-chart"),
+           style = "height: 95%; width: 95%; background-color: #ffffff; 
+                    border: 0px solid #ffffff;",
+           h3("Time trend"),
+           p("This section allows you to see changes over time. You can use", 
+             "the filters to select the data you are interested in. You can", 
+             "visualise multiple locations at the same time. To view the data", 
+             "in a table use the ‘show/hide table’ button. To download your", 
+             "data selection as a csv file use the ‘download data’ button."),
+           tags$ul(tags$li(tags$b("Download plot as a png"),  
+                           icon("camera"),  
+                           " - click this button to save the graph as an", 
+                           "image (please note that Internet Explorer does", 
+                           "not support this function)."),
+                   tags$li(tags$b("Zoom"),  
+                           icon("search"),  
+                           " - zoom into the graph by clicking this button", 
+                           "and then clicking and dragging your mouse over", 
+                           "the area of the graph you are interested in."),   
+                   tags$li(tags$b("Pan"),  
+                           icon("move", lib = "glyphicon"),  
+                           " - adjust the axes of the graph by clicking this", 
+                           "button and then clicking and moving your mouse", 
+                           "in any direction you want."),   
+                   tags$li(tags$b("Reset axes"),  
+                           icon("home"),  
+                           " - click this button to return the axes to their",   
+                           "default range.") 
+           ),
+           wellPanel(tags$style(".well {background-color: #ffffff;
+                                        border: 0px solid #336699;}"),
+                     column(6, uiOutput("geotype_ui_trend")),  
+                     column(6, uiOutput("locname_ui_trend")),
+                     column(6, pickerInput(
+                       "service_trend",
+                       label = "Select type of activity",
+                       choices = trend_service,
+                       selected = c("All inpatients and daycases"))),
+                     column(6, pickerInput(
+                       "measure_trend",
+                       label = "Select measure", 
+                       choices = trend_measure,
+                       selected = "Number")),
+                     column(6, downloadButton(outputId = 'download_trend',
+                                              label = 'Download data',
+                                              width = "95%"))  
+           ),
+           mainPanel(width = 12,
+                     plotlyOutput("trend_plot"),
+                     
+                     # Button to show / hide div where data table is
+                     HTML("<button data-toggle = 'collapse' href = '#trend' 
+                            class='btn btn-primary'>
+                            <strong>Show/hide table</strong></button>"),
+                     HTML("<div id = 'trend' class = 'collapse'> "),
+                     dataTableOutput("table_trend",
+                                     width = "95%"),
+                     HTML("</div>")
+           )
   ),
   
   ### Tab 3: Time trend for multiple activity ----   
   
   
-  tabPanel(    "Time trend 
-                         (activity comparison)",
-               icon = icon("line-chart"),
-               style = "height: 95%; width: 95%; background-color: #ffffff;
-                         border: 0px solid #ffffff;",
-               h3("Time trend"),
-               p("This section allows you to see changes over time.
-                           You can use the filters to select the data you are 
-                           interested in.You can visualise multiple activities
-                           at the same time. To view the data in a table use the 
-                           ‘show/hide table’ button. To download your data 
-                           selection as a csv file use the ‘download data’ 
-                           button."),
-               tags$ul( 
-                 tags$li(tags$b("Download plot as a png"),  
-                         icon("camera"),  
-                         " - click this button to save the graph as an image  
-                                   (please note that Internet Explorer does not support this  
-                                   function)."), 
-                 tags$li(tags$b("Zoom"),  
-                         icon("search"),  
-                         " - zoom into the graph by clicking this button and then  
-                                   clicking and dragging your mouse over the area of the  
-                                   graph you are interested in."),   
-                 tags$li(tags$b("Pan"),  
-                         icon("move", lib = "glyphicon"),  
-                         " - adjust the axes of the graph by clicking this button  
-                                   and then clicking and moving your mouse in any direction 
-                                   you want."),   
-                 tags$li(tags$b("Reset axes"),  
-                         icon("home"),  
-                         " - click this button to return the axes to their  
-                                   default range.") 
-               ),
-               wellPanel(tags$style(".well {background-color: #ffffff;
-                                              border: 0px solid #336699;}"),
-                         column(6, uiOutput("geotype_ui_trend_2")),  
-                         column(6, uiOutput("locname_ui_trend_2")),
-                         column(6,
-                                shinyWidgets::pickerInput(
-                                  "service_trend_2",
-                                  label = "Select type of activity (multiple selections allowed)",
-                                  choices = trend_service,
-                                  multiple = TRUE,
-                                  options = list(
-                                    `selected-text-format` = "count > 1"
-                                  ),
-                                  selected =
-                                    c("All inpatients and daycases")  
-                                )),
-                         column(6,
-                                shinyWidgets::pickerInput("measure_trend_2",
-                                                          label = "Select measure", 
-                                                          choices = trend_measure,
-                                                          selected = "Number")),
-                         column(6,
-                                downloadButton(outputId = 'download_trend_2',
-                                               label = 'Download data',
-                                               width = "95%"))  
-               ),
-               mainPanel(width = 12,
-                         plotlyOutput("trend_plot_2"),
-                         
-                         # Button to show / hide div where data table is
-                         HTML("<button data-toggle = 'collapse' href = '#trend2' 
-                                        class='btn btn-primary'>
-                                        <strong>Show/hide table</strong></button>"),
-                         HTML("<div id = 'trend2' class = 'collapse'> "),
-                         dataTableOutput("table_trend_2",
-                                         width = "95%"),
-                         HTML("</div>")
-               )
+  tabPanel("Time trend (activity comparison)",
+           icon = icon("line-chart"),
+           style = "height: 95%; width: 95%; background-color: #ffffff;
+                    border: 0px solid #ffffff;",
+           h3("Time trend"),
+           p("This section allows you to see changes over time. You can", 
+             "use the filters to select the data you are interested in.", 
+             "You can visualise multiple activities at the same time.", 
+             "To view the data in a table use the ‘show/hide table’ button.", 
+             "To download your data selection as a csv file use the", 
+             "‘download data’ button."),
+           tags$ul( 
+             tags$li(tags$b("Download plot as a png"),  
+                     icon("camera"),  
+                     " - click this button to save the graph as an image", 
+                     "(please note that Internet Explorer does not support", 
+                     "this function)."), 
+             tags$li(tags$b("Zoom"),  
+                     icon("search"),  
+                     " - zoom into the graph by clicking this button and then", 
+                     "clicking and dragging your mouse over the area of the",
+                     "graph you are interested in."),   
+             tags$li(tags$b("Pan"),  
+                     icon("move",
+                          lib = "glyphicon"),  
+                     " - adjust the axes of the graph by clicking this button",  
+                     "and then clicking and moving your mouse in any", 
+                     "direction you want."),   
+             tags$li(tags$b("Reset axes"),  
+                     icon("home"),  
+                     " - click this button to return the axes to their", 
+                     "default range.") 
+           ),
+           wellPanel(tags$style(".well {background-color: #ffffff;
+                                        border: 0px solid #336699;}"),
+                     column(6, uiOutput("geotype_ui_trend_2")),  
+                     column(6, uiOutput("locname_ui_trend_2")),
+                     column(6, pickerInput(
+                       "service_trend_2",
+                       label = paste0("Select type of activity", 
+                                      "(multiple selections allowed)"),
+                       choices = trend_service,
+                       multiple = TRUE,
+                       options = list(
+                         `selected-text-format` = "count > 1"
+                       ),
+                       selected = c("All inpatients and daycases"))),
+                     column(6, pickerInput("measure_trend_2",
+                                           label = "Select measure", 
+                                           choices = trend_measure,
+                                           selected = "Number")),
+                     column(6,
+                            downloadButton(outputId = 'download_trend_2',
+                                           label = 'Download data',
+                                           width = "95%"))  
+           ),
+           mainPanel(width = 12,
+                     plotlyOutput("trend_plot_2"),
+                     
+                     # Button to show / hide div where data table is
+                     HTML("<button data-toggle = 'collapse' href = '#trend2' 
+                            class='btn btn-primary'>
+                            <strong>Show/hide table</strong></button>"),
+                     HTML("<div id = 'trend2' class = 'collapse'> "),
+                     dataTableOutput("table_trend_2",
+                                     width = "95%"),
+                     HTML("</div>")
+           )
   ),
   
   
