@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 30 October 2018
+### Last edited on: 08 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -71,22 +71,59 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                     "following six sections there are filters that let you",
                     "select the data you are interested in:"),
                   tags$ul( 
-                    tags$li(tags$b("Time trend (location comparison)"),
-                            " - shows the data over time."),
-                    tags$li(tags$b("Time trend (activity comparison)"),
-                            " - shows the data over time."),
-                    tags$li(tags$b("Age/sex"),
-                            " - shows the age and sex distribution of", 
-                            "the data."),
-                    tags$li(tags$b("Deprivation"),
-                            " - shows activity across different levels",
-                            "of deprivation."),
-                    tags$li(tags$b("Cross-boundary flow"),
-                            " - shows the relationship between where", 
-                            "patients live and where they are treated."),
-                    tags$li(tags$b("Table"), " - allows you to view the", 
-                            "data in a table.")
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_trend_location",
+                          "Time trend (location comparison)")),
+                      icon("line-chart"),
+                      " - shows the data over time."),
+                    
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_trend_activity",
+                          "Time trend (activity comparison)")),
+                      icon("line-chart"),
+                      " - shows the data over time."),
+                    
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_age_sex",
+                          "Age/sex")),
+                      icon("bar-chart"),
+                      " - shows the age and sex distribution of", 
+                      "the data."),
+                    
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_deprivation",
+                          "Deprivation")),
+                      icon("user-circle-o"),
+                      " - shows activity across different levels",
+                      "of deprivation."),
+                    
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_cbf",
+                          "Cross-boundary flow")),
+                      icon("exchange"),
+                      " - shows the relationship between where", 
+                      "patients live and where they are treated."),
+                    
+                    tags$li(
+                      tags$b(
+                        actionLink(
+                          "tabpanel_table",
+                          "Table")), 
+                      icon("table"), 
+                      "- allows you to view the", 
+                      "data in a table.")
                   ),
+                  
                   p("When using the data explorer please take the", 
                     "following factors into consideration:"),
                   tags$ul(
