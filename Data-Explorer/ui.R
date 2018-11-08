@@ -65,6 +65,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
            column(2,
                   h3("Data explorer")),
            column(10,
+                  tags$br(),
                   p("The data explorer allows you to find the data you want",
                     "and visualise it in different ways. Within each of the",
                     "following six sections there are filters that let you",
@@ -98,27 +99,27 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                                             "Acute-Hospital-Publication/",
                                             "data-quality/"),
                               "data quality"), " section."),
-                    tags$li("The data for the most recent quarter are
-                                      provisional. Provisional data are subject
-                                      to change in future publications as submissions
-                                      may be updated to reflect a more accurate and
-                                      complete set of data from NHS Boards."),
-                    tags$li("Missing data points within graphs / missing
-                                      rows of data within the tables means no data
-                                      / activity."),
-                    tags$li("Disclosure control methods have been applied
-                                      to the data in order to protect patient
-                                      confidentiality therefore figures may not
-                                      be additive.")),
-                  p("If you have any trouble using this tool or you have
-                              further questions relating to the data, please contact
-                              us at: ",
+                    tags$li("The data for the most recent quarter are", 
+                            "provisional. Provisional data are subject to", 
+                            "change in future publications as submissions", 
+                            "may be updated to reflect a more accurate and", 
+                            "complete set of data from NHS Boards."),
+                    tags$li("Missing data points within graphs / missing",
+                            "rows of data within the tables means no data", 
+                            "/ activity."),
+                    tags$li("Disclosure control methods have been applied", 
+                            "to the data in order to protect patient", 
+                            "confidentiality therefore figures may not", 
+                            "be additive.")),
+                  p("If you have any trouble using this tool or you have",
+                    "further questions relating to the data, please contact", 
+                    "us at: ",
                     tags$b(tags$a(
-                      href = "mailto:nss.isdtransformingpublishing@nhs.net",
-                      "nss.isdtransformingpublishing@nhs.net")),
+                      href = "mailto:NSS.isdQualityIndicators@nhs.net",
+                      "NSS.isdQualityIndicators@nhs.net")),
                     " and we will be happy to help.")
-           )
-  ),
+                  )
+           ),
   
   
   
