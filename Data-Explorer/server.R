@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 30 October 2018
+### Last edited on: 08 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -25,10 +25,49 @@
 ### Server ----
 
 
-function(input, output)  {
+function(input, output, session)  {
   
+  ### Tab 1: Introduction ----
   
-  ### Tab 2: Time trend for multiple location----   
+  # Add hyperlinks to each tab to the corresponding text on the introduction
+  # tab
+  observeEvent(input$tabpanel_trend_location, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Time trend (location comparison)")
+  })
+  
+  observeEvent(input$tabpanel_trend_activity, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Time trend (activity comparison)")
+  })
+  
+  observeEvent(input$tabpanel_age_sex, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Age/sex")
+  })
+  
+  observeEvent(input$tabpanel_deprivation, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Deprivation")
+  })
+  
+  observeEvent(input$tabpanel_cbf, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Cross-boundary")
+  })
+  
+  observeEvent(input$tabpanel_table, {
+    updateTabsetPanel(session,
+                      "Panels",
+                      selected = "Table")
+  })
+  
+  ### Tab 2: Time trend for multiple location ----   
   
   # Reactive dropdowns for this tab
   # They will provide a list of locations filtered by geography type
