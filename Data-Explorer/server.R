@@ -18,26 +18,6 @@
 # This is because filter struggles with the '$' operator
 # Where possible, filter is still preferred
 
-### TO DO (Jaime): ----
-
-
-# Fix issues with selection of dates (max date and order)
-# Order quarter variable in tables based on date (use date variable instead?)
-# Add visualization for specialty (time trend, bar chart)
-
-# Figure out colors scale for map/fix legend image
-# Make map outpatients work (need to check raw data, add switch or
-# merge datasets)
-# Include los, dna rate and avlos in map, deprivation, age-sex?
-
-# Include bed time trend might require merging datasets
-# Fix formatting numbers tooltip
-# Set labels for time trend (to avoid cases with decimals)
-
-# Alignment download boxes
-# Think about color palette for trend
-# Include functionality to save cross-boundary plots
-
 
 
 
@@ -236,7 +216,6 @@ function(input, output)  {
   
   
   # Downloading data
-  # Downloading data
   output$download_trend <- downloadHandler(
     filename =  'trend_data_multiple_location.csv',
     content = function(file) {
@@ -382,11 +361,6 @@ function(input, output)  {
           
           
         ) %>%
-        
-        # Take out plotly logo and collaborate button
-        # config(displaylogo = FALSE,
-        #        collaborate = FALSE,
-        #        editable = FALSE)
         
         
         #Remove unnecessary buttons from the modebar. 
@@ -703,11 +677,6 @@ function(input, output)  {
                                                               input$measure_simd)), 
                xaxis = list(fixedrange = FALSE, showline = TRUE,
                             title = "Deprivation (SIMD) quintile")) %>%
-        
-        # # Take out plotly logo and collaborate button
-        # config(displaylogo = FALSE,
-        #        collaborate = FALSE,
-        #        editable = FALSE)
         
         
         #Remove unnecessary buttons from the modebar.
