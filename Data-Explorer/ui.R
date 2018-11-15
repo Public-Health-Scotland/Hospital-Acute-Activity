@@ -5,12 +5,16 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 08 November 2018
+### Last edited on: 15 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
 ### This script creates the user interface of the
 ### data explorer
+###
+###
+### NOTE - the hyperlinks to the data quality page in the first and last tabs
+### need to be updated every quarter
 
 
 
@@ -132,7 +136,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                             tags$a(
                               href = paste0("https://www.isdscotland.org/",
                                             "Health-Topics/Hospital-Care/",
-                                            "Publications/2018-10-30/",
+                                            "Publications/2018-12-18/",
                                             "Acute-Hospital-Publication/",
                                             "data-quality/"),
                               "data quality"), " section."),
@@ -608,7 +612,11 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                          are inaccurate due to a system issue with their patient 
                          management system. Please bear this in mind when looking 
                          at the data. Further detail about this can be found in the ",
-               tags$a(href="http://www.isdscotland.org/tpp/data-quality",
+               tags$a(href = paste0("https://www.isdscotland.org/",
+                                    "Health-Topics/Hospital-Care/",
+                                    "Publications/2018-12-18/",
+                                    "Acute-Hospital-Publication/",
+                                    "data-quality/"),
                       "data quality"),
                "section.")
            )
