@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 15 November 2018
+### Last edited on: 26 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
