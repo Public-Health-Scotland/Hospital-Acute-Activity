@@ -5,7 +5,7 @@
 ### Original Author: Jack Hannah
 ### Original Date: 01 June 2018
 ### Last edited by: Jack Hannah
-### Last edited on: 27 August 2018
+### Last edited on: 26 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -49,7 +49,7 @@ res <- function(df) {
       substr(loc_code, 1, 3) == "S12"
       ~ "Council area of residence",
       TRUE
-      ~ "Health board of residence"
+      ~ "NHS Board of residence"
     ))
 }
 
@@ -62,7 +62,7 @@ treat <- function(df) {
   df %>%
     mutate(geo_type = case_when(
       substr(loc_code, 1, 3) == "S08"
-      ~ "Health board of treatment",
+      ~ "NHS Board of treatment",
       loc_code == "scot"
       ~ "Scotland",
       hb_name %in% c("Other", "Null") | loc_name == "Other"

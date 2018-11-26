@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 15 November 2018
+### Last edited on: 26 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -354,16 +354,15 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                     selectInput("measure_pyramid",
                                 label = "Select the type of activity",
                                 choices = pyramid_service,
-                                selectize=TRUE,
-                                selected = c("All inpatients 
-                                                       and daycases"))),
+                                selectize = TRUE,
+                                selected = "All inpatients and daycases")),
              column(3,
                     br(),
                     
                     # For downloading the data
                     downloadButton(outputId = 'download_pyramid',
                                    label = 'Download data',
-                                   width= "95%"))
+                                   width = "95%"))
            ),
            mainPanel(width = 12,
                      plotlyOutput("pyramid_plot"),
@@ -435,8 +434,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                                 label = "Select the type of activity",
                                 choices = pyramid_service,
                                 selectize = TRUE,
-                                selected = c("All inpatients
-                                                       and daycases"))),
+                                selected = "All inpatients and daycases")),
              
              # For downloading the data
              column(3,
@@ -536,6 +534,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                     selectInput("hb_flow",
                                 label = "Select the board of interest", 
                                 choices = data_cbf %>%
+                                  arrange(hbres_name) %>%
                                   distinct(hbres_name) %>%
                                   pull(hbres_name)),
                     downloadButton(outputId = 'download_flow',
