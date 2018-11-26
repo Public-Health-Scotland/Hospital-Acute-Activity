@@ -302,7 +302,7 @@ function(input, output, session)  {
   
   data_trend_plot_2 <- reactive({
     data_trend %>% 
-      filter(loc_name %in% input$locname_trend_2 &
+      subset(loc_name %in% input$locname_trend_2 &
                measure %in% input$service_trend_2 &
                geo_type %in% input$geotype_trend_2) %>% 
       rename("Total length of stay (days)" = los,
@@ -471,7 +471,7 @@ function(input, output, session)  {
     selectInput("locname_pyramid",
                 "Select the location",
                 choices = data_pyramid %>%
-                  subset(geo_type == input$geotype_pyramid) %>%
+                  subset(geo_type %in% input$geotype_pyramid) %>%
                   distinct(loc_name) %>%
                   arrange(loc_name) %>%
                   pull(loc_name),
@@ -481,10 +481,10 @@ function(input, output, session)  {
   
   # Reactive datasets
   data_pyramid_plot <- reactive({data_pyramid %>% 
-      subset(loc_name == input$locname_pyramid & 
-               measure == input$measure_pyramid &
-               geo_type == input$geotype_pyramid &
-               quarter_name == input$quarter_pyramid) %>%
+      subset(loc_name %in% input$locname_pyramid & 
+               measure %in% input$measure_pyramid &
+               geo_type %in% input$geotype_pyramid &
+               quarter_name %in% input$quarter_pyramid) %>%
       
       # So the graph plots correctly with no stacked bars
       mutate(count = ifelse(sex == "Male",
@@ -631,7 +631,7 @@ function(input, output, session)  {
     selectInput("locname_simd",
                 "Select the location",
                 choices = data_simd %>%
-                  subset(geo_type == input$geotype_simd) %>%
+                  subset(geo_type %in% input$geotype_simd) %>%
                   distinct(loc_name) %>%
                   arrange(loc_name) %>%
                   pull(loc_name),
@@ -642,10 +642,10 @@ function(input, output, session)  {
   # Reactive datasets
   # Reactive dataset for the simd plot
   data_simd_plot <- reactive({data_simd %>% 
-      subset(loc_name == input$locname_simd & 
-               measure == input$measure_simd &
-               geo_type == input$geotype_simd &
-               quarter_name == input$quarter_simd) 
+      subset(loc_name %in% input$locname_simd & 
+               measure %in% input$measure_simd &
+               geo_type %in% input$geotype_simd &
+               quarter_name %in% input$quarter_simd) 
   })
   
   # Table data
