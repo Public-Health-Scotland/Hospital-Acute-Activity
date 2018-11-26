@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 08 November 2018
+### Last edited on: 26 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -552,9 +552,7 @@ function(input, output, session)  {
                               prettyNum(abs(data_pyramid_plot()$count), 
                                         big.mark = ",")))
       
-      
-      
-      plot_ly(data=data_pyramid_plot(),
+      plot_ly(data = data_pyramid_plot(),
               x = ~count,
               y = ~age,
               color = ~sex,
@@ -574,13 +572,7 @@ function(input, output, session)  {
                             title = paste("Number of",
                                           input$measure_pyramid))) %>%
         
-        # # Take out plotly logo and collaborate button
-        # config(displaylogo = FALSE,
-        #        collaborate = FALSE,
-        #        editable = FALSE)
-        
-        
-        #Remove unnecessary buttons from the modebar.
+        # Remove unnecessary buttons from the modebar
         config(displayModeBar = TRUE, 
                modeBarButtonsToRemove = list('select2d', 'lasso2d',
                                              'zoomIn2d',  
@@ -1118,12 +1110,12 @@ function(input, output, session)  {
       mutate(quarter_name = forcats::fct_reorder(
         quarter_name, dmy(quarter_date)
       )) %>%
-      select(geo_type, loc_name, measure, specialty,
+      select(geo_type, loc_name, measure, spec_name,
              quarter_name, stays, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
-             Specialty = specialty,
+             Specialty = spec_name,
              Time_period = quarter_name,
              Stays = stays,
              Total_length_stay = los,
@@ -1137,12 +1129,12 @@ function(input, output, session)  {
       mutate(quarter_name = forcats::fct_reorder(
         quarter_name, dmy(quarter_date)
       )) %>%
-      select(geo_type, loc_name, measure, specialty,
+      select(geo_type, loc_name, measure, spec_name,
              quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
-             Specialty = specialty,
+             Specialty = spec_name,
              Time_period = quarter_name,
              Appointments = count,
              DNA_rate = rate) %>%
@@ -1275,7 +1267,8 @@ function(input, output, session)  {
     
     
     # 7.6.1 - Inpatient Data
-    "Inpatients/Day cases - Cross boundary flow" = data_cbf_ip %>%
+    "Inpatients/Day cases - Cross boundary flow" = data_cbf %>%
+      filter(file == "Inpatients/Day Cases") %>%
       mutate(quarter_name = forcats::fct_reorder(
         quarter_name, dmy(quarter_date)
       )) %>%
@@ -1290,7 +1283,8 @@ function(input, output, session)  {
     
     
     # 7.6.2 - Outpatient Data
-    "Outpatients - Cross boundary flow" = data_cbf_op %>%
+    "Outpatients - Cross boundary flow" = data_cbf %>%
+      filter(file == "Outpatients") %>%
       mutate(quarter_name = forcats::fct_reorder(
         quarter_name, dmy(quarter_date)
       )) %>%
