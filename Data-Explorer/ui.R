@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 26 November 2018
+### Last edited by: Mark Hamilton
+### Last edited on: 06 March 2019
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -136,7 +136,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                             tags$a(
                               href = paste0("https://www.isdscotland.org/",
                                             "Health-Topics/Hospital-Care/",
-                                            "Publications/2018-12-18/",
+                                            "Publications/2019-05-28/",
                                             "Acute-Hospital-Publication/",
                                             "data-quality/"),
                               "data quality"), " section."),
@@ -613,7 +613,7 @@ fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
                          at the data. Further detail about this can be found in the ",
                tags$a(href = paste0("https://www.isdscotland.org/",
                                     "Health-Topics/Hospital-Care/",
-                                    "Publications/2018-12-18/",
+                                    "Publications/2019-05-28/",
                                     "Acute-Hospital-Publication/",
                                     "data-quality/"),
                       "data quality"),
