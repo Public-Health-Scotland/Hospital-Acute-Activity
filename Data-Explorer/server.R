@@ -391,7 +391,7 @@ function(input, output, session)  {
         layout(
           showlegend = TRUE,
           yaxis = list(fixedrange = TRUE,
-                       title = input$measure_trend,
+                       title = input$measure_trend_2,
                        rangemode = "tozero"),
           
           # Axis parameter
