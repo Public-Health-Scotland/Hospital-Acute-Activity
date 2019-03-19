@@ -109,7 +109,7 @@ saveRDS(data_bed, paste0(
 # 3.1.1 - Residence data
 data_spec_ip_res <- read_csv(paste0(
   base_filepath,
-  "20190528_Inpatient_and_Daycase_Episodes_by_Health_Board_of_Residence_",
+  "20190528_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence_",
   "and_Specialty.csv")) %>%
   res()
 
@@ -180,7 +180,7 @@ rm(data_spec_ip_res, data_spec_ip_treat,
 # 4.1.1 - Residence data
 data_simd_ip_res <- read_csv(paste0(
   base_filepath,
-  "20190528_Inpatient_and_Daycase_Episodes_by_Health_Board_of_Residence_",
+  "20190528_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence_",
   "and_SIMD.csv")) %>%
   res()
 
