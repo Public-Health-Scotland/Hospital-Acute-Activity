@@ -22,7 +22,11 @@
 ### Visual interface ----
 
 
-fluidPage(style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
+fluidPage(
+  
+  HTML('<meta name="viewport" content="width=1200">'),
+  
+  style = "width: 100%; height: 100%; max-width: 1200px;", tags$head(
   
   # Prevent red text error messages from appearing
   # throughout the app
