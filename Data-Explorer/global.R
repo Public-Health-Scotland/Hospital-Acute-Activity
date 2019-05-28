@@ -5,7 +5,7 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ### Last edited by: Jack Hannah
-### Last edited on: 12 September 2018
+### Last edited on: 08 November 2018
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -45,59 +45,51 @@ library(zoo)
 library(lubridate)
 library(shinyWidgets)
 
-# 1.2 - Define base filepath
-base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
-                        "/4_Oct18/data/output/")
- 
+# 1.2 - Define filepath
+# Note that this is the same folder as is specified in the data_preparation
+# script, but the path is defined differently due to the way shiny handles
+# working directories
+rds_filepath <- ("./data/")
 
-RDS_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
-                       "/4_Oct18/data_explorer/")
 
 ### Section 2: Loading Data ----
 
 
 # Beds data
 data_bed <- readRDS(paste0(
-  RDS_filepath,
-  "R files/beds.rds"))
+  rds_filepath,
+  "beds.rds"))
 
 # Specialty data
 data_spec <- readRDS(paste0(
-  RDS_filepath,
-  "R files/spec.rds"))
+  rds_filepath,
+  "spec.rds"))
 
 # SIMD data
 data_simd <- readRDS(paste0(
-  RDS_filepath,
-  "R files/simd.rds"))
+  rds_filepath,
+  "simd.rds"))
 
 # Time Trend data
 data_trend <- readRDS(paste0(
-  RDS_filepath,
-  "R files/trend.rds"))
+  rds_filepath,
+  "trend.rds"))
 
 # Population Pyramid data
 data_pyramid <- readRDS(paste0(
-  RDS_filepath,
-  "R files/pyramid.rds"))
+  rds_filepath,
+  "pyramid.rds"))
 
 # Map data (outpatients)
 # Not in use at the moment
 # data_map_op <- readRDS(paste0(
-#   base_filepath,
-#   "R files/map_op.rds"))
+#   rds_filepath,
+#   "map_op.rds"))
 
 # Cross-Boundary data
-
-# Inpatients
-data_cbf_ip <- readRDS(paste0(
-  RDS_filepath,
-  "R files/cbf_ip.rds"))
-
-# Outpatients
-data_cbf_op <- readRDS(paste0(
-  RDS_filepath,
-  "R files/cbf_op.rds"))
+data_cbf <- readRDS(paste0(
+  rds_filepath,
+  "cbf.rds"))
 
 
 
