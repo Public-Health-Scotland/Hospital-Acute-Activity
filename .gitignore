@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+deploying_app.R
 
 # 'data' folder #
 # 'data' folder was previously called 'R files' #
