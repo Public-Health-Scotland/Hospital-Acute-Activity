@@ -535,14 +535,14 @@ function(input, output, session)  {
     } else {
       
       # Breaks and labels for plot
-      breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
       max <- round(max(abs(data_pyramid_plot()$count)))
       
       # Calculate breaks and labels for x axis
-      brks <- c(seq(-max, 0, breaks),
-                seq(breaks, max, breaks))
-      lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
-                                    seq(breaks, max, breaks))))
+      xlab_female <- round(seq(0, max, length.out = 4))
+      xlab_male   <- -c(xlab_female[4], xlab_female[3], xlab_female[2])
+      
+      brks <- c(xlab_male, xlab_female)
+      lbls <- as.character(c(-xlab_male, xlab_female))
       
       
       # Text for tooltip
