@@ -1090,7 +1090,8 @@ function(input, output, session)  {
                quarter_name, quarter
              )) %>%
       select(-quarter) %>%
-      rename(Area_name = loc_name,
+      rename(Geography_Level = hb_name,
+             Area_name = loc_name,
              Specialty = spec_name,
              Time_period = quarter_name,
              Occupancy_percentage = p_occ,
