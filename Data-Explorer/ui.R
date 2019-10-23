@@ -140,7 +140,7 @@ fluidPage(
                             tags$a(
                               href = paste0("https://www.isdscotland.org/",
                                             "Health-Topics/Hospital-Care/",
-                                            "Publications/2019-05-28/",
+                                            "Publications/2019-11-26/",
                                             "Acute-Hospital-Publication/",
                                             "data-quality/"),
                               "data quality"), " section."),
@@ -617,7 +617,7 @@ fluidPage(
                          at the data. Further detail about this can be found in the ",
                tags$a(href = paste0("https://www.isdscotland.org/",
                                     "Health-Topics/Hospital-Care/",
-                                    "Publications/2019-05-28/",
+                                    "Publications/2019-11-26/",
                                     "Acute-Hospital-Publication/",
                                     "data-quality/"),
                       "data quality"),
