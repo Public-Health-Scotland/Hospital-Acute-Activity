@@ -1094,11 +1094,11 @@ function(input, output, session)  {
              Area_name = loc_name,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Occupancy_percentage = p_occ,
-             All_available_beds = aasb,
-             Total_occupied_beds = tobd,
-             Average_available_staffed_beds = asb,
-             Average_occupied_beds = aob) %>%
+             Percentage_occupancy = p_occ,
+             Quarterly_available_staffed_beds = aasb,
+             Quarterly_occupied_beds = tobd,
+             Daily_average_available_staffed_beds = asb,
+             Daily_average_occupied_beds = aob) %>%
       mutate_if(is.character, as.factor),
     
     
