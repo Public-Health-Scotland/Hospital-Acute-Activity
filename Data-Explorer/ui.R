@@ -85,7 +85,7 @@ fluidPage(
                           "tabpanel_trend_location",
                           "Time trend (location comparison)")),
                       icon("line-chart"),
-                      " - shows the data over time."),
+                      " - shows the data over time by multiple locations."),
                     
                     tags$li(
                       tags$b(
@@ -93,7 +93,7 @@ fluidPage(
                           "tabpanel_trend_activity",
                           "Time trend (activity comparison)")),
                       icon("line-chart"),
-                      " - shows the data over time."),
+                      " - shows the data over time by multiple activity types."),
                     
                     tags$li(
                       tags$b(
