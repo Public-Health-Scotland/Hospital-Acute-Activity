@@ -61,7 +61,7 @@
 
 
 # 1.1 - Load functions script
-source("./Data-Explorer/functions.R")
+source("Data-Explorer/functions.R")
 
 
 # 1.2 - Load libraries
@@ -70,11 +70,10 @@ library(readr)
 library(zoo)
 library(janitor)
 
-# 1.3 - Define filepaths - update filepaths and pub_date each quarter.
-base_filepath <- paste0("//stats/SecondaryCare/Quarterly Publication/TPP",
-                        "/7_Nov19/data/output/")
+# 1.3 - Define filepaths - update pub_date each quarter.
+base_filepath <- "../../data/output/"
 
-rds_filepath <- ("./Data-Explorer/data/")
+rds_filepath <- "Data-Explorer/data/"
 
 
 pub_date <- ("20191126")
