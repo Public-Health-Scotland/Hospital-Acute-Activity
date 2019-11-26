@@ -85,7 +85,7 @@ fluidPage(
                           "tabpanel_trend_location",
                           "Time trend (location comparison)")),
                       icon("line-chart"),
-                      " - shows the data over time."),
+                      " - shows the data over time by multiple locations."),
                     
                     tags$li(
                       tags$b(
@@ -93,7 +93,7 @@ fluidPage(
                           "tabpanel_trend_activity",
                           "Time trend (activity comparison)")),
                       icon("line-chart"),
-                      " - shows the data over time."),
+                      " - shows the data over time by multiple activity types."),
                     
                     tags$li(
                       tags$b(
@@ -140,7 +140,7 @@ fluidPage(
                             tags$a(
                               href = paste0("https://www.isdscotland.org/",
                                             "Health-Topics/Hospital-Care/",
-                                            "Publications/2019-05-28/",
+                                            "Publications/2019-11-26/",
                                             "Acute-Hospital-Publication/",
                                             "data-quality/"),
                               "data quality"), " section."),
@@ -617,7 +617,7 @@ fluidPage(
                          at the data. Further detail about this can be found in the ",
                tags$a(href = paste0("https://www.isdscotland.org/",
                                     "Health-Topics/Hospital-Care/",
-                                    "Publications/2019-05-28/",
+                                    "Publications/2019-11-26/",
                                     "Acute-Hospital-Publication/",
                                     "data-quality/"),
                       "data quality"),

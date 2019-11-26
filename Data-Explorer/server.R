@@ -535,14 +535,14 @@ function(input, output, session)  {
     } else {
       
       # Breaks and labels for plot
-      breaks <- round(max(abs(data_pyramid_plot()$count)) / 3)
       max <- round(max(abs(data_pyramid_plot()$count)))
       
       # Calculate breaks and labels for x axis
-      brks <- c(seq(-max, 0, breaks),
-                seq(breaks, max, breaks))
-      lbls <- paste0(as.character(c(-seq(-max, 0, breaks), 
-                                    seq(breaks, max, breaks))))
+      xlab_female <- round(seq(0, max, length.out = 4))
+      xlab_male   <- -c(xlab_female[4], xlab_female[3], xlab_female[2])
+      
+      brks <- c(xlab_male, xlab_female)
+      lbls <- as.character(c(-xlab_male, xlab_female))
       
       
       # Text for tooltip
@@ -1090,14 +1090,15 @@ function(input, output, session)  {
                quarter_name, quarter
              )) %>%
       select(-quarter) %>%
-      rename(Area_name = loc_name,
+      rename(Geography_Level = hb_name,
+             Area_name = loc_name,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Occupancy_percentage = p_occ,
-             All_available_beds = aasb,
-             Total_occupied_beds = tobd,
-             Average_available_staffed_beds = asb,
-             Average_occupied_beds = aob) %>%
+             Percentage_occupancy = p_occ,
+             Quarterly_available_staffed_beds = aasb,
+             Quarterly_occupied_beds = tobd,
+             Daily_average_available_staffed_beds = asb,
+             Daily_average_occupied_beds = aob) %>%
       mutate_if(is.character, as.factor),
     
     

@@ -133,10 +133,11 @@ file_types <-  c("Beds",
 # 3.4 - Geography types
 
 
-# 3.4.1 - Including 'Other'
-# Used in most tabs
-# Use SIMD dataset, as this contains 'Other' type
-geo_type <- data_simd %>%
+# 3.4.1 - Excluding 'other' from SIMD tab
+# no longer want to present other in the SIMD tab 
+# this just takes all the types of geographies hbres,hbt, 
+# hospital, scotland for use in drop downs.
+geo_type <- data_trend %>%
   distinct(geo_type) %>%
   pull(geo_type)
 
