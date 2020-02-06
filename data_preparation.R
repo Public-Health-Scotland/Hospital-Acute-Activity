@@ -78,7 +78,7 @@ rds_filepath <- "Data-Explorer/data/"
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
 
-pub_date <- ("20191126")
+pub_date <- ("20200225")
 ### Section 2: Beds Data ----
 
 
