@@ -401,8 +401,8 @@ fluidPage(
              h3("Deprivation"),
              p("This section allows you to explore the data by 
                different levels of",
-               tags$a(href=paste0("https://www.gov.scot/publications/",
-                                  "scottish-index-multiple-deprivation-2020/"), 
+               tags$a(href=paste0("https://www.gov.scot/collections/",
+                                  "scottish-index-of-multiple-deprivation-2020/"), 
                       "deprivation"),
                ". You can use the filters to select the data you are 
                interested in. To view the data in a table use the 
