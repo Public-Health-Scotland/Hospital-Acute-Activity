@@ -142,14 +142,14 @@ fluidPage(
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "25-february-2020/data-quality/"),
+                                              "26-may-2020/data-quality/"),
                                 "Data Quality"), " and ",
                               tags$a(
                                 href = paste0("https://beta.isdscotland.org/",
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "25-february-2020/trend-data/"),
+                                              "26-may-2020/trend-data/"),
                                 "Data Trends"), "sections."),
                       tags$li("The data for the most recent quarter are", 
                               "provisional. Provisional data are subject to", 
@@ -167,8 +167,8 @@ fluidPage(
                       "further questions relating to the data, please contact", 
                       "us at: ",
                       tags$b(tags$a(
-                        href = "mailto:NSS.isdQualityIndicators@nhs.net",
-                        "NSS.isdQualityIndicators@nhs.net")),
+                        href = "mailto:phi.qualityindicators@nhs.net",
+                        "phi.qualityindicators@nhs.net")),
                       " and we will be happy to help.")
              )
     ),
