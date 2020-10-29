@@ -102,6 +102,20 @@ function(input, output, session)  {
                               ))
   })
   
+  output$service_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("service_trend",
+                              label = "Select type of activity",
+                              choices = trend_service,
+                              selected = "All inpatients and daycases")
+  })
+  
+  output$measure_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("measure_trend",
+                              label = "Select measure", 
+                              choices = trend_measure,
+                              selected = "Number")
+  })
+  
   # Reactive datasets
   # Reactive dataset for the trend plot
   
@@ -295,6 +309,25 @@ function(input, output, session)  {
                                                            "NHS Board of treatment") 
                                 ~ "NHS Ayrshire & Arran"
                               ))
+  })
+  
+  output$service_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("service_trend_2",
+                              label = paste0("Select type of activity", 
+                                             "(multiple selections allowed)"),
+                              choices = trend_service,
+                              multiple = TRUE,
+                              options = list(
+                                `selected-text-format` = "count > 1"
+                              ),
+                              selected = "All inpatients and daycases")
+  })
+  
+  output$measure_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("measure_trend_2",
+                              label = "Select measure", 
+                              choices = trend_measure,
+                              selected = "Number")
   })
   
   # Reactive datasets
