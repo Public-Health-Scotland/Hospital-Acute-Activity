@@ -1145,15 +1145,15 @@ function(input, output, session)  {
         quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, spec_name,
-             quarter_name, stays, los, avlos) %>% 
+             quarter_name, spells, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Stays = stays,
-             Total_length_stay = los,
-             Mean_length_stay = avlos) %>%
+             Spells = spells,
+             Total_length_spell = los,
+             Mean_length_spell = avlos) %>%
       mutate_if(is.character, as.factor),
     
     
