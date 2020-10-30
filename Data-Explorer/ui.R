@@ -612,6 +612,17 @@ fluidPage(
                You can use the filters to select the  data you are
                interested in. You can also download the data as a csv 
                using the download buttons."),
+             p("Specialty breakdowns are measured in episodes and spells rather 
+               than stays. For more information, please see the ",
+               tags$a(
+                 href = paste0("https://beta.isdscotland.org/",
+                               "find-publications-and-data/health-services/",
+                               "hospital-care/",
+                               "acute-hospital-activity-and-nhs-beds-information-quarterly",
+                               "/24-november-2020/",
+                               "methods-used-to-produce-this-data/"),
+                         "methodology section", target = "_blank",
+                         class = "special-link"), "."),
              column(8,
                     selectInput("filename_table",
                                 label = "Select the data file",
