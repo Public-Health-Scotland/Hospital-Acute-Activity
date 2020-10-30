@@ -623,6 +623,7 @@ fluidPage(
                                "methods-used-to-produce-this-data/"),
                          "methodology section", target = "_blank",
                          class = "special-link"), "."),
+             br(),
              column(8,
                     selectInput("filename_table",
                                 label = "Select the data file",
