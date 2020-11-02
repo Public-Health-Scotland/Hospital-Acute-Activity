@@ -33,7 +33,10 @@ fluidPage(
     tags$style(
       type = "text/css",
       ".shiny-output-error { visibility: hidden; }", 
-      ".shiny-output-error:before { visibility: hidden; }"
+      ".shiny-output-error:before { visibility: hidden; }",
+      ".special-link { padding-left: 7.5px; padding-right: 5px; 
+      padding-top: 7.5px; padding-bottom: 7.5px; 
+      display:in-line; }"
     ) 
   ),
   
@@ -43,18 +46,20 @@ fluidPage(
   # 3. Sets the font size for the sentence that appears above the 
   #    cross-boundary flow diagram.
   
-  tags$style(HTML(".tabbable > .nav > li > a {  
+  tags$style(HTML(".nav > li > a {  
                   color: #000000;  
                   } 
                   
-                  .tabbable > .nav > li[class = active] > a { 
+                  .nav > li[class = active] > a { 
                   background-color: #0072B2; 
                   color: #FFFFFF; 
                   } 
                   
                   #flow_text { 
                   font-size: 15px; 
-                  }")),
+                  }
+                  
+                  ul li { margin-bottom: 10px; }")),
   
   # We are going to divide our UI into discrete sections,
   # called tab panels 
@@ -132,9 +137,29 @@ fluidPage(
                         "data in a table.")
                     ),
                     
+                    tags$br(),
                     p("When using the data explorer please take the", 
                       "following factors into consideration:"),
                     tags$ul(
+                      tags$li("Please note this release includes the initial ",
+                              "months of Scotland going into emergency measures", 
+                              "due to COVID-19, which will impact on the volume", 
+                              "of hospital activity and trends observed."),
+                      tags$li("This release does not include specific ",
+                              "COVID-19 information. For PHS Coronavirus ",
+                              "information, visit our ", 
+                              tags$a(
+                                href = paste0("https://www.publichealthscotland.scot/",
+                                              "our-areas-of-work/sharing-our-data-and-intelligence","
+                                              /coronavirus-covid-19-data-and-guidance/"),
+                                "COVID-19 webpages", target = "_blank",
+                                class = "special-link"), ".",
+                              "Coronavirus in Scotland information can also ",
+                              "be found on the ",
+                              tags$a(
+                                href = paste0("https://www.gov.scot/coronavirus-covid-19/"),
+                                "Scottish Government website", target = "_blank",
+                                class = "special-link"), "."),
                       tags$li("There are issues with the quality of the data", 
                               "presented. Known issues are summarised in the", 
                               tags$a(
@@ -142,15 +167,17 @@ fluidPage(
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "26-may-2020/data-quality/"),
-                                "Data Quality"), " and ",
+                                              "24-november-2020/data-quality/"),
+                                "Data Quality", target = "_blank",
+                                class = "special-link"), " and ",
                               tags$a(
                                 href = paste0("https://beta.isdscotland.org/",
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "26-may-2020/trend-data/"),
-                                "Data Trends"), "sections."),
+                                              "24-november-2020/data-quality/"),
+                                "Data Trends", target = "_blank", 
+                                class = "special-link"), "sections."),
                       tags$li("The data for the most recent quarter are", 
                               "provisional. Provisional data are subject to", 
                               "change in future publications as submissions", 
@@ -167,8 +194,8 @@ fluidPage(
                       "further questions relating to the data, please contact", 
                       "us at: ",
                       tags$b(tags$a(
-                        href = "mailto:phi.qualityindicators@nhs.net",
-                        "phi.qualityindicators@nhs.net")),
+                        href = "mailto:phs.qualityindicators@phs.scot",
+                        "phs.qualityindicators@phs.scot")),
                       " and we will be happy to help.")
              )
     ),
@@ -212,16 +239,8 @@ fluidPage(
                                   border: 0px solid #336699;}"),
                        column(6, uiOutput("geotype_ui_trend")),  
                        column(6, uiOutput("locname_ui_trend")),
-                       column(6, pickerInput(
-                         "service_trend",
-                         label = "Select type of activity",
-                         choices = trend_service,
-                         selected = c("All inpatients and daycases"))),
-                       column(6, pickerInput(
-                         "measure_trend",
-                         label = "Select measure", 
-                         choices = trend_measure,
-                         selected = "Number")),
+                       column(6, uiOutput("service_ui_trend")),
+                       column(6, uiOutput("measure_ui_trend")),
                        column(6, downloadButton(outputId = 'download_trend',
                                                 label = 'Download data',
                                                 width = "95%"))  
@@ -280,20 +299,8 @@ fluidPage(
                                   border: 0px solid #336699;}"),
                        column(6, uiOutput("geotype_ui_trend_2")),  
                        column(6, uiOutput("locname_ui_trend_2")),
-                       column(6, pickerInput(
-                         "service_trend_2",
-                         label = paste0("Select type of activity", 
-                                        "(multiple selections allowed)"),
-                         choices = trend_service,
-                         multiple = TRUE,
-                         options = list(
-                           `selected-text-format` = "count > 1"
-                         ),
-                         selected = c("All inpatients and daycases"))),
-                       column(6, pickerInput("measure_trend_2",
-                                             label = "Select measure", 
-                                             choices = trend_measure,
-                                             selected = "Number")),
+                       column(6, uiOutput("service_trend_2")),
+                       column(6, uiOutput("measure_trend_2")),
                        column(6,
                               downloadButton(outputId = 'download_trend_2',
                                              label = 'Download data',
@@ -605,6 +612,18 @@ fluidPage(
                You can use the filters to select the  data you are
                interested in. You can also download the data as a csv 
                using the download buttons."),
+             p("Specialty breakdowns are measured in episodes and spells rather 
+               than stays. For more information, please see the ",
+               tags$a(
+                 href = paste0("https://beta.isdscotland.org/",
+                               "find-publications-and-data/health-services/",
+                               "hospital-care/",
+                               "acute-hospital-activity-and-nhs-beds-information-quarterly",
+                               "/24-november-2020/",
+                               "methods-used-to-produce-this-data/"),
+                         "methodology section", target = "_blank",
+                         class = "special-link"), "."),
+             br(),
              column(8,
                     selectInput("filename_table",
                                 label = "Select the data file",

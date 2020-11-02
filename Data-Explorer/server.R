@@ -102,6 +102,20 @@ function(input, output, session)  {
                               ))
   })
   
+  output$service_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("service_trend",
+                              label = "Select type of activity",
+                              choices = trend_service,
+                              selected = "All inpatients and daycases")
+  })
+  
+  output$measure_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("measure_trend",
+                              label = "Select measure", 
+                              choices = trend_measure,
+                              selected = "Number")
+  })
+  
   # Reactive datasets
   # Reactive dataset for the trend plot
   
@@ -295,6 +309,25 @@ function(input, output, session)  {
                                                            "NHS Board of treatment") 
                                 ~ "NHS Ayrshire & Arran"
                               ))
+  })
+  
+  output$service_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("service_trend_2",
+                              label = paste0("Select type of activity", 
+                                             "(multiple selections allowed)"),
+                              choices = trend_service,
+                              multiple = TRUE,
+                              options = list(
+                                `selected-text-format` = "count > 1"
+                              ),
+                              selected = "All inpatients and daycases")
+  })
+  
+  output$measure_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("measure_trend_2",
+                              label = "Select measure", 
+                              choices = trend_measure,
+                              selected = "Number")
   })
   
   # Reactive datasets
@@ -1112,15 +1145,15 @@ function(input, output, session)  {
         quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, spec_name,
-             quarter_name, stays, los, avlos) %>% 
+             quarter_name, spells, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Stays = stays,
-             Total_length_stay = los,
-             Mean_length_stay = avlos) %>%
+             Spells = spells,
+             Total_length_spell = los,
+             Mean_length_spell = avlos) %>%
       mutate_if(is.character, as.factor),
     
     

@@ -4,8 +4,8 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: December 2017
-### Last edited by: Mark Hamilton
-### Last edited on: 06 March 2019
+### Last edited by: Róisín Farrell
+### Last edited on: 29 October 2020
 ###
 ### Written to be run on RStudio Desktop
 ###
@@ -78,7 +78,7 @@ rds_filepath <- "Data-Explorer/data/"
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
 
-pub_date <- ("20200526")
+pub_date <- ("20201124")
 ### Section 2: Beds Data ----
 
 
