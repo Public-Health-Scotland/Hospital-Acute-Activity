@@ -150,16 +150,15 @@ fluidPage(
                               "information, visit our ", 
                               tags$a(
                                 href = paste0("https://www.publichealthscotland.scot/",
-                                              "our-areas-of-work/sharing-our-data-and-intelligence","
-                                              /coronavirus-covid-19-data-and-guidance/"),
+                                              "our-areas-of-work/covid-19"),
                                 "COVID-19 webpages", target = "_blank",
-                                class = "special-link"), ".",
+                                class = "special-link"), 
                               "Coronavirus in Scotland information can also ",
                               "be found on the ",
                               tags$a(
                                 href = paste0("https://www.gov.scot/coronavirus-covid-19/"),
-                                "Scottish Government website", target = "_blank",
-                                class = "special-link"), "."),
+                                "Scottish Government website.", target = "_blank",
+                                class = "special-link")),
                       tags$li("There are issues with the quality of the data", 
                               "presented. Known issues are summarised in the", 
                               tags$a(
@@ -175,7 +174,7 @@ fluidPage(
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "24-november-2020/data-quality/"),
+                                              "24-november-2020/data-trends/"),
                                 "Data Trends", target = "_blank", 
                                 class = "special-link"), "sections."),
                       tags$li("The data for the most recent quarter are", 
@@ -407,11 +406,11 @@ fluidPage(
              background-color:#ffffff; border: 0px solid #ffffff;",
              h3("Deprivation"),
              p("This section allows you to explore the data by 
-               different levels of",
+               ",
                tags$a(href=paste0("https://www.gov.scot/collections/",
                                   "scottish-index-of-multiple-deprivation-2020/"), 
-                      "deprivation"),
-               ". You can use the filters to select the data you are 
+                      "different levels of deprivation."),
+               " You can use the filters to select the data you are 
                interested in. To view the data in a table use the 
                ‘show/hide table’ button. To download your data selection 
                as a csv file use the ‘download data’ button.
