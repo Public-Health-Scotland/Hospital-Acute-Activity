@@ -131,8 +131,7 @@ data_spec_ip <- comb_inp(data_spec_ip_treat,
 data_spec_op_res <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Residence_and_Specialty.csv")) %>%
-  res() %>%
-  convert_dates()
+  res() 
 
 
 # 3.2.2 - Treatment data
@@ -203,8 +202,7 @@ data_simd_ip <- comb_inp(data_simd_ip_res,
 data_simd_op_res <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Residence_and_SIMD.csv")) %>%
-  res() %>%
-  convert_dates()
+  res() 
 
 
 # 4.2.2 - Treatment data
@@ -214,8 +212,7 @@ data_simd_op_treat <- read_csv(paste0(
   
   # Exclude three location codes which have no name
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
-  treat() %>%
-  convert_dates()
+  treat() 
 
 
 # 4.2.3 - Combine outpatient files
@@ -284,8 +281,7 @@ data_trend_ip <- comb_inp(data_trend_ip_treat,
 data_trend_op_res <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Residence.csv")) %>%
-  res() %>%
-  convert_dates()
+  res() 
 
 
 # 5.2.2 - Treatment data
@@ -375,7 +371,6 @@ data_pyramid_op_res <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Residence_Age_and_Sex.csv")) %>%
   res() %>%
-  convert_dates() %>%
   
   # Split sex and age into two columns
   separate(sex_age, c("sex", "age"), "\\s") %>%
@@ -387,7 +382,7 @@ data_pyramid_op_treat <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Treatment_Age_and_Sex.csv")) %>%
   treat() %>%
-  convert_dates() %>%
+ 
   
   # Split sex and age into two columns
   separate(sex_age, c("sex", "age"), "\\s") %>%
@@ -464,7 +459,7 @@ saveRDS(data_map_ipdc, paste0(
 data_map_op <- read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_by_Health_Board_of_Residence.csv")) %>%
-  convert_dates() %>%
+  
   
   # Exclude Scotland, Golden Jubilee and
   # non-territorial codes
@@ -530,7 +525,6 @@ data_cbf_ip <- read_csv(paste0(
 data_cbf_op <-  read_csv(paste0(
   base_filepath, pub_date,
   "_Outpatients_Cross_Boundary_Flow.csv")) %>%
-  convert_dates() %>%
   mutate(file = "Outpatients") %>%
   
   # Select health boards only
