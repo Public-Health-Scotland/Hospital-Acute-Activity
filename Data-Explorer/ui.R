@@ -238,8 +238,16 @@ fluidPage(
                                   border: 0px solid #336699;}"),
                        column(6, uiOutput("geotype_ui_trend")),  
                        column(6, uiOutput("locname_ui_trend")),
-                       column(6, uiOutput("service_ui_trend")),
-                       column(6, uiOutput("measure_ui_trend")),
+                       column(6, pickerInput(
+                         "service_trend",
+                         label = "Select type of activity",	
+                         choices = trend_service,	
+                         selected = c("All inpatients and daycases"))),	
+                       column(6, pickerInput(	
+                         "measure_trend",	
+                         label = "Select measure", 	
+                         choices = trend_measure,	
+                         selected = "Number")),
                        column(6, downloadButton(outputId = 'download_trend',
                                                 label = 'Download data',
                                                 width = "95%"))  
@@ -298,8 +306,20 @@ fluidPage(
                                   border: 0px solid #336699;}"),
                        column(6, uiOutput("geotype_ui_trend_2")),  
                        column(6, uiOutput("locname_ui_trend_2")),
-                       column(6, uiOutput("service_trend_2")),
-                       column(6, uiOutput("measure_trend_2")),
+                       column(6, pickerInput(
+                         "service_trend_2",
+                         label = paste0("Select type of activity", 	
+                                        "(multiple selections allowed)"),	
+                         choices = trend_service,	
+                         multiple = TRUE,	
+                         options = list(	
+                           `selected-text-format` = "count > 1"	
+                         ),	
+                         selected = c("All inpatients and daycases"))),	
+                       column(6, pickerInput("measure_trend_2",	
+                                             label = "Select measure", 	
+                                             choices = trend_measure,	
+                                             selected = "Number")),
                        column(6,
                               downloadButton(outputId = 'download_trend_2',
                                              label = 'Download data',
