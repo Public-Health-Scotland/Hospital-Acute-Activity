@@ -174,7 +174,7 @@ fluidPage(
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "24-november-2020/data-trends/"),
+                                              "24-november-2020/trend-data/"),
                                 "Data Trends", target = "_blank", 
                                 class = "special-link"), "sections."),
                       tags$li("The data for the most recent quarter are", 
