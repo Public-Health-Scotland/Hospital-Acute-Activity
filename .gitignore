@@ -3,6 +3,8 @@
 .RData
 .Ruserdata
 deploying_app.R
+credentials.rds
+credentials.R
 
 # 'data' folder #
 # 'data' folder was previously called 'R files' #
@@ -18,8 +20,10 @@ R files/
 
 # SPSS formats #
 *.[sS][aA][vV]
+*.[zZ][sS][aA][vV]
 
 # R data files #
 *.[rR][dD][aA][tT][aA]
+*.[rR][dD][aA]
 *.[rR][dD][sS]
 *.[fF][sS][tT]

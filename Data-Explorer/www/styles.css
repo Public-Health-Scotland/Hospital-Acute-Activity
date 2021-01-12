@@ -1,0 +1,68 @@
+/* CSS styles used in the shiny app */
+
+/* to avoid red text error messages in the whole app, take out for testing*/
+.shiny-output-error { visibility: hidden; }
+.shiny-output-error:before { visibility: hidden; }
+
+/* makes clickable areas for URLs larger */
+.special-link { 
+    padding-left: 10px; 
+    padding-right: 5px; 
+    padding-top: 10px; 
+    padding-bottom: 10px;
+    display:in-line; 
+}
+  
+/* Style sidebars/well panels */
+.tab {
+    background-color:#ffffff; 
+    border: 0 solid #3F3685;
+    padding: 5px; 
+    box-shadow: none; 
+}
+
+/* Changes the top bar colour to PHS purple */    
+.navbar-default {
+    color: #ffffff; 
+    background-color: #3F3685; 
+    margin-bottom: -10px;
+}
+
+/* changes background colour of logo to white */
+.navbar-default .navbar-brand, 
+.navbar-default:hover .navbar-brand:hover, 
+.navbar-brand {
+    color: #3F3685; 
+    background-color: #ffffff;
+    margin-bottom: -10px;
+}
+
+/* changes font colour of top bar to white */
+.navbar-default .navbar-nav > li > a {
+    color: #ffffff;
+    margin-bottom: -10px;
+} 
+
+/* changes the colour of the selected tab to 80% saturation of PHS purple */
+.navbar-default .navbar-nav > .active > a, 
+.navbar-default .navbar-nav > .active > a:focus, 
+.navbar-default .navbar-nav > .active > a:hover {
+    color: #ffffff;
+    background-color: #655E9D;
+    margin-bottom: -10px;
+}
+
+/* keeps text of tabs white when hovering */
+.navbar-default .navbar-nav > li > a:hover, 
+.navbar-default .navbar-nav > li > a:focus {
+    color: #ffffff;     
+    background-color: #655E9D;
+    margin-bottom: -10px;
+} 
+
+/* adds some space between bullet points */
+ul li { margin-bottom: 10px; }
+
+
+#flow_text { font-size: 15px; }
+        
