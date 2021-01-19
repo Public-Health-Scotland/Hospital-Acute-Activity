@@ -44,6 +44,7 @@ library(readr)
 library(zoo)
 library(lubridate)
 library(shinyWidgets)
+library(shinymanager)
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation

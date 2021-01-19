@@ -11,21 +11,25 @@
 ###
 ### This script controls what the data explorer *does*
 
-
-
 # NOTE - the subset function is used in the below code on several
 # occasions, rather than using filter
 # This is because filter struggles with the '$' operator
 # Where possible, filter is still preferred
 
-
-
-
-
 ### Server ----
 
+credentials <- readRDS("data/admin/credentials.rds")
 
-function(input, output, session)  {
+function(input, output, session) {
+  
+  # Shinymanager Auth
+  res_auth <- secure_server(
+    check_credentials = check_credentials(credentials)
+  )
+
+  output$auth_output <- renderPrint({
+    reactiveValuesToList(res_auth)
+  })
   
   ### Tab 1: Introduction ----
   
@@ -102,6 +106,19 @@ function(input, output, session)  {
                               ))
   })
   
+  output$service_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("service_trend",
+                              label = "Select type of activity",
+                              choices = trend_service,
+                              selected = "All inpatients and daycases")
+  })
+  
+  output$measure_ui_trend <- renderUI({
+    shinyWidgets::pickerInput("measure_trend",
+                              label = "Select measure", 
+                              choices = trend_measure,
+                              selected = "Number")
+  })
   
   # Reactive datasets
   # Reactive dataset for the trend plot
@@ -273,14 +290,14 @@ function(input, output, session)  {
   # They will provide a list of locations filtered by geography type
   output$geotype_ui_trend_2 <- renderUI({
     shinyWidgets::pickerInput("geotype_trend_2",
-                              label = "Select the type of location", 
+                              label = "Select type of location", 
                               choices = geo_type_trend,
                               selected =  "Scotland")
   })
   
   output$locname_ui_trend_2 <- renderUI({
     shinyWidgets::pickerInput("locname_trend_2",
-                              label = "Select the location",
+                              label = "Select location",
                               choices = sort(unique(
                                 data_trend$loc_name
                                 [data_trend$geo_type %in% input$geotype_trend_2]
@@ -297,7 +314,25 @@ function(input, output, session)  {
                                 ~ "NHS Ayrshire & Arran"
                               ))
   })
-  
+
+  output$service_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("service_trend_2",
+                              label = paste0("Select type of activity ",
+                                             "(multiple selections allowed)"),
+                              choices = trend_service,
+                              multiple = TRUE,
+                              options = list(
+                                `selected-text-format` = "count > 1"
+                              ),
+                              selected = "All inpatients and daycases")
+  })
+
+  output$measure_ui_trend_2 <- renderUI({
+    shinyWidgets::pickerInput("measure_trend_2",
+                              label = "Select measure",
+                              choices = trend_measure,
+                              selected = "Number of stays / appointments")
+  })
 
   # Reactive datasets
   # Reactive dataset for the trend plot
@@ -342,9 +377,7 @@ function(input, output, session)  {
                  "All inpatients and daycases",
                  "All inpatients",
                  "All daycases") %in% input$service_trend_2 ))
-        )
-        
-    )
+        ))
     {
       # Plotting empty plot just with text
       text_na <- list(x = 5,
@@ -479,6 +512,24 @@ function(input, output, session)  {
                   pull(loc_name),
                 selectize = TRUE,
                 selected = "Scotland")
+  })
+  
+  output$quarter_ui_pyramid <- renderUI({
+    selectInput("quarter_pyramid",
+                label = "Select the time period",
+                choices = data_pyramid %>%
+                  distinct(quarter_name) %>%
+                  pull(quarter_name),
+                selected = latest_quarter,
+                width = "95%")
+  })
+  
+  output$measure_ui_pyramid <- renderUI({
+    selectInput("measure_pyramid",
+                label = "Select the type of activity",
+                choices = pyramid_service,
+                selectize = TRUE,
+                selected = "All inpatients and daycases")
   })
   
   # Reactive datasets
@@ -1087,8 +1138,10 @@ function(input, output, session)  {
       
       # Create temporary year quarter variable to allow time period dropdown
       # to be displayed chronologically
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>% 
+      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
+             quarter_name = forcats::fct_reorder(
+               quarter_name, quarter
+             )) %>%
       select(-quarter) %>%
       rename(Geography_Level = hb_name,
              Area_name = loc_name,
@@ -1108,28 +1161,30 @@ function(input, output, session)  {
     # 7.2.1 - Inpatient Data
     "Inpatients/Day cases - Specialty" = data_spec %>% 
       filter(file == "Inpatients/Day Cases") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, spec_name,
-              spells, los, avlos) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(geo_type, loc_name, measure, spec_name,
+             quarter_name, stays, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Spells = spells,
-             Total_length_spell = los,
-             Mean_length_spell = avlos) %>%
+             Stays = stays,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
       mutate_if(is.character, as.factor),
     
     
     # 7.2.2 - Outpatient Data
     "Outpatients - Specialty" = data_spec %>% 
       filter(file == "Outpatients") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, spec_name,
-             count, rate) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(geo_type, loc_name, measure, spec_name,
+             quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1146,10 +1201,11 @@ function(input, output, session)  {
     # 7.3.1 - Inpatient Data
     "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>% 
       filter(file == "Inpatients/Day Cases") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, simd,
-              count, los, avlos) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1164,10 +1220,11 @@ function(input, output, session)  {
     # 7.3.2 - Outpatient Data
     "Outpatients - Deprivation (SIMD)" = data_simd %>% 
       filter(file == "Outpatients") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, simd,
-              count, rate) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1184,10 +1241,11 @@ function(input, output, session)  {
     # 7.4.1 - Inpatient Data
     "Inpatients/Day cases - Time trend" = data_trend %>% 
       filter(file == "Inpatients/Day Cases") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure,
-              count, los, avlos) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
+      select(geo_type, loc_name, measure,
+             quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1201,9 +1259,10 @@ function(input, output, session)  {
     # 7.4.2 - Outpatient Data
     "Outpatients - Time trend" = data_trend %>% 
       filter(file == "Outpatients") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name,geo_type,loc_name, 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
+      select(geo_type,loc_name, quarter_name,
              measure, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
@@ -1220,10 +1279,11 @@ function(input, output, session)  {
     # 7.5.1 - Inpatient Data
     "Inpatients/Day cases - Age/sex" = data_pyramid %>% 
       filter(file == "Inpatients/Day Cases") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, sex, age,
-              count, los, avlos) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1240,10 +1300,11 @@ function(input, output, session)  {
     # 7.5.2 - Outpatient Data
     "Outpatients - Age/sex" = data_pyramid %>% 
       filter(file == "Outpatients") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, geo_type, loc_name, measure, sex, age,
-              count, rate) %>% 
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, quarter_date_last
+      )) %>%
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, rate) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
@@ -1262,10 +1323,12 @@ function(input, output, session)  {
     # 7.6.1 - Inpatient Data
     "Inpatients/Day cases - Cross boundary flow" = data_cbf %>%
       filter(file == "Inpatients/Day Cases") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, hbres_name, hbtreat_name,
-              count) %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
@@ -1276,10 +1339,12 @@ function(input, output, session)  {
     # 7.6.2 - Outpatient Data
     "Outpatients - Cross boundary flow" = data_cbf %>%
       filter(file == "Outpatients") %>%
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y")) %>% 
-      arrange(-quarter) %>%
-      select(quarter_name, hbres_name, hbtreat_name,
-              count) %>%
+      mutate(quarter_name = forcats::fct_reorder(
+        quarter_name, dmy(quarter_date)
+      )) %>%
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
