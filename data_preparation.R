@@ -287,9 +287,7 @@ data_trend_op_res <- read_csv(paste0(
 data_trend_op_treat <- read_csv(paste0(
   base_filepath, 
   "Outpatients-by-NHS-Board-of-Treatment", pub_date,".csv")) %>%
-  treat() %>%
-  ## remove GJNH activity in Forth Valley
-  filter(!(loc_code == "D102H" & hb_code != "SB0801"))
+  treat()
 
 
 # 5.2.3 - Combine outpatient files
