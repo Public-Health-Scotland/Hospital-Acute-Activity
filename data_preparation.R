@@ -78,13 +78,12 @@ rds_filepath <- "Data-Explorer/data/"
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
 
-pub_date <- ("20201124")
+pub_date <- ("-to-September-2020")
 ### Section 2: Beds Data ----
 
 
 data_bed <- as_tibble(read_csv(paste0(
-  base_filepath,pub_date,
-  "_Beds_by_Health_Board_of_Treatment_and_Specialty.csv")))
+  base_filepath, "Beds-by-NHS-Board-of-Treatment-and-Specialty", pub_date,".csv")))
 
 data_bed <- data_bed %>%
   select(-c(quarter_date, hb_code, loc_code)) %>%
@@ -105,17 +104,17 @@ saveRDS(data_bed, paste0(
 
 # 3.1.1 - Residence data
 data_spec_ip_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence_",
-  "and_Specialty.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Spells-by-NHS-Board-of-Residence-",
+  "and-Specialty", pub_date,".csv")) %>%
   res()
 
 
 # 3.1.2 - Treatment data
 data_spec_ip_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Treatment_",
-  "and_Specialty.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Spells-by-NHS-Board-of-Treatment-",
+  "and-Specialty", pub_date,".csv")) %>%
   treat()
 
 
@@ -129,15 +128,15 @@ data_spec_ip <- comb_inp(data_spec_ip_treat,
 
 # 3.2.1 - Residence data
 data_spec_op_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Residence_and_Specialty.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Residence-and-Specialty", pub_date,".csv")) %>%
   res() 
 
 
 # 3.2.2 - Treatment data
 data_spec_op_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Treatment_and_Specialty.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Treatment-and-Specialty", pub_date,".csv")) %>%
   treat()
 
 
@@ -152,7 +151,7 @@ data_spec <- comb_all(data_spec_op,
   
   # Exclude others as there are
   # duplicates from both files
-  filter(geo_type != "Other")
+  filter(geo_type != "Other") 
 
 # Save file
 saveRDS(data_spec, paste0(
@@ -175,17 +174,17 @@ rm(data_spec_ip_res, data_spec_ip_treat,
 
 # 4.1.1 - Residence data
 data_simd_ip_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence_",
-  "and_SIMD.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence-",
+  "and-SIMD", pub_date,".csv")) %>%
   res()
 
 
 # 4.1.2 - Treatment data
 data_simd_ip_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Treatment_",
-  "and_SIMD.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment-",
+  "and-SIMD", pub_date,".csv")) %>%
   treat()
 
 
@@ -200,15 +199,15 @@ data_simd_ip <- comb_inp(data_simd_ip_res,
 
 # 4.2.1 - Residence data
 data_simd_op_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Residence_and_SIMD.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Residence-and-SIMD", pub_date,".csv")) %>%
   res() 
 
 
 # 4.2.2 - Treatment data
 data_simd_op_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Treatment_and_SIMD.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Treatment-and-SIMD", pub_date,".csv")) %>%
   
   # Exclude three location codes which have no name
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
@@ -256,15 +255,15 @@ rm(data_simd_ip_res, data_simd_ip_treat,
 
 # 5.1.1 - Residence data
 data_trend_ip_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
   res()
 
 
 # 5.1.2 - Treatment data
 data_trend_ip_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Treatment.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment", pub_date,".csv")) %>%
   treat()
 
 
@@ -279,15 +278,15 @@ data_trend_ip <- comb_inp(data_trend_ip_treat,
 
 # 5.2.1 - Residence data
 data_trend_op_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Residence.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
   res() 
 
 
 # 5.2.2 - Treatment data
 data_trend_op_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Treatment.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Treatment", pub_date,".csv")) %>%
   treat()
 
 
@@ -310,9 +309,22 @@ data_trend <- comb_all(data_trend_op,
   # This will be used as the x-axis in a shiny plot
   mutate(quarter_date_last = as.yearmon(quarter_date,
                                         "%d/%m/%Y")) %>%
+  # removing National Facility All Outpatient Appointments
+  filter(loc_code != "SB0801") %>%
+  # distinguishing between GJNH and NHS Louisa Jordan
+  mutate(hb_name = case_when(hb_name == "National Facility" ~ loc_name,
+                             TRUE ~ hb_name)) %>%
   
   # Arrange by date for later plotting
   arrange(quarter_date_last)
+
+### recoding GJNH and Louisa Jordan to NHS Boards
+nf_data_trend = data_trend %>% 
+  filter(hb_code == "SB0801") %>%
+  mutate(geo_type = "NHS Board of treatment")
+
+### adding GJNH and LJ as boards
+data_trend = full_join(data_trend, nf_data_trend)
 
 # Save file
 saveRDS(data_trend, paste0(
@@ -335,9 +347,9 @@ rm(data_trend_ip_res, data_trend_ip_treat,
 
 # 6.1.1 - Residence data
 data_pyramid_ip_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence_",
-  "Age_and_Sex.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence-",
+  "Age-and-Sex", pub_date,".csv")) %>%
   res() %>%
   
   # Split sex and age into two columns
@@ -347,9 +359,9 @@ data_pyramid_ip_res <- read_csv(paste0(
 
 # 6.1.2 - Treatment data
 data_pyramid_ip_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Treatment_",
-  "Age_and_Sex.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment-",
+  "Age-and-Sex", pub_date,".csv")) %>%
   treat() %>%
   
   # Split sex and age into two columns
@@ -368,8 +380,8 @@ data_pyramid_ip <- comb_inp(data_pyramid_ip_treat,
 
 # 6.2.1 - Residence data
 data_pyramid_op_res <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Residence_Age_and_Sex.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Residence-Age-and-Sex", pub_date,".csv")) %>%
   res() %>%
   
   # Split sex and age into two columns
@@ -379,8 +391,8 @@ data_pyramid_op_res <- read_csv(paste0(
 
 # 6.2.2 - Treatment data
 data_pyramid_op_treat <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Treatment_Age_and_Sex.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Treatment-Age-and-Sex", pub_date,".csv")) %>%
   treat() %>%
  
   
@@ -424,8 +436,8 @@ rm(data_pyramid_ip_res, data_pyramid_ip_treat,
 
 # 7.1 - Inpatient data
 data_map_ipdc <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Stays_by_Health_Board_of_Residence.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
   
   # Exclude Scotland, Golden Jubilee and
   # non-territorial codes
@@ -457,8 +469,8 @@ saveRDS(data_map_ipdc, paste0(
 
 # 7.2 - Outpatient data
 data_map_op <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_by_Health_Board_of_Residence.csv")) %>%
+  base_filepath, 
+  "Outpatients-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
   
   
   # Exclude Scotland, Golden Jubilee and
@@ -497,8 +509,8 @@ saveRDS(data_map_op, paste0(
 
 # 8.1 - Inpatient data
 data_cbf_ip <- read_csv(paste0(
-  base_filepath, pub_date,
-  "_Inpatient_and_Daycase_Cross_Boundary_Flow.csv")) %>%
+  base_filepath, 
+  "Inpatient-and-Daycase-Cross-Boundary-Flow", pub_date,".csv")) %>%
   mutate(file = "Inpatients/Day Cases") %>%
   
   # Select health boards only
@@ -523,8 +535,8 @@ data_cbf_ip <- read_csv(paste0(
 
 # 8.2 - Outpatient data
 data_cbf_op <-  read_csv(paste0(
-  base_filepath, pub_date,
-  "_Outpatients_Cross_Boundary_Flow.csv")) %>%
+  base_filepath, 
+  "Outpatients-Cross-Boundary-Flow", pub_date,".csv")) %>%
   mutate(file = "Outpatients") %>%
   
   # Select health boards only
