@@ -20,10 +20,8 @@
 ### Visual interface ----
 secure_app(
   tagList( #needed for shinyjs
-  navbarPage(id = "intabset", # id used for jumping between tabs
-             title = div(tags$a(img(src="phs-logo.png", height = 40), 
-                                href= "https://www.publichealthscotland.scot/"),
-                         style = "position: relative; top: -5px;"),  
+  navbarPage(id = "Panels", # id used for jumping between tabs
+             title = div(style = "position: relative; top: -5px;"),  
              #title for browser tab
              windowTitle = "Acute Hospital Activity Data Explorer",
              header = tags$head(includeCSS("www/styles.css"), # CSS styles
@@ -113,8 +111,7 @@ tabPanel("Introduction",
                               "information, visit our ", 
                               tags$a(
                                 href = paste0("https://www.publichealthscotland.scot/",
-                                              "our-areas-of-work/sharing-our-data-and-intelligence","
-                                              /coronavirus-covid-19-data-and-guidance/"),
+                                              "our-areas-of-work/covid-19/covid-19-data-and-intelligence/"),
                                 "COVID-19 webpages", target = "_blank",
                                 class = "special-link"), ".",
                               "Coronavirus in Scotland information can also ",
@@ -138,7 +135,7 @@ tabPanel("Introduction",
                                               "find-publications-and-data/",
                                               "health-services/hospital-care/",
                                               "acute-hospital-activity-and-nhs-beds-information-quarterly/",
-                                              "23-february-2021/data-quality/"),
+                                              "23-february-2021/trend-data/"),
                                 "Data Trends", target = "_blank", 
                                 class = "special-link"), "sections."),
                       tags$li("The data for the most recent quarter are", 
@@ -168,10 +165,10 @@ tabPanel("Introduction",
 ### Tab 2: Time trend for multiple location ----   
     
     
-  tabPanel("Time trend (location comparison)",
-           icon = icon("line-chart"),
-           h3("Time trend"),
-           p("This section allows you to see changes over time. You can use", 
+tabPanel("Time trend (location comparison)",
+         icon = icon("line-chart"),
+         h3("Time trend"),
+         p("This section allows you to see changes over time. You can use", 
              "the filters to select the data you are interested in. You can", 
              "visualise multiple locations at the same time. To view the data", 
              "in a table use the ‘show/hide table’ button. To download your", 

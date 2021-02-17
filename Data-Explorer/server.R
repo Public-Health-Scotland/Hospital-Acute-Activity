@@ -37,7 +37,7 @@ function(input, output, session) {
   # tab
   observeEvent(input$tabpanel_trend_location, {
     updateTabsetPanel(session,
-                      "Panels",
+                      "Panels", 
                       selected = "Time trend (location comparison)")
   })
   
