@@ -10,9 +10,6 @@
 ### Written to be run on RStudio Desktop
 library(here)
 
-###Update each quarter
-publication_date<-"23-february-2021"
-
 source(here("Data-Explorer/ui_code.R"))
 
 ### Visual interface ----
