@@ -4,23 +4,6 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 08 November 2018
-###
-### Written to be run on RStudio Desktop
-###
-### Packages required:
-### shiny (for the interactive framework);
-### shinyWidgets (for the interactive framework);
-### DT (for data tables);
-### googleVis (for Sankey charts);
-### htmltools (for tooltips);
-### leaflet (for maps);
-### plotly (for interactive plots);
-### rgdal (for reading shapefiles);
-### dplyr and tidyr (for data manipulation);
-### readr (for writing csv files);
-### zoo and lubridate (for dates)
 ###
 ### This script includes all packages, datasets and other
 ### values used by both the UI and server files
