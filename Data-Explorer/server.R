@@ -4,10 +4,6 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
-### Last edited by: Jack Hannah
-### Last edited on: 26 November 2018
-###
-### Written to be run on RStudio Desktop
 ###
 ### This script controls what the data explorer *does*
 
@@ -18,21 +14,21 @@
 
 ### Server ----
 
-credentials <- readRDS("data/admin/credentials.rds")
+#credentials <- readRDS("data/admin/credentials.rds")
 
-function(input, output, session) {
-  if(credentials$authorisation=="Public"){
-
-  } else if (credentials$authorisation=="Private"){
-    # Shinymanager Auth
-    res_auth <- secure_server(
-      check_credentials = check_credentials(credentials)
-    )
-    
-    output$auth_output <- renderPrint({
-      reactiveValuesToList(res_auth)
-    })
-  } 
+ function(input, output, session) {
+#   if(credentials$authorisation=="Public"){
+# 
+#   } else if (credentials$authorisation=="Private"){
+#     # Shinymanager Auth
+#     res_auth <- secure_server(
+#       check_credentials = check_credentials(credentials)
+#     )
+#     
+#     output$auth_output <- renderPrint({
+#       reactiveValuesToList(res_auth)
+#     })
+#   } 
   
   ### Tab 1: Introduction ----
   
