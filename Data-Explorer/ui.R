@@ -7,6 +7,10 @@
 
 publication_date<-"23-february-2021"
 
+
+# secure_app( is commented out for PUBLICATION.
+# It should be uncommented for PRA.
+
 #secure_app(
   tagList( #needed for shinyjs
   navbarPage(id = "Panels", # id used for jumping between tabs
@@ -564,6 +568,8 @@ publication_date<-"23-february-2021"
                       )
                       )
              )
+  # The last ) is commented out for PUBLICATION.
+  # It should be uncommented for PRA.
   #)
   
 
