@@ -12,23 +12,8 @@
 # This is because filter struggles with the '$' operator
 # Where possible, filter is still preferred
 
-### Server ----
-
-#credentials <- readRDS("data/admin/credentials.rds")
-
  function(input, output, session) {
-#   if(credentials$authorisation=="Public"){
-# 
-#   } else if (credentials$authorisation=="Private"){
-#     # Shinymanager Auth
-#     res_auth <- secure_server(
-#       check_credentials = check_credentials(credentials)
-#     )
-#     
-#     output$auth_output <- renderPrint({
-#       reactiveValuesToList(res_auth)
-#     })
-#   } 
+
   
   ### Tab 1: Introduction ----
   
