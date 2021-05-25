@@ -14,21 +14,19 @@
 
 ### Server ----
 
-#credentials <- readRDS("data/admin/credentials.rds")
+
 
  function(input, output, session) {
-#   if(credentials$authorisation=="Public"){
-# 
-#   } else if (credentials$authorisation=="Private"){
-#     # Shinymanager Auth
-#     res_auth <- secure_server(
-#       check_credentials = check_credentials(credentials)
-#     )
-#     
-#     output$auth_output <- renderPrint({
-#       reactiveValuesToList(res_auth)
-#     })
-#   } 
+   if(credentials$authorisation=="Private"){
+
+     res_auth <- secure_server(
+       check_credentials = check_credentials(credentials)
+     )
+     
+     output$auth_output <- renderPrint({
+       reactiveValuesToList(res_auth)
+     })
+   } 
   
   ### Tab 1: Introduction ----
   
@@ -138,7 +136,8 @@
     
     # If no data are available for that quarter then plot message
     # saying data are missing
-    if ((is.data.frame(data_trend_plot()) &&
+
+    if (!isTruthy(!((is.data.frame(data_trend_plot()) &&
          nrow(data_trend_plot()) == 0) |
         (input$measure_trend == "Did not attend rate (%)" & 
          !("Did not attend outpatient appointments" %in% input$service_trend)
@@ -164,7 +163,7 @@
                  "All daycases") %in% input$service_trend ))
         )
         
-    )
+    )))
     {
       # Plotting empty plot just with text
       text_na <- list(x = 5,
@@ -174,7 +173,8 @@
                       yref = "y",
                       showarrow = FALSE)
       
-      plot_ly() %>%
+      plot_ly(type = 'scatter',
+              mode = 'lines+markers') %>%
         layout(annotations = text_na,
                
                # Empty layout
@@ -197,10 +197,10 @@
                           input$measure_trend, ": ",
                           prettyNum(data_trend_plot()[[input$measure_trend]],
                                     big.mark = ",")))
-      
+            
       # Plotting time trend
       plot_ly(data = data_trend_plot(),
-              x = ~quarter_date_last, 
+              x = ~quarter_middle,
               y = ~get(input$measure_trend), 
               text = tooltip,
               hoverinfo = "text",
@@ -218,8 +218,8 @@
           
           # Axis parameter
           xaxis = list(fixedrange = TRUE,
-                       title = "Time period")
-          
+                       title = "Time period",
+                       nticks = length(unique(data_trend_plot()$quarter_date)))
           
         )%>% 
         
@@ -240,7 +240,7 @@
                                              'toggleSpikelines',  
                                              'hoverCompareCartesian',  
                                              'hoverClosestCartesian'),  
-               displaylogo = F, collaborate = F, editable = F) 
+               displaylogo = F, editable = F) 
     }
     
   })
@@ -352,7 +352,7 @@
     
     # If no data are available for that quarter then plot message
     # saying data are missing
-    if ((is.data.frame(data_trend_plot_2()) &&
+    if (!isTruthy(!((is.data.frame(data_trend_plot_2()) &&
          nrow(data_trend_plot_2()) == 0) |
         (input$measure_trend_2 == "Did not attend rate (%)" & 
          !("Did not attend outpatient appointments" %in% input$service_trend_2)
@@ -376,7 +376,7 @@
                  "All inpatients and daycases",
                  "All inpatients",
                  "All daycases") %in% input$service_trend_2 ))
-        ))
+        ))))
     {
       # Plotting empty plot just with text
       text_na <- list(x = 5,
@@ -386,7 +386,8 @@
                       yref = "y",
                       showarrow = FALSE)
       
-      plot_ly() %>%
+      plot_ly(type = 'scatter',
+              mode = 'lines+markers') %>%
         layout(annotations = text_na,
                
                # Empty layout
@@ -412,7 +413,7 @@
       
       # Plotting time trend
       plot_ly(data = data_trend_plot_2(),
-              x = ~quarter_date_last, 
+              x = ~quarter_middle, 
               y = ~get(input$measure_trend_2), 
               text = tooltip,
               hoverinfo = "text",
@@ -430,8 +431,8 @@
           
           # Axis parameter
           xaxis = list(fixedrange = FALSE,
-                       title = "Time period")
-          
+                       title = "Time period",
+                       nticks = length(unique(data_trend_plot_2()$quarter_date)))
           
         ) %>%
         
@@ -446,7 +447,7 @@
                                              'toggleSpikelines',  
                                              'hoverCompareCartesian',  
                                              'hoverClosestCartesian'),  
-               displaylogo = F, collaborate = F, editable = F) 
+               displaylogo = F, editable = F) 
     }
     
   }) 
@@ -570,7 +571,7 @@
                       yref = "y", 
                       showarrow = FALSE)
       
-      plot_ly() %>%
+      plot_ly(type="bar") %>%
         layout(annotations = text_na,
                
                # empty layout
@@ -633,7 +634,7 @@
                                              'toggleSpikelines',  
                                              'hoverCompareCartesian',  
                                              'hoverClosestCartesian'),  
-               displaylogo = F, collaborate = F, editable = F) 
+               displaylogo = F, editable = F) 
       
     }
   }) 
@@ -723,7 +724,7 @@
                       yref = "y",
                       showarrow = FALSE)
       
-      plot_ly() %>%
+      plot_ly(type="bar") %>%
         layout(annotations = text_na,
                
                # Empty layout
@@ -771,7 +772,7 @@
                                              'toggleSpikelines',  
                                              'hoverCompareCartesian',  
                                              'hoverClosestCartesian'),  
-               displaylogo = F, collaborate = F, editable = F) 
+               displaylogo = F, editable = F) 
     }
   }) 
   
@@ -1164,13 +1165,13 @@
         quarter_name, dmy(quarter_date)
       )) %>%
       select(geo_type, loc_name, measure, spec_name,
-             quarter_name, stays, los, avlos) %>% 
+             quarter_name, spells, los, avlos) %>% 
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Stays = stays,
+             Spells = spells,
              Total_length_stay = los,
              Mean_length_stay = avlos) %>%
       mutate_if(is.character, as.factor),

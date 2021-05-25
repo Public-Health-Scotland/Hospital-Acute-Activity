@@ -7,9 +7,11 @@ credentials.rds
 credentials.R
 
 # 'data' folder #
-# 'data' folder was previously called 'R files' #
 data/
-R files/
+admin/
+Data-Explorer/data/
+Data-Explorer/admin/
+Data-Explorer/rsconnect/
 
 # Common text files that may contain data #
 *.[cC][sS][vV]

@@ -78,7 +78,7 @@ rds_filepath <- "Data-Explorer/data/"
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
 
-pub_date <- ("-to-September-2020")
+pub_date <- ("-to-December-2020")
 ### Section 2: Beds Data ----
 
 
@@ -309,22 +309,9 @@ data_trend <- comb_all(data_trend_op,
   # This will be used as the x-axis in a shiny plot
   mutate(quarter_date_last = as.yearmon(quarter_date,
                                         "%d/%m/%Y")) %>%
-  # removing National Facility All Outpatient Appointments
-  filter(loc_code != "SB0801") %>%
-  # distinguishing between GJNH and NHS Louisa Jordan
-  mutate(hb_name = case_when(hb_name == "National Facility" ~ loc_name,
-                             TRUE ~ hb_name)) %>%
-  
+
   # Arrange by date for later plotting
   arrange(quarter_date_last)
-
-### recoding GJNH and Louisa Jordan to NHS Boards
-nf_data_trend = data_trend %>% 
-  filter(hb_code == "SB0801") %>%
-  mutate(geo_type = "NHS Board of treatment")
-
-### adding GJNH and LJ as boards
-data_trend = full_join(data_trend, nf_data_trend)
 
 # Save file
 saveRDS(data_trend, paste0(
