@@ -4,19 +4,16 @@
 ###
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
+###
+### This script controls the way the dashboard looks, sets up
+### the tabs etc.
 
-
+### Visual interface ----
 ui_code <- tagList( #needed for shinyjs
   navbarPage(id = "Panels", # id used for jumping between tabs
              title = div(style = "position: relative; top: -5px;"),  
              #title for browser tab
              windowTitle = "Acute Hospital Activity Data Explorer",
-             # When the app is run locally  ie. the 
-             # "Run app" button is pressed "Data-Explorer/" may need
-             # to be added to the "www/styles.css" filepath for the 
-             # app to run correctly.
-             # However, it MUST be removed again for the deployment
-             # to work.
              header = tags$head(includeCSS("www/styles.css"), # CSS styles
                                 #Icon for browser tab
                                 tags$link(rel="shortcut icon", 
@@ -561,10 +558,13 @@ ui_code <- tagList( #needed for shinyjs
                       )
              )
 
-### Visual interface ----
+### Credentials ----
+
 if (credentials$authorisation=="Private"){
- secure_app(ui_code)
+  # Use secure_app if auth is private
+  secure_app(ui_code)
 } else if (credentials$authorisation=="Public"){
+  # Call ui with no credentials if auth is public
   ui_code
 }
 

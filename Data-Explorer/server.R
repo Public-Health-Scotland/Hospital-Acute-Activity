@@ -5,7 +5,8 @@
 ### Original Author: Jaime Villacampa
 ### Original Date: October 2017
 ###
-### This script controls what the data explorer *does*
+### This script controls what the data explorer *does*, i.e. it
+### creates all of the dropdowns, figures, tables etc.
 
 # NOTE - the subset function is used in the below code on several
 # occasions, rather than using filter
@@ -14,19 +15,12 @@
 
 ### Server ----
 
-
-
  function(input, output, session) {
-   if(credentials$authorisation=="Private"){
-
-     res_auth <- secure_server(
-       check_credentials = check_credentials(credentials)
-     )
-     
-     output$auth_output <- renderPrint({
-       reactiveValuesToList(res_auth)
-     })
-   } 
+   
+   # Check credentials (only runs if secure_app is called in ui)
+   res_auth <- secure_server(
+     check_credentials = check_credentials(credentials)
+   )
   
   ### Tab 1: Introduction ----
   

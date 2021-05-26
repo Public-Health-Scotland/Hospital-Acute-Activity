@@ -38,16 +38,22 @@ publication_date<-"25-may-2021"
 # working directories
 rds_filepath <- ("./data/")
 
+# 1.3 - Credentials
+
+# Delete any existing credentials
 if(exists("credentials")) rm(credentials)
 
+# Expected location of credentials
 credential_filepath = paste0(rds_filepath,"admin/credentials.csv")
 
+# If the crendentials file exists read it in and set auth to private
 if(file.exists(credential_filepath)){
   credentials <- list(authorisation = "Private")
   credentials <- merge(credentials, read_csv(credential_filepath,
                                              col_types = cols()))
 }
 
+# Need to check with Jaime whether we should be using something like this
 if (Sys.time() >= dmy_hm(paste(publication_date,"09:30"), tz=Sys.timezone())) {
   credentials <- list(authorisation = "Public")
 }
