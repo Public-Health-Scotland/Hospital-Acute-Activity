@@ -29,12 +29,34 @@ library(lubridate)
 library(shinyWidgets)
 library(shinymanager)
 
+###Update each quarter
+publication_date<-"25-may-2021"
+
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
 # script, but the path is defined differently due to the way shiny handles
 # working directories
 rds_filepath <- ("./data/")
 
+# 1.3 - Credentials
+
+# Delete any existing credentials
+if(exists("credentials")) rm(credentials)
+
+# Expected location of credentials
+credential_filepath = paste0(rds_filepath,"admin/credentials.csv")
+
+# If the crendentials file exists read it in and set auth to private
+if(file.exists(credential_filepath)){
+  credentials <- list(authorisation = "Private")
+  credentials <- merge(credentials, read_csv(credential_filepath,
+                                             col_types = cols()))
+}
+
+# Need to check with Jaime whether we should be using something like this
+if (Sys.time() >= dmy_hm(paste(publication_date,"09:30"), tz=Sys.timezone())) {
+  credentials <- list(authorisation = "Public")
+}
 
 ### Section 2: Loading Data ----
 
@@ -57,7 +79,8 @@ data_simd <- readRDS(paste0(
 # Time Trend data
 data_trend <- readRDS(paste0(
   rds_filepath,
-  "trend.rds"))
+  "trend.rds")) %>%
+  mutate(quarter_middle = dmy(quarter_date) - ddays(45))
 
 # Population Pyramid data
 data_pyramid <- readRDS(paste0(
