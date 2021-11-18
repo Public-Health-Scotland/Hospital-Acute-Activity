@@ -8,7 +8,7 @@
 ### This script controls what the data explorer *does*, i.e. it
 ### creates all of the dropdowns, figures, tables etc.
 
-# NOTE - the subset function is used in the below code on several
+# NOTE - the subset function is used in the code below on several
 # occasions, rather than using filter
 # This is because filter struggles with the '$' operator
 # Where possible, filter is still preferred
@@ -101,7 +101,7 @@
     shinyWidgets::pickerInput("service_trend",
                               label = "Select type of activity",
                               choices = trend_service,
-                              selected = "All inpatients and daycases")
+                              selected = "All inpatients and day cases")
   })
   
   output$measure_ui_trend <- renderUI({
@@ -142,9 +142,9 @@
          !(any(c("Elective inpatients",
                  "Emergency inpatients",
                  "Inpatient transfers",
-                 "All inpatients and daycases",
+                 "All inpatients and day cases",
                  "All inpatients",
-                 "All daycases") %in% input$service_trend ))
+                 "All day cases") %in% input$service_trend ))
         )|
         (is.data.frame(data_trend_plot()) &&
          nrow(data_trend_plot()) == 0) | 
@@ -152,9 +152,9 @@
          !(any(c("Elective inpatients",
                  "Emergency inpatients",
                  "Inpatient transfers",
-                 "All inpatients and daycases",
+                 "All inpatients and day cases",
                  "All inpatients",
-                 "All daycases") %in% input$service_trend ))
+                 "All day cases") %in% input$service_trend ))
         )
         
     )))
@@ -317,7 +317,7 @@
                               options = list(
                                 `selected-text-format` = "count > 1"
                               ),
-                              selected = "All inpatients and daycases")
+                              selected = "All inpatients and day cases")
   })
 
   output$measure_ui_trend_2 <- renderUI({
@@ -357,9 +357,9 @@
          !(any(c("Elective inpatients",
                  "Emergency inpatients",
                  "Inpatient transfers",
-                 "All inpatients and daycases",
+                 "All inpatients and day cases",
                  "All inpatients",
-                 "All daycases") %in% input$service_trend_2 ))
+                 "All day cases") %in% input$service_trend_2 ))
         )|
         (is.data.frame(data_trend_plot_2()) &&
          nrow(data_trend_plot_2()) == 0) | 
@@ -367,9 +367,9 @@
          !(any(c("Elective inpatients",
                  "Emergency inpatients",
                  "Inpatient transfers",
-                 "All inpatients and daycases",
+                 "All inpatients and day cases",
                  "All inpatients",
-                 "All daycases") %in% input$service_trend_2 ))
+                 "All day cases") %in% input$service_trend_2 ))
         ))))
     {
       # Plotting empty plot just with text
@@ -523,7 +523,7 @@
                 label = "Select the type of activity",
                 choices = pyramid_service,
                 selectize = TRUE,
-                selected = "All inpatients and daycases")
+                selected = "All inpatients and day cases")
   })
   
   # Reactive datasets

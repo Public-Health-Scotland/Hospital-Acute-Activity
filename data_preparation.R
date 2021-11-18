@@ -78,9 +78,10 @@ rds_filepath <- "Data-Explorer/data/"
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
 
-pub_date <- ("-to-December-2020")
-### Section 2: Beds Data ----
+pub_date <- ("-to-June-2021")
 
+
+### Section 2: Beds Data ----
 
 data_bed <- as_tibble(read_csv(paste0(
   base_filepath, "Beds-by-NHS-Board-of-Treatment-and-Specialty", pub_date,".csv")))

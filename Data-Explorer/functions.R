@@ -119,8 +119,8 @@ comb_all <- function(df_1, df_2) {
       "New" = "New outpatient appointments",
       "Return" = "Return outpatient appointments",
       "All Inpatients" = "All inpatients",
-      "All Inpatients and Daycases" = "All inpatients and daycases",
-      "All Daycases" = "All daycases",
+      "All Inpatients and Day cases" = "All inpatients and day cases",
+      "All Day cases" = "All day cases",
       "Emergency Inpatients" = "Emergency inpatients",
       "Elective Inpatients" = "Elective inpatients"
     ))
