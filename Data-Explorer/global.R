@@ -18,7 +18,7 @@ library(shiny)
 library(DT)
 library(googleVis)
 library(htmltools)
-library(leaflet)
+#library(leaflet)
 library(plotly)
 # library(rgdal) (Only needed for mapping - not in use at present)
 library(dplyr)
@@ -30,7 +30,7 @@ library(shinyWidgets)
 library(shinymanager)
 
 ###Update each quarter
-publication_date<-"25-may-2021"
+publication_date<-"30-november-2021"
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
