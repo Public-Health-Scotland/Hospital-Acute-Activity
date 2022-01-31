@@ -46,17 +46,14 @@ if(exists("credentials")) rm(credentials)
 # Expected location of credentials
 credential_filepath = paste0(rds_filepath,"admin/credentials.csv")
 
-# If the crendentials file exists read it in and set auth to private
-if(file.exists(credential_filepath)){
-  credentials <- list(authorisation = "Private")
-  credentials <- merge(credentials, read_csv(credential_filepath,
-                                             col_types = cols()))
-}
+# Read in crendentials file and set auth to private
+credentials <- list(authorisation = "Private")
+credentials <- merge(credentials, read_csv(credential_filepath,
+                                           col_types = cols()))
 
-# Need to check with Jaime whether we should be using something like this
-if (Sys.time() >= dmy_hm(paste(publication_date,"09:30"), tz=Sys.timezone())) {
-  credentials <- list(authorisation = "Public")
-}
+# Uncomment this line to remove authentication:
+# credentials <- list(authorisation = "Public")
+
 
 ### Section 2: Loading Data ----
 
@@ -125,15 +122,15 @@ latest_quarter <- data_trend %>%
 
 # 3.3 - Dropdown choices in 'Table' tab
 file_types <-  c("Beds",
-                 "Inpatients/Day cases - Age/sex", 
+                 "Inpatients/Day cases - Age/sex",
                  "Inpatients/Day cases - Cross boundary flow",
-                 "Inpatients/Day cases - Time trend", 
+                 "Inpatients/Day cases - Time trend",
                  "Inpatients/Day cases - Specialty",
-                 "Inpatients/Day cases - Deprivation (SIMD)", 
+                 "Inpatients/Day cases - Deprivation (SIMD)",
                  "Outpatients - Age/sex",
-                 "Outpatients - Cross boundary flow", 
+                 "Outpatients - Cross boundary flow",
                  "Outpatients - Time trend",
-                 "Outpatients - Specialty", 
+                 "Outpatients - Specialty",
                  "Outpatients - Deprivation (SIMD)")
 
 
@@ -141,8 +138,8 @@ file_types <-  c("Beds",
 
 
 # 3.4.1 - Excluding 'other' from SIMD tab
-# no longer want to present other in the SIMD tab 
-# this just takes all the types of geographies hbres,hbt, 
+# no longer want to present other in the SIMD tab
+# this just takes all the types of geographies hbres,hbt,
 # hospital, scotland for use in drop downs.
 geo_type <- data_trend %>%
   distinct(geo_type) %>%
