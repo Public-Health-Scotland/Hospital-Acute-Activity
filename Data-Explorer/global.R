@@ -27,7 +27,7 @@ library(shinyWidgets)
 library(shinymanager)
 
 ## Update each quarter
-publication_date<-"30-november-2021"
+data_up_to <- "30-september-2021"
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
@@ -50,7 +50,11 @@ credentials <- merge(credentials, read_csv(credential_filepath,
 # Uncomment this line to remove authentication:
 # credentials <- list(authorisation = "Public")
 
-
+# Publication URL
+pub_url = paste0("https://publichealthscotland.scot/publications/",
+                 "acute-hospital-activity-and-nhs-beds-information-quarterly/",
+                 "acute-hospital-activity-and-nhs-beds-information-quarterly-quarter-ending-",
+                 data_up_to, "/")
 
 ############################################################
 ### Section 2: Loading Data ----
