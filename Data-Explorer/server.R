@@ -1384,11 +1384,11 @@
                a bed depends partly on what the patient is being treated for,
                so for some wards the mix of specialties may change over time.
                Similarly, analysis of the Accident & Emergency specialty bed
-               usage will only provide information on beds within the Accident
-               & Emergency specialty e.g. Accident & Emergency ward beds and
-               observation beds. It will not provide information on the
-               services/capacity within Accident & Emergency departments as
-               whole."))
+               usage will only provide inpatient and day case information on
+               beds within the Accident & Emergency specialty e.g. Accident &
+               Emergency ward beds and observation beds staffed overnight. It
+               will not provide information on the services/capacity within
+               Accident & Emergency departments as a whole."))
     } else if(input$filename_table == "Inpatients/Day cases - Specialty"){
       return(p("Specialty breakdowns are measured in episodes and spells rather
                         than stays. For more information, please see the ",
