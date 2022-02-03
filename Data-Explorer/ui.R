@@ -519,16 +519,12 @@ ui_code <- tagList( #needed for shinyjs
 
              tabPanel("Table",
                       icon = icon("table"),
+                      h3("Table"),
                       p("This section allows you to view the data in table format.
                         You can use the filters to select the  data you are
                         interested in. You can also download the data as a csv
                         using the download buttons."),
-                      p("Specialty breakdowns are measured in episodes and spells rather
-                        than stays. For more information, please see the ",
-                        tags$a(
-                          href = paste0(pub_url, "methods-used-to-produce-this-data/"),
-                          "methodology section", target = "_blank",
-                          class = "special-link"), "."),
+                      uiOutput("table_notes"),
                       p("For more information on the data, data variables and definitions,
                         please see the ",
                         tags$a(

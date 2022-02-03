@@ -1368,6 +1368,38 @@
     )
   })
 
+  # Notes text above table
+  output$table_notes <- renderUI({
+    if(input$filename_table == "Beds"){
+      return(p("Due to the way specialties are recorded for beds data, it is not
+               possible to use the PHS Beds statistics to estimate the total
+               number of beds which are available for use for different services
+               and/or departments. For example, selecting the paediatric
+               specialty grouping will only provide a partial picture of
+               the staffed beds that are used for children’s services.
+               This is because many beds used for children are not recorded
+               under paediatric specialties and are instead recorded under
+               more specific specialties, e.g. Haematology, Neurology, and
+               Respiratory Medicine. Furthermore, the specialty recorded for
+               a bed depends partly on what the patient is being treated for,
+               so for some wards the mix of specialties may change over time.
+               Similarly, analysis of the Accident & Emergency specialty bed
+               usage will only provide inpatient and day case information on
+               beds within the Accident & Emergency specialty e.g. Accident &
+               Emergency ward beds and observation beds staffed overnight. It
+               will not provide information on the services/capacity within
+               Accident & Emergency departments as a whole."))
+    } else if(input$filename_table == "Inpatients/Day cases - Specialty"){
+      return(p("Specialty breakdowns are measured in episodes and spells rather
+                        than stays. For more information, please see the ",
+        tags$a(
+          href = paste0(pub_url, "methods-used-to-produce-this-data/"),
+          "methodology section", target = "_blank",
+          class = "special-link"), "."))
+    } else {
+      return("")
+    }
+  })
 
   # Downloading data
   # The downloaded data are those selected by the user using
