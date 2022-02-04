@@ -42,7 +42,7 @@ if(exists("credentials")) rm(credentials)
 # Expected location of credentials
 credential_filepath = paste0(rds_filepath,"admin/credentials.csv")
 
-# Read in crendentials file and set auth to private
+# Read in credentials file and set auth to private
 credentials <- list(authorisation = "Private")
 credentials <- merge(credentials, read_csv(credential_filepath,
                                            col_types = cols()))
@@ -162,8 +162,7 @@ trend_pal <- c("#004785", "#4c7ea9", "#99b5ce",
 colours_node <- rep("CornflowerBlue", times = 28)
 
 colours_node_array <- paste0("[", paste0("'", colours_node,
-                                         "'", collapse = ','),
-                             "]")
+                                         "'", collapse = ','),"]")
 
 opts <- paste0("{
                node: { colours: ", colours_node_array ," }
