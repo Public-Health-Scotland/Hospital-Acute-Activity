@@ -401,49 +401,7 @@ ui_code <- tagList( #needed for shinyjs
     ),
     
 ############################################################
-### Tab 6: Map ----
-    ### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA
-    #
-    # tabPanel("Map", icon = icon("globe"), style="float: top; height: 95%; width: 95%;
-    #           background-color:#ffffff; border: 0px solid #ffffff;",
-    #          h4(textOutput("title_map")),
-    #          p("There are marked differences among Scottish regions in the numbers of patients
-    #               admitted to hospital or treated as day cases. This map allows to explore this regional
-    #               differences in total and relative volume of hospital acute care activity in Scotland."),
-    #          div(style="height: 15%; width: 95%;  background-color:#ffffff; border: 0px solid #ffffff;",
-    #              column(4,
-    #               selectInput("datatype_map", label = "Select type of patients:", choices = data_type),
-    #               selectInput("measure_map", label = "Select category:",
-    #                       choices=unique(data_mapipdc$measure), width= "95%"),
-    #              downloadButton(outputId = 'download_map', label = 'Download data',
-    #                             width= "95%")  #For downloading the data
-    #              ),
-    #           column(4,
-    #             selectInput("value_map", label = "Select measure:",
-    #                 choices=c("Admissions", "Crude rate"), width= "95%"),
-    #             selectInput("quarter_map", label = "Select quarter:",
-    #                         choices = unique(data_cbfip$quarter_name),
-    #                         selected=tail(data_cbfip$quarter_name, n=1), width= "95%") #to be fixed properly
-    #             ),
-    #           column(4,
-    #             h5(style="font-weight: bold;", "Percentile", width= "95%"),
-    #             img(src='legend.png', width= "95%", style="vertical-align:middle; max-width:200px")
-    #         )),
-    #         div(style="float:left; height: 80%; width: 95%; background-color:#ffffff; border: 0px solid #ffffff;",
-    #           leafletOutput("map"),
-    #           HTML("<button data-toggle='collapse' data-target='#map_collaps' class='btn btn-primary'>
-    #                   <strong>Show/hide table</strong></button>"),
-    #           HTML("<div id='map_collaps' class='collapse'> "),
-    #           DT::dataTableOutput("table_map", width="95%"),
-    #           HTML("</div>"),
-    #           p("To embed this graphic in your website include this code:"),
-    #           p("<iframe src='https://scotland.shinyapps.io/hospcare_ipdcmap/' style='border: none;
-    #               width: 100%; height: 100%;'></iframe>")
-    #         )
-    # ),
-    
-############################################################
-### Tab 7: Cross boundary ----
+### Tab 6: Cross boundary ----
     tabPanel("Cross-boundary",
              icon = icon("exchange"),
              h3("Cross-boundary flow"),

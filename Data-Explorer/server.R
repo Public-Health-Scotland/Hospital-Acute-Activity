@@ -700,118 +700,9 @@ output$download_simd <- downloadHandler(
     write_csv(data_simd_plot(),
               file)})
 
-############################################################
-### Tab 6: Map ----
-### SECTION NOT IN USE AT THE MOMENT, STILL REQUIRES WORK AND RATE DATA
-
-# Merging shapefile with dynamic selection of data
-# First for HB
-#   hb_pol <- reactive({merge(hb_bound,
-#                             data_mapipdc %>% subset(quarter_name==input$quarter_map
-#                                                     & measure==input$measure_map
-#                                                     & value_type == input$value_map
-#                                                     & substr(loc_name,1,3)=="NHS") %>% #selecting only HB
-#                               droplevels() %>% #dropping missing factor levels to allow merging
-#                               rename(HBCode=loc_code),
-#                             by='HBCode')
-#   })
-#
-#   #Now for CA
-#   ca_pol <- reactive({merge(ca_bound,
-#                             data_mapipdc %>% subset(quarter_name==input$quarter_map
-#                                                     & measure==input$measure_map
-#                                                     & value_type == input$value_map
-#                                                     & substr(loc_name,1,3)!="NHS") %>% #selecting only HB
-#                               droplevels() %>% #dropping missing factor levels to allow merging
-#                               rename(GSS_COD=loc_code) ,
-#                             by='GSS_COD')
-#   })
-#
-#
-#   #Palettes for map.
-#   pal_hb <- reactive({
-#     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), hb_pol()$value, n=4)
-#   })
-#   pal_ca <- reactive({
-#     colorQuantile(c('#004785','#00a2e5', '#99b5ce',  '#99daf5'), ca_pol()$value, n=4)
-#   })
-#
-#   #title
-#   output$title_map <- renderText(paste("Hospital acute care activity - ", input$measure_map,
-#                                        " during ", input$quarter_map))
-#
-#   #Plotting map
-#
-#   output$map <- renderLeaflet({
-#     leaflet() %>%
-#       setView(-5, 56.33148888, zoom = 10) %>% # setting initial view point
-#       fitBounds(-7.0, 60.5, 0.25, 55.8)  %>% #limits of map
-#       setMaxBounds(-9.0, 62.5, 2.25, 53)  %>% #limits of map
-#       addProviderTiles(providers$CartoDB.Positron) %>% #background map
-#       #Adding layer control
-#       addLayersControl(
-#         baseGroups = c("Health Board", "Council Area"),
-#         options = layersControlOptions(collapsed = FALSE)
-#       )
-#   })
-#   #Creating observer to avoid redrawing of map everytime
-#   #a different option (time, measure) is chosen
-#   observe({
-#
-#     leafletProxy("map") %>%
-#       clearShapes() %>%
-#       #Adding polygons with HB
-#       addPolygons(data=hb_pol(),  group="Health Board",
-#                   color = "#444444", weight = 2, smoothFactor = 0.5,
-#                   label = sprintf(hb_pol()$labs) %>% lapply(HTML), #tooltip for hovering
-#                   labelOptions = labelOptions(direction = "left"),
-#                   opacity = 1.0, fillOpacity = 0.5,
-#                   fillColor = ~pal_hb()(value), # palette
-#                   highlightOptions = highlightOptions(color = "white", weight = 2,
-#                                                       bringToFront = FALSE) #For highlighting the selection while hovering
-#       )%>%
-#       #Adding polygons with HB rate
-#       addPolygons(data=ca_pol(), group="Council Area",
-#                   color = "#444444", weight = 2, smoothFactor = 0.5,
-#                   label = sprintf(ca_pol()$labs) %>% lapply(HTML), #tooltip for hovering
-#                   labelOptions = labelOptions(direction = "left"),
-#                   opacity = 1.0, fillOpacity = 0.5,
-#                   fillColor = ~pal_ca()(value), # palette
-#                   highlightOptions = highlightOptions(color = "white", weight = 2,
-#                                                       bringToFront = FALSE) #For highlighting the selection while hovering
-#       )
-#   })
-#
-#   #####################################.
-#   #### Table
-#
-#   #Table data
-#   table_mapdata <- reactive({
-#     data_mapipdc %>% subset(quarter_name==input$quarter_map & measure==input$measure_map) %>%
-#       select(loc_name, quarter_name, measure, value_type, value) %>%
-#       dcast(loc_name+quarter_name+measure~value_type, fun.aggregate=sum)
-#
-#   })
-#
-#   #Actual table.
-#   output$table_map <- DT::renderDataTable({
-#     DT::datatable(table_mapdata(),style = 'bootstrap', class = 'table-bordered table-condensed', rownames = FALSE,
-#                   options = list(pageLength = 14, dom = 'tip'),
-#                   colnames = c("Location", "Quarter", "Measure", "Admissions", "Crude Rate")
-#     )
-#   })
-#
-#   #####################################.
-#   #### Downloading data
-#   output$download_map <- downloadHandler(
-#     filename =  'map_data.csv',
-#     content = function(file) {
-#       write.csv(data_mapipdc, file)
-#     }
-#   )
 
 ############################################################
-### Tab 7: Cross-boundary ----
+### Tab 6: Cross-boundary ----
 
 # Reactive data
 # Creating dynamic selection of dataset.
@@ -976,7 +867,7 @@ output$download_flow <- downloadHandler(
               file)})
 
 ############################################################
-### Tab 8: Table----
+### Tab 7: Table----
 
 # Switch function is used to select correct dataset based on
 # user input
