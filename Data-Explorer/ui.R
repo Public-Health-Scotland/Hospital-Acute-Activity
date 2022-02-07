@@ -128,9 +128,9 @@ ui_code <- tagList( #needed for shinyjs
                               "change in future publications as submissions",
                               "may be updated to reflect a more accurate and",
                               "complete set of data from NHS Boards."),
-                      tags$li("Missing data points within graphs / missing",
-                              "rows of data within the tables means no data",
-                              "/ activity."),
+                      tags$li("Missing data points within graphs and missing",
+                              "rows of data within the tables indicates that ",
+                              "there is no activity for that breakdown."),
                       tags$li("Disclosure control methods have been applied",
                               "to the data in order to protect patient",
                               "confidentiality therefore figures may not",
@@ -413,7 +413,7 @@ ui_code <- tagList( #needed for shinyjs
            of interest are treated. The right chart shows where
            patients treated in the NHS Board of interest come from.
            To include patients treated in their own NHS Board in the
-           charts, use the ‘flows within own Health Board’ tick box."),
+           charts, use the ‘Include flows within same board?’ tick box."),
              p("You can use the filters to select the data you are interested
            in. To view the data in a table use the ‘show/hide table’
            button. To download your data selection as a csv use the

@@ -96,7 +96,7 @@ output$measure_ui_trend <- renderUI({
   shinyWidgets::pickerInput("measure_trend",
                             label = "Select measure",
                             choices = trend_measure,
-                            selected = "Number")})
+                            selected = "Number of stays/appointments")})
 
 # Reactive datasets
 # Reactive dataset for the trend plot
@@ -107,7 +107,7 @@ data_trend_plot <- reactive({
              geo_type %in% input$geotype_trend) %>%
     rename("Total length of stay (days)" = los,
            "Mean length of stay (days)" = avlos,
-           "Number of stays / appointments" = count,
+           "Number of stays/appointments" = count,
            "Did not attend rate (%)" = rate)})
 
 # Plotting
@@ -284,7 +284,7 @@ output$measure_ui_trend_2 <- renderUI({
     "measure_trend_2",
     label = "Select measure",
     choices = trend_measure,
-    selected = "Number of stays / appointments")})
+    selected = "Number of stays/appointments")})
 
 # Reactive datasets
 # Reactive dataset for the trend plot
@@ -295,7 +295,7 @@ data_trend_plot_2 <- reactive({
              geo_type %in% input$geotype_trend_2) %>%
     rename("Total length of stay (days)" = los,
            "Mean length of stay (days)" = avlos,
-           "Number of stays / appointments" = count,
+           "Number of stays/appointments" = count,
            "Did not attend rate (%)" = rate)})
 
 # Plotting
