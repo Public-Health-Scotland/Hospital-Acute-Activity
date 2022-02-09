@@ -332,9 +332,9 @@ ui_code <- tagList( #needed for shinyjs
              h3("Deprivation"),
              p("This section allows you to explore the data by
         different levels of",
-               tags$a(href=paste0("https://www.gov.scot/collections/",
-                                  "scottish-index-of-multiple-deprivation-2020/"),
-                      "deprivation"),
+               tags$a(href="https://gov.scot/simd",
+                      "deprivation", target = "_blank",
+                      class = "special-link"),
                ". You can use the filters to select the data you are
           interested in. To view the data in a table use the
           ‘show/hide table’ button. To download your data selection
