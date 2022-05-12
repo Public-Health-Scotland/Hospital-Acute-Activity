@@ -45,7 +45,7 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_trend_location",
                             "Time trend (location comparison)")),
                         icon("line-chart"),
-                        " – – shows the data over time by multiple locations."),
+                        " – shows the data over time by multiple locations."),
                       
                       tags$li(
                         tags$b(
