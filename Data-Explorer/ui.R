@@ -45,7 +45,7 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_trend_location",
                             "Time trend (location comparison)")),
                         icon("line-chart"),
-                        " – shows the data over time by multiple locations."),
+                        " – shows the data over time by multiple locations"),
                       
                       tags$li(
                         tags$b(
@@ -53,7 +53,7 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_trend_activity",
                             "Time trend (activity comparison)")),
                         icon("line-chart"),
-                        " – shows the data over time by multiple activity types."),
+                        " – shows the data over time by multiple activity types"),
                       
                       tags$li(
                         tags$b(
@@ -61,7 +61,7 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_age_sex",
                             "Age/sex")),
                         icon("bar-chart"),
-                        " – shows the age and sex distribution of the data."),
+                        " – shows the age and sex distribution of the data"),
                       
                       tags$li(
                         tags$b(
@@ -69,7 +69,8 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_deprivation",
                             "Deprivation")),
                         icon("user-circle-o"),
-                        " – shows activity across different levels of deprivation."),
+                        " – shows activity across different levels of deprivation in accordance with the
+                        Scottish Index of Multiple Deprivation (SIMD)"),
                       
                       tags$li(
                         tags$b(
@@ -78,7 +79,7 @@ ui_code <- tagList( #needed for shinyjs
                             "Cross-boundary flow")),
                         icon("exchange"),
                         " – shows the relationship between where",
-                        "patients live and where they are treated."),
+                        "patients live and where they are treated"),
                       
                       tags$li(
                         tags$b(
@@ -86,19 +87,19 @@ ui_code <- tagList( #needed for shinyjs
                             "tabpanel_table",
                             "Table")),
                         icon("table"),
-                        "– allows you to view the data in a table.")
+                        "– allows you to view the data in a table")
                     ),
                     
                     tags$br(),
-                    p("When using the data explorer please consider the",
+                    p("When using the data explorer, please consider the",
                       "following:"),
                     tags$ul(
                       tags$li("please note that this release includes Scotland going into emergency measures",
                               "due to COVID-19, which is impacting on the volume",
-                              "of hospital activity and trends observed."),
+                              "of hospital activity and trends observed"),
                       tags$li("NHS Louisa Jordan hospital has been included within this publication; outpatient activity across",
                               "several specialties was undertaken from July 2020 and day case activity across several specialties",
-                              "from January 2021, before NHS Louisa Jordan hospital closed at the end of March 2021."),
+                              "from January 2021, before NHS Louisa Jordan hospital closed at the end of March 2021"),
                       tags$li("this release does not include specific ",
                               "COVID-19 information; visit our ",
                               tags$a(
@@ -109,7 +110,7 @@ ui_code <- tagList( #needed for shinyjs
                               tags$a(
                                 href = paste0("https://www.gov.scot/coronavirus-covid-19/"),
                                 "Scottish Government website (external website) ",target = "_blank",class = "special_link"),
-                              "for information on COVID-19 in Scotland. "
+                              "for information on COVID-19 in Scotland "
                               ),
                       tags$li("there are issues with the quality of the data",
                               "presented, which are summarised in the",
@@ -120,19 +121,19 @@ ui_code <- tagList( #needed for shinyjs
                               tags$a(
                                 href = paste0(pub_url, "trend-data/"),
                                 "Trend data", target = "_blank",
-                                class = "special-link"), "sections."),
+                                class = "special-link"), "sections"),
                       tags$li("the data for the most recent quarter are",
                               "provisional and subject to",
                               "change in future publications, as submissions",
                               "may be updated to reflect a more accurate and",
-                              "complete set of data from NHS boards."),
+                              "complete set of data from NHS boards"),
                       tags$li("missing data points within graphs or missing",
                               "rows of data within the tables indicate ",
-                              "'no data' or 'no activity'."),
+                              "'no data' or 'no activity'"),
                       tags$li("disclosure control methods have been applied",
                               "to the data to protect patient",
                               "confidentiality; therefore, figures may not",
-                              "be additive.")),
+                              "be additive")),
                     p("If you have any trouble using this tool, or if you have",
                       "further questions relating to the data, please contact",
                       "us at: ",
@@ -153,31 +154,31 @@ ui_code <- tagList( #needed for shinyjs
                "the filters to select the data you are interested in. You can",
                "visualise multiple locations at the same time. To view the data",
                "in a table, use the ‘Show/hide table’ button. To download your",
-               "data selection as a .csv file use the ‘Download data’ button."),
+               "data selection as a .csv file, use the ‘Download data’ button."),
              tags$ul(
                tags$li(
                  tags$b("Download plot as a .png file"),
                  icon("camera"),
                  " – click this button to save the graph as an",
                  "image (please note that Internet Explorer does",
-                 "not support this function)."),
+                 "not support this function)"),
                tags$li(
                  tags$b("Zoom"),
                  icon("search"),
                  " – zoom into the graph by clicking this button",
                  "and then clicking and dragging your mouse over",
-                 "the area of the graph you are interested in."),
+                 "the area of the graph you are interested in"),
                tags$li(
                  tags$b("Pan"),
                  icon("move", lib = "glyphicon"),
                  " – adjust the axes of the graph by clicking this",
                  "button and then clicking and moving your mouse",
-                 "in any direction you want."),
+                 "in any direction you want"),
                tags$li(
                  tags$b("Reset axes"),
                  icon("home"),
                  " – click this button to return the axes to their",
-                 "default range.")),
+                 "default range")),
              
              wellPanel(tags$style(".well {background-color: #ffffff;
           border: 0px solid #0078D4;}"),
@@ -208,11 +209,11 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Time trend (activity comparison)",
              icon = icon("line-chart"),
              h3("Time trend"),
-             p("In this section you can see changes over time. You can",
+             p("In this section, you can see changes over time. You can",
                "use the filters to select the data you are interested in.",
                "You can visualise multiple activities at the same time.",
                "To view the data in a table, use the ‘Show/hide table’ button.",
-               "To download your data selection as a .csv file use the",
+               "To download your data selection as a .csv file, use the",
                "‘Download data’ button."),
              tags$ul(
                tags$li(
@@ -220,24 +221,24 @@ ui_code <- tagList( #needed for shinyjs
                  icon("camera"),
                  " – click this button to save the graph as an image",
                  "(please note that Internet Explorer does not support",
-                 "this function)."),
+                 "this function)"),
                tags$li(
                  tags$b("Zoom"),
                  icon("search"),
                  " – zoom into the graph by clicking this button and then",
                  "clicking and dragging your mouse over the area of the",
-                 "graph you are interested in."),
+                 "graph you are interested in"),
                tags$li(tags$b("Pan"),
                        icon("move",
                             lib = "glyphicon"),
                        " – adjust the axes of the graph by clicking this button",
                        "and then clicking and moving your mouse in any",
-                       "direction you want."),
+                       "direction you want"),
                tags$li(
                  tags$b("Reset axes"),
                  icon("home"),
                  " – click this button to return the axes to their",
-                 "default range.")),
+                 "default range")),
              
              wellPanel(tags$style(".well {background-color: #ffffff;
           border: 0px solid #0078D4;}"),
@@ -267,36 +268,36 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Age/sex",
              icon = icon("bar-chart"),
              h3("Age/sex"),
-             p("In this section you can explore the age and
+             p("In this section, you can explore the age and
            sex distribution of the data. You can use the
            filters to select the data you are interested
            in. To view the data in a table, use the ‘Show/hide
            table’ button. To download your data selection
-           as a .csv file use the ‘Download data’ button."),
+           as a .csv file, use the ‘Download data’ button."),
              tags$ul(
                tags$li(
                  tags$b("Download plot as a .png file"),
                  icon("camera"),
                  " – click this button to save the graph as an image
            (please note that Internet Explorer does not support this
-           function)."),
+           function)"),
                tags$li(
                  tags$b("Zoom"),
                  icon("search"),
                  " – zoom into the graph by clicking this button and then
            clicking and dragging your mouse over the area of the
-           graph you are interested in."),
+           graph you are interested in"),
                tags$li(
                  tags$b("Pan"),
                  icon("move", lib = "glyphicon"),
                  " – adjust the axes of the graph by clicking this button
            and then clicking and moving your mouse in any direction
-           you want."),
+           you want"),
                tags$li(
                  tags$b("Reset axes"),
                  icon("home"),
                  " – click this button to return the axes to their
-           default range.")),
+           default range")),
              
              wellPanel(
                column(4, uiOutput("geotype_ui_pyramid")),
@@ -328,13 +329,13 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Deprivation",
              icon = icon("user-circle-o"),
              h3("Deprivation"),
-             p("In this section you can explore the data by
+             p("In this section, you can explore the data by
         different levels of deprivation in accordance with the",
                tags$a(href="https://gov.scot/simd",
                       "Scottish Index of Multiple Deprivation (SIMD) (external website)" , target = "_blank",
                       class = "special-link"),
                ". You can use the filters to select the data you are
-          interested in. To view the data in a table use the
+          interested in. To view the data in a table, use the
           ‘Show/hide table’ button. To download your data selection
           as a .csv file use the ‘Download data’ button."),
              tags$ul(
@@ -343,24 +344,24 @@ ui_code <- tagList( #needed for shinyjs
                  icon("camera"),
                  " – click this button to save the graph as an image
           (please note that Internet Explorer does not support this
-          function)."),
+          function)"),
                tags$li(
                  tags$b("Zoom"),
                  icon("search"),
                  " – zoom into the graph by clicking this button and then
           clicking and dragging your mouse over the area of the
-          graph you are interested in."),
+          graph you are interested in"),
                tags$li(
                  tags$b("Pan"),
                  icon("move", lib = "glyphicon"),
                  " – adjust the axes of the graph by clicking this button
           and then clicking and moving your mouse in any direction
-          you want."),
+          you want"),
                tags$li(
                  tags$b("Reset axes"),
                  icon("home"),
                  " – click this button to return the axes to their
-          default range.")
+          default range")
              ),
              
              wellPanel(
@@ -409,8 +410,8 @@ ui_code <- tagList( #needed for shinyjs
            the NHS board selected in the ‘Board of interest’ filter.
            The left chart shows where patients living in the NHS board
            of interest are treated. The right chart shows where
-           patients treated in the NHS Board of interest come from.
-           To include patients treated in their own NHS Board in the
+           patients treated in the NHS board of interest come from.
+           To include patients treated in their own NHS board in the
            charts, use the ‘Include flows within same board?’ tick box."),
              p("You can use the filters to select the data you are interested
            in. To view the data in a table, use the ‘Show/hide table’
@@ -475,9 +476,10 @@ ui_code <- tagList( #needed for shinyjs
              icon = icon("table"),
              h3("Table"),
              p("In this section you can view the data in table format.
-           You can use the filters to select the  data you are
-           interested in. You can also download the data as a .csv file
-           using the download buttons."),
+              You can use the filters to select the data you are interested
+               in. To view the data in a table, use the ‘Show/hide table’
+               button. To download your data selection as a .csv file, use the
+               ‘Download data’ button."),
              uiOutput("table_notes"),
              p("For more information on the data, data variables and definitions,
            please see the ",
