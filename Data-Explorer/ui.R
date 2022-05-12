@@ -150,7 +150,7 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Time trend (location comparison)",
              icon = icon("line-chart"),
              h3("Time trend"),
-             p("In this section you can see changes over time. You can use",
+             p("In this section, you can see changes over time. You can use",
                "the filters to select the data you are interested in. You can",
                "visualise multiple locations at the same time. To view the data",
                "in a table, use the ‘Show/hide table’ button. To download your",
@@ -404,7 +404,7 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Cross-boundary",
              icon = icon("exchange"),
              h3("Cross-boundary flow"),
-             p("In this section you can see where patients are treated.
+             p("In this section, you can see where patients are treated.
            The top chart shows where patients living in each NHS
            board are treated. The bottom charts show data specific to
            the NHS board selected in the ‘Board of interest’ filter.
@@ -475,7 +475,7 @@ ui_code <- tagList( #needed for shinyjs
     tabPanel("Table",
              icon = icon("table"),
              h3("Table"),
-             p("In this section you can view the data in table format.
+             p("In this section, you can view the data in table format.
               You can use the filters to select the data you are interested
                in. To view the data in a table, use the ‘Show/hide table’
                button. To download your data selection as a .csv file, use the
