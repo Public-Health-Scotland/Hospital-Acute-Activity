@@ -1097,7 +1097,7 @@ output$table_notes <- renderUI({
                the staffed beds that are used for children’s services.
                This is because many beds used for children are not recorded
                under paediatric specialties and are instead recorded under
-               more specific specialties such as Haematology, Neurology, and
+               more specific specialties such as Haematology, Neurology and
                Respiratory Medicine. Furthermore, the specialty recorded for
                a bed depends partly on what the patient is being treated for;
                therefore, the mix of specialties may change over time for some wards.
@@ -1114,7 +1114,7 @@ output$table_notes <- renderUI({
                href = paste0(pub_url, "methods-used-to-produce-this-data/"),
                "Methods used to produce this data release ", target = "_blank",
                class = "special-link"), "section. ",
-             "For more information on the data and definitions, please see the ",
+             "For more information on the data, data variables and definitions, please see the ",
  tags$a(href= paste0(pub_url,"data-files/"),
         "Data Files", target = "_blank",
         class ="special-link"),
