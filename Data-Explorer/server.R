@@ -1113,17 +1113,7 @@ output$table_notes <- renderUI({
              tags$a(
                href = paste0(pub_url, "methods-used-to-produce-this-data/"),
                "Methods used to produce this data release ", target = "_blank",
-               class = "special-link"), "section. ",
-             "For more information on the data, data variables and definitions, please see the ",
- tags$a(href= paste0(pub_url,"data-files/"),
-        "Data Files", target = "_blank",
-        class ="special-link"),
- " and ",
- tags$a(
-   href = paste0(pub_url, "glossary/"),
-   "Glossary", target = "_blank",
-   class = "special-link"),
- "sections."))
+               class = "special-link"), "section."))
   } else {
     return("")
   }

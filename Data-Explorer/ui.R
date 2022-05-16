@@ -337,7 +337,7 @@ ui_code <- tagList( #needed for shinyjs
                ". You can use the filters to select the data you are
           interested in. To view the data in a table, use the
           ‘Show/hide table’ button. To download your data selection
-          as a .csv file use the ‘Download data’ button."),
+          as a .csv file, use the ‘Download data’ button."),
              tags$ul(
                tags$li(
                  tags$b("Download plot as a .png file"),
