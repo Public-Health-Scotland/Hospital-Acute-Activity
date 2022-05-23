@@ -1111,7 +1111,7 @@ output$table_notes <- renderUI({
     return(p("Specialty breakdowns are measured in episodes and spells rather
                         than stays. For more information, please see the ",
              tags$a(
-               href = paste0(pub_url, "methods-used-to-produce-this-data/"),
+               href = paste0(pub_url, "methods-used-to-produce-this-data-release/"),
                "Methods used to produce this data release ", target = "_blank",
                class = "special-link"), "section."))
   } else {
