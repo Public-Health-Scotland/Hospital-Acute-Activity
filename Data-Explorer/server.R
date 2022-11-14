@@ -125,7 +125,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))
@@ -135,7 +135,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))))))
@@ -313,7 +313,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 ))
@@ -323,7 +323,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 )))

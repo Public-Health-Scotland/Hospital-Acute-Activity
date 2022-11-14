@@ -63,45 +63,19 @@ pub_url = paste0("https://publichealthscotland.scot/publications/",
 data_bed <- readRDS(paste0(rds_filepath, "beds.rds"))
 
 # Specialty data
-data_spec <- readRDS(paste0(rds_filepath, "spec.rds")) %>% 
-    mutate(file = case_when(file %in% "Inpatients/Day Cases" ~ "Inpatients/day cases",
-                            TRUE ~ file),
-           measure = case_when(measure %in% "Not Specified" ~ "Not specified",
-                            TRUE ~ measure),
-           geo_type = case_when(geo_type %in% "NHS Board of treatment" ~ "NHS board of treatment",
-                                geo_type %in% "NHS Board of residence" ~ "NHS board of residence",
-                                TRUE ~ geo_type)
-           )
-
+data_spec <- readRDS(paste0(rds_filepath, "spec.rds"))
+           
 # SIMD data
-data_simd <- readRDS(paste0(rds_filepath, "simd.rds")) %>% 
-    mutate(file = case_when(file %in% "Inpatients/Day Cases" ~ "Inpatients/day cases",
-                            TRUE ~ file),
-           geo_type = case_when(geo_type %in% "NHS Board of treatment" ~ "NHS board of treatment",
-                                geo_type %in% "NHS Board of residence" ~ "NHS board of residence",
-                                TRUE ~ geo_type)
-           )
+data_simd <- readRDS(paste0(rds_filepath, "simd.rds"))
 
 # Time Trend data
 data_trend <- readRDS(paste0(rds_filepath, "trend.rds")) %>%
-    mutate(quarter_middle = dmy(quarter_date) - ddays(45),
-           geo_type = case_when(geo_type %in% "NHS Board of treatment" ~ "NHS board of treatment",
-                                geo_type %in% "NHS Board of residence" ~ "NHS board of residence",
-                                TRUE ~ geo_type),
-           file = case_when(file %in% "Inpatients/Day Cases" ~ "Inpatients/day cases",
-                            TRUE ~ file)
+    mutate(quarter_middle = dmy(quarter_date) - ddays(45)
            )
 
 # Population Pyramid data
-data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds")) %>% 
-    mutate(file = case_when(file %in% "Inpatients/Day Cases" ~ "Inpatients/day cases",
-                            TRUE ~ file),
-           geo_type = case_when(geo_type %in% "NHS Board of treatment" ~ "NHS board of treatment",
-                                geo_type %in% "NHS Board of residence" ~ "NHS board of residence",
-                                TRUE ~ geo_type),
-           measure = case_when(measure %in% "Not Specified" ~ "Not specified",
-                               TRUE ~ measure))
-
+data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds"))
+    
 # Map data (outpatients)
 # Not in use at the moment
 # data_map_op <- readRDS(paste0(rds_filepath, "map_op.rds"))
@@ -110,11 +84,8 @@ data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds")) %>%
 data_cbf <- readRDS(paste0(rds_filepath, "cbf.rds")) %>% 
     mutate(count.tooltip = paste0(hbres_name, " patients treated in ",
                                   hbtreat_name, ": ", prettyNum(count, big.mark = ",")
-                                  ),
-           file = case_when(file %in% "Inpatients/Day Cases" ~ "Inpatients/day cases",
-                            TRUE ~ file)
+                                  )
            )
-
 
 ############################################################
 ### Section 3: Other Values ----
@@ -169,7 +140,7 @@ geo_type_trend <- data_trend %>%
 # 3.5 - Time Trend services
 trend_service <- data_trend %>%
   distinct(measure) %>%
-  filter(measure != "Not Specified") %>%
+  filter(measure != "Not specified – inpatients") %>%
   pull(measure)
 
 # 3.6 - Time Trend measures
@@ -181,7 +152,7 @@ trend_measure <- c("Number of stays/appointments",
 # 3.7 - Pyramid services
 pyramid_service <- data_pyramid %>%
   distinct(measure) %>%
-  filter(measure != "Not Specified") %>%
+  filter(measure != "Not specified – inpatients") %>%
   pull(measure)
 
 

@@ -392,7 +392,7 @@ saveRDS(data_map_op, paste0(rds_filepath, "map_op.rds"))
 data_cbf_ip <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Cross-Boundary-Flow", pub_date,".csv")) %>%
-  mutate(file = "Inpatients/Day Cases") %>%
+  mutate(file = "Inpatients/day cases") %>%
   
 # Select health boards only
   filter(hbtreat_name != "Non-NHS Provider" &
