@@ -35,7 +35,7 @@ res <- function(df) {
       substr(loc_code, 1, 3) == "S12"
       ~ "Council area of residence",
       TRUE
-      ~ "NHS Board of residence"
+      ~ "NHS board of residence"
     ))
 }
 
@@ -47,7 +47,7 @@ treat <- function(df) {
     mutate(geo_type = case_when(
       substr(loc_code, 1, 3) == "S08" | loc_code %in% c("SB0801","SN0811")
       | hb_name %in% ("Unknown Health Board")
-        ~ "NHS Board of treatment",
+        ~ "NHS board of treatment",
       loc_code == "scot"
         ~ "Scotland",
       hb_name %in% c("Other", "Null") | loc_name == "Other"
@@ -63,7 +63,7 @@ treat <- function(df) {
 comb_inp <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     mutate(avlos = round(avlos, 1),
-           file = "Inpatients/Day Cases") %>%
+           file = "Inpatients/day cases") %>%
 # Remove a few random null measure cases
     drop_na(measure)
 }
@@ -97,7 +97,8 @@ comb_all <- function(df_1, df_2) {
       "All Inpatients and Day cases" = "All inpatients and day cases",
       "All Day cases" = "All day cases",
       "Emergency Inpatients" = "Emergency inpatients",
-      "Elective Inpatients" = "Elective inpatients"
+      "Elective Inpatients" = "Elective inpatients",
+      "Not Specified" = "Not specified – inpatients"
     ))
 }
 

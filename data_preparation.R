@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - data_preparation.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: Ruth Gordon, February 2022
+## Latest Update: James Fixter, November 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -49,7 +49,7 @@ library(janitor)
 # 1.3 - Define filepaths - update pub_date each quarter.
 base_filepath <- "../../data/output/"
 rds_filepath <- "Data-Explorer/data/"
-pub_date <- ("-to-December-2021")
+pub_date <- ("-to-June-2022")
 
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
@@ -392,7 +392,7 @@ saveRDS(data_map_op, paste0(rds_filepath, "map_op.rds"))
 data_cbf_ip <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Cross-Boundary-Flow", pub_date,".csv")) %>%
-  mutate(file = "Inpatients/Day Cases") %>%
+  mutate(file = "Inpatients/day cases") %>%
   
 # Select health boards only
   filter(hbtreat_name != "Non-NHS Provider" &

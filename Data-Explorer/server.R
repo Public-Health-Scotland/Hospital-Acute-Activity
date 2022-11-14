@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - server.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: Ruth Gordon, February 2022
+## Latest Update: James Fixter, November 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -65,7 +65,7 @@ observeEvent(input$tabpanel_table, {
 output$geotype_ui_trend <- renderUI({
   shinyWidgets::pickerInput("geotype_trend",
                             label = "Select type of location",
-                            choices = geo_type_trend,
+                            choices = sort(geo_type_trend, decreasing = TRUE),
                             selected =  "Scotland")})
 
 output$locname_ui_trend <- renderUI({
@@ -82,8 +82,8 @@ output$locname_ui_trend <- renderUI({
                               ~ "Aberdeen City",
                               input$geotype_trend == "Hospital of treatment"
                               ~ "Aberdeen Royal Infirmary",
-                              input$geotype_trend %in% c("NHS Board of residence",
-                                                         "NHS Board of treatment")
+                              input$geotype_trend %in% c("NHS board of residence",
+                                                         "NHS board of treatment")
                               ~ "NHS Ayrshire & Arran"))})
 
 output$service_ui_trend <- renderUI({
@@ -125,7 +125,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))
@@ -135,7 +135,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))))))
@@ -179,8 +179,8 @@ output$trend_plot <- renderPlotly({
             type = 'scatter',
             mode = 'lines+markers',
             color = ~loc_name,
-            colors = trend_pal) %>%
-      
+            colors = trend_pal[1:(length(unique(data_trend_plot()$loc_name)))])%>%
+     
       # Layout
       layout(showlegend = TRUE,
              yaxis = list(
@@ -248,7 +248,7 @@ output$download_trend <- downloadHandler(
 output$geotype_ui_trend_2 <- renderUI({
   shinyWidgets::pickerInput("geotype_trend_2",
                             label = "Select type of location",
-                            choices = geo_type_trend,
+                            choices = sort(geo_type_trend, decreasing = TRUE),
                             selected =  "Scotland")})
 
 output$locname_ui_trend_2 <- renderUI({
@@ -264,8 +264,8 @@ output$locname_ui_trend_2 <- renderUI({
       ~ "Aberdeen City",
       input$geotype_trend == "Hospital of treatment"
       ~ "Aberdeen Royal Infirmary",
-      input$geotype_trend %in% c("NHS Board of residence",
-                                 "NHS Board of treatment")
+      input$geotype_trend %in% c("NHS board of residence",
+                                 "NHS board of treatment")
       ~ "NHS Ayrshire & Arran"))})
 
 output$service_ui_trend_2 <- renderUI({
@@ -313,7 +313,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 ))
@@ -323,7 +323,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Inpatient transfers",
+             "Not specified – inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 )))
@@ -372,7 +372,7 @@ output$trend_plot_2 <- renderPlotly({
             type = 'scatter',
             mode = 'lines+markers',
             color = ~measure,
-            colors = trend_pal) %>%
+            colors = trend_pal[1:(length(unique(data_trend_plot_2()$measure)))])%>%
       
       # Layout
       layout(
@@ -438,12 +438,12 @@ output$download_trend_2 <- downloadHandler(
 output$geotype_ui_pyramid <- renderUI({
   selectInput("geotype_pyramid",
               label = "Select the type of location",
-              choices = geo_type,
+              choices = sort(geo_type_trend, decreasing = TRUE),
               selected =  "Scotland")})
 
 output$locname_ui_pyramid <- renderUI({
   selectInput("locname_pyramid",
-              "Select the location",
+              label = "Select the location",
               choices = data_pyramid %>%
                 subset(geo_type %in% input$geotype_pyramid) %>%
                 distinct(loc_name) %>%
@@ -456,8 +456,9 @@ output$quarter_ui_pyramid <- renderUI({
   selectInput("quarter_pyramid",
               label = "Select the time period",
               choices = data_pyramid %>%
-                distinct(quarter_name) %>%
-                pull(quarter_name),
+                  arrange(dmy(quarter_date)) %>%
+                  distinct(quarter_name) %>%
+                  pull(quarter_name),
               selected = latest_quarter,
               width = "95%")})
 
@@ -535,7 +536,7 @@ output$pyramid_plot <- renderPlotly({
             x = ~count,
             y = ~age,
             color = ~sex,
-            colors = trend_pal,
+            colors = trend_pal[2:1],
             text = tooltip_pyr,
             hoverinfo = "text") %>%
       add_bars(orientation = 'h') %>%
@@ -591,12 +592,12 @@ output$download_pyramid <- downloadHandler(
 output$geotype_ui_simd <- renderUI({
   selectInput("geotype_simd",
               label = "Select the type of location",
-              choices = geo_type,
+              choices = sort(geo_type_trend, decreasing = TRUE),
               selected = "Scotland")})
 
 output$locname_ui_simd <- renderUI({
   selectInput("locname_simd",
-              "Select the location",
+              label = "Select the location",
               choices = data_simd %>%
                 subset(geo_type %in% input$geotype_simd) %>%
                 distinct(loc_name) %>%
@@ -660,7 +661,7 @@ output$simd_plot <- renderPlotly({
             y = ~count,
             text = tooltip_simd,
             hoverinfo = "text") %>%
-      add_bars(marker = list(color = "#004785")) %>%
+      add_bars(marker = list(color = trend_pal[1])) %>%
       layout(bargap = 0.1,
              yaxis = list(fixedrange = FALSE, title = paste("Number of",
                                                             input$measure_simd)),
@@ -797,30 +798,39 @@ output$sankey_all <- renderGvis({
   options(gvis.plot.tag = NULL)
   gvisSankey(flow_all()[, c('hbres_name',
                             'hb_treat_space',
-                            'count')],
+                            'count',
+                            'count.tooltip')],
              options = list(width = "automatic",
-                            sankey = opts))
-})
+                            sankey = opts)
+             )
+  })
 
 # This one has only the selected health board of residence
 output$sankey_res <- renderGvis({
-  gvisSankey(flow_res()[, c('hbres_name',
-                            'hb_treat_space',
-                            'count')],
-             options = list(width = "automatic",
-                            # Change to chart for the html code
-                            gvis.plot.tag = NULL))
-})
+    gvisSankey(flow_res()[, c('hbres_name',
+                              'hb_treat_space',
+                              'count',
+                              'count.tooltip')],
+               options = list(width = "automatic",
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL,
+                              sankey = opts)
+               )
+    })
+
 
 # This one has only the selected health board of treatment
 output$sankey_treat <- renderGvis({
-  gvisSankey(flow_treat()[, c('hbres_name',
-                              'hb_treat_space',
-                              'count')],
-             options = list(width = "automatic",
-                            # Change to chart for the html code
-                            gvis.plot.tag = NULL))
-})
+    gvisSankey(flow_treat()[, c('hbres_name',
+                                'hb_treat_space',
+                                'count',
+                                'count.tooltip')],
+               options = list(width = "automatic",
+                              # Change to chart for the html code
+                              gvis.plot.tag = NULL,
+                              sankey = opts)
+               )
+    })
 
 # Table
 # Selecting the Table data
@@ -906,8 +916,8 @@ data_table <- reactive({switch(
   
   # 7.2 - Specialty Data
   # 7.2.1 - Inpatient Data
-  "Inpatients/Day cases - Specialty" = data_spec %>%
-    filter(file == "Inpatients/Day Cases") %>%
+  "Inpatients/day cases - Specialty" = data_spec %>%
+    filter(file == "Inpatients/day cases") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, dmy(quarter_date))) %>%
     select(geo_type, loc_name, measure, spec_name,
@@ -940,8 +950,8 @@ data_table <- reactive({switch(
   
   # 7.3 - SIMD Data
   # 7.3.1 - Inpatient Data
-  "Inpatients/Day cases - Deprivation (SIMD)" = data_simd %>%
-    filter(file == "Inpatients/Day Cases") %>%
+  "Inpatients/day cases - Deprivation (SIMD)" = data_simd %>%
+    filter(file == "Inpatients/day cases") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, dmy(quarter_date))) %>%
     select(geo_type, loc_name, measure, simd,
@@ -974,8 +984,8 @@ data_table <- reactive({switch(
   
   # 7.4 - Time Trend Data
   # 7.4.1 - Inpatient Data
-  "Inpatients/Day cases - Time trend" = data_trend %>%
-    filter(file == "Inpatients/Day Cases") %>%
+  "Inpatients/day cases - Time trend" = data_trend %>%
+    filter(file == "Inpatients/day cases") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, quarter_date_last)) %>%
     select(geo_type, loc_name, measure,
@@ -1006,8 +1016,8 @@ data_table <- reactive({switch(
   
   # 7.5 - Population Pyramid Data
   # 7.5.1 - Inpatient Data
-  "Inpatients/Day cases - Age/sex" = data_pyramid %>%
-    filter(file == "Inpatients/Day Cases") %>%
+  "Inpatients/day cases - Age/sex" = data_pyramid %>%
+    filter(file == "Inpatients/day cases") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, quarter_date_last)) %>%
     select(geo_type, loc_name, measure, sex, age,
@@ -1044,8 +1054,8 @@ data_table <- reactive({switch(
   
   # 7.6 - Cross-Boundary Data
   # 7.6.1 - Inpatient Data
-  "Inpatients/Day cases - Cross boundary flow" = data_cbf %>%
-    filter(file == "Inpatients/Day Cases") %>%
+  "Inpatients/day cases - Cross-boundary flow" = data_cbf %>%
+    filter(file == "Inpatients/day cases") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, dmy(quarter_date))) %>%
     select(hbres_name, hbtreat_name,
@@ -1058,7 +1068,7 @@ data_table <- reactive({switch(
     mutate_if(is.character, as.factor),
   
   # 7.6.2 - Outpatient Data
-  "Outpatients - Cross boundary flow" = data_cbf %>%
+  "Outpatients - Cross-boundary flow" = data_cbf %>%
     filter(file == "Outpatients") %>%
     mutate(quarter_name = forcats::fct_reorder(
       quarter_name, dmy(quarter_date))) %>%
@@ -1090,7 +1100,7 @@ output$table_explorer <- renderDataTable({
 output$table_notes <- renderUI({
   if(input$filename_table == "Beds"){
     return(p("Due to the way specialties are recorded for beds data, it is not
-               possible to use the PHS Beds statistics to estimate the total
+               possible to use the PHS beds statistics to estimate the total
                number of beds available for use by different services
                and/or departments. For example, selecting the Paediatric
                specialty grouping will only provide a partial picture of
@@ -1099,7 +1109,7 @@ output$table_notes <- renderUI({
                under paediatric specialties and are instead recorded under
                more specific specialties such as Haematology, Neurology and
                Respiratory Medicine. Furthermore, the specialty recorded for
-               a bed depends partly on what the patient is being treated for;
+               a bed depends partly on what the patient is being treated for:
                therefore, the mix of specialties may change over time for some wards.
                Similarly, analysis of the Accident & Emergency specialty bed
                usage will only provide inpatient and day case information on
@@ -1107,12 +1117,12 @@ output$table_notes <- renderUI({
                Emergency ward beds and observation beds staffed overnight). It
                will not provide information on the services/capacity within
                Accident & Emergency departments as a whole."))
-  } else if(input$filename_table == "Inpatients/Day cases - Specialty"){
+  } else if(input$filename_table == "Inpatients/day cases - Specialty"){
     return(p("Specialty breakdowns are measured in episodes and spells rather
                         than stays. For more information, please see the ",
              tags$a(
                href = paste0(pub_url, "methods-used-to-produce-this-data-release/"),
-               "Methods used to produce this data release ", target = "_blank",
+               "Methods used to produce this data release", target = "_blank",
                class = "special-link"), "section."))
   } else {
     return("")
