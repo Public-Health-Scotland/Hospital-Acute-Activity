@@ -105,11 +105,11 @@ ui_code <- tagList( #needed for shinyjs
                               tags$a(
                                 href = paste0("https://www.publichealthscotland.scot/",
                                               "our-areas-of-work/covid-19/covid-19-data-and-intelligence/"),
-                                "COVID-19 webpages",target = "_blank",class = "special_link"), 
+                                "COVID-19 webpages",target = "_blank",class = "special-link"), 
                               "for PHS COVID-19 information or the ",
                               tags$a(
                                 href = paste0("https://www.gov.scot/coronavirus-covid-19/"),
-                                "Scottish Government website (external website)",target = "_blank",class = "special_link"),
+                                "Scottish Government website (external website)",target = "_blank",class = "special-link"),
                               " for information on COVID-19 in Scotland"
                               ),
                       tags$li("there are issues with the quality of the data",
@@ -117,11 +117,11 @@ ui_code <- tagList( #needed for shinyjs
                               tags$a(
                                 href = paste0(pub_url, "data-quality/"),
                                 "Data quality", target = "_blank",
-                                class = "special_link"), "and",
+                                class = "special-link"), "and",
                               tags$a(
                                 href = paste0(pub_url, "trend-data/"),
                                 "Trend data", target = "_blank",
-                                class = "special_link"), "sections"),
+                                class = "special-link"), "sections"),
                       tags$li("the data for the most recent quarter are",
                               "provisional and subject to",
                               "change in future publications, as submissions",
@@ -333,7 +333,7 @@ ui_code <- tagList( #needed for shinyjs
         different levels of deprivation in accordance with the",
                tags$a(href="https://gov.scot/simd",
                       "Scottish Index of Multiple Deprivation (SIMD) (external website)." , target = "_blank",
-                      class = "special_link"),
+                      class = "special-link"),
                "Use the filters to select the data you are
           interested in. To view the data in a table, use the
           ‘Show/hide table’ button. To download your data selection
@@ -488,12 +488,12 @@ ui_code <- tagList( #needed for shinyjs
                tags$a(
                  href = paste0(pub_url, "data-files/"),
                  "Data files", target = "_blank",
-                 class = "special_link"),
+                 class = "special-link"),
                "and",
                tags$a(
                  href = paste0(pub_url, "glossary/"),
                  "Glossary", target = "_blank",
-                 class = "special_link"),
+                 class = "special-link"),
                "sections."),
              br(),
              column(8,
