@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - server.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: James Fixter, November 2022
+## Latest Update: James Fixter, December 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -172,7 +172,7 @@ output$trend_plot <- renderPlotly({
     
     # Plotting time trend
     plot_ly(data = data_trend_plot(),
-            x = ~quarter_middle,
+            x = ~quarter_end,
             y = ~get(input$measure_trend),
             text = tooltip,
             hoverinfo = "text",
@@ -189,15 +189,15 @@ output$trend_plot <- renderPlotly({
                rangemode = "tozero"),
              
              # Axis parameter
-             xaxis = list(
-               fixedrange = TRUE,
-               title = "Time period",
-               nticks = length(unique(data_trend_plot()$quarter_date))))%>%
-      
-      # Take out plotly logo and collaborate button
-      # config(displaylogo = FALSE,
-      #        collaborate = FALSE,
-      #        editable = FALSE)
+             xaxis = list(fixedrange = FALSE,
+                          title = "Quarter",
+                          type = "date",
+                          nticks = length(unique(data_trend_plot()$quarter_name)),
+                          ticktext = data_trend_plot()$quarter_name, 
+                          tickvals = data_trend_plot()$quarter_end,
+                          tickmode = "array"),
+             shapes = list(vline(x=dmy("30-03-2020"))),
+             annotations = covid_line) %>%
       
       # Remove unnecessary buttons from the modebar.
       config(displayModeBar = TRUE,
@@ -365,7 +365,7 @@ output$trend_plot_2 <- renderPlotly({
     
     # Plotting time trend
     plot_ly(data = data_trend_plot_2(),
-            x = ~quarter_middle,
+            x = ~quarter_end,
             y = ~get(input$measure_trend_2),
             text = tooltip,
             hoverinfo = "text",
@@ -383,8 +383,14 @@ output$trend_plot_2 <- renderPlotly({
         
         # Axis parameter
         xaxis = list(fixedrange = FALSE,
-                     title = "Time period",
-                     nticks = length(unique(data_trend_plot_2()$quarter_date)))) %>%
+                     title = "Quarter",
+                     type = "date",
+                     nticks = length(unique(data_trend_plot_2()$quarter_name)),
+                     ticktext = data_trend_plot_2()$quarter_name, 
+                     tickvals = data_trend_plot_2()$quarter_end,
+                     tickmode = "array"),
+        shapes = list(vline(x=dmy("30-03-2020"))),
+        annotations = covid_line) %>%
       
       # Remove unnecessary buttons from the modebar.
       config(displayModeBar = TRUE,
@@ -606,6 +612,23 @@ output$locname_ui_simd <- renderUI({
               selectize = TRUE,
               selected = "Scotland")})
 
+output$quarter_simd <- renderUI({
+    selectInput("quarter_simd",
+            label = "Select the time period",
+            choices = data_simd %>%
+                arrange(dmy(quarter_date)) %>%
+                distinct(quarter_name) %>%
+                pull(quarter_name),
+            selected = latest_quarter,
+            width = "95%")})
+
+output$measure_simd <- renderUI({
+    selectInput("measure_simd",
+            label = "Select the type of activity",
+            choices = pyramid_service,
+            selectize = TRUE,
+            selected = "All inpatients and day cases")})
+
 # Reactive datasets
 # Reactive dataset for the simd plot
 data_simd_plot <- reactive({data_simd %>%
@@ -704,6 +727,30 @@ output$download_simd <- downloadHandler(
 
 ############################################################
 ### Tab 6: Cross-boundary ----
+
+# Reactive dropdowns for this tab
+# They will provide a list of health boards and time periods
+output$datatype_flow <- renderUI({
+    selectInput("datatype_flow",
+                label = "Select the hospital service",
+                choices = data_type)})
+
+output$hb_flow <- renderUI({
+    selectInput("hb_flow",
+            label = "Select the board of interest",
+            choices = data_cbf %>%
+                arrange(hbres_name) %>%
+                distinct(hbres_name) %>%
+                pull(hbres_name))})
+
+output$quarter_flow <- renderUI({
+selectInput("quarter_flow",
+            label = "Select the time period",
+            choices = data_cbf %>%
+                arrange(dmy(quarter_date)) %>%
+                distinct(quarter_name) %>%
+                pull(quarter_name),
+            selected = latest_quarter)})
 
 # Reactive data
 # Creating dynamic selection of dataset.
@@ -892,6 +939,13 @@ output$download_flow <- downloadHandler(
 # dataset for use in the table
 # This is because dropdown prompts on the table filters only
 # appear for factors
+
+output$filename_table <- renderUI({
+    selectInput("filename_table",
+                label = "Select the data file",
+                choices = file_types,
+                width = "95%")})
+
 data_table <- reactive({switch(
   input$filename_table,
   

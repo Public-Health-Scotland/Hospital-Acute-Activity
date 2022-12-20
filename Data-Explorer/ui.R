@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - ui.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: James Fixter, November 2022
+## Latest Update: James Fixter, December 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -367,21 +367,8 @@ ui_code <- tagList( #needed for shinyjs
              wellPanel(
                column(4, uiOutput("geotype_ui_simd")),
                column(4, uiOutput("locname_ui_simd")),
-               column(4,
-                      selectInput("quarter_simd",
-                                  label = "Select the time period",
-                                  choices = data_simd %>%
-                                      arrange(dmy(quarter_date)) %>%
-                                      distinct(quarter_name) %>%
-                                      pull(quarter_name),
-                                  selected = latest_quarter,
-                                  width = "95%")),
-               column(9,
-                      selectInput("measure_simd",
-                                  label = "Select the type of activity",
-                                  choices = pyramid_service,
-                                  selectize = TRUE,
-                                  selected = "All inpatients and day cases")),
+               column(4, uiOutput("quarter_simd")),
+               column(9, uiOutput("measure_simd")),
                # For downloading the data
                column(3,
                       br(),
@@ -421,27 +408,11 @@ ui_code <- tagList( #needed for shinyjs
            button. To download your data selection as a .csv file, use the
            ‘Download data’ button."),
              wellPanel(
-               column(4,
-                      selectInput("datatype_flow",
-                                  label = "Select the hospital service",
-                                  choices = data_type)),
-               column(4,
-                      selectInput("hb_flow",
-                                  label = "Select the board of interest",
-                                  choices = data_cbf %>%
-                                    arrange(hbres_name) %>%
-                                    distinct(hbres_name) %>%
-                                    pull(hbres_name)),
+               column(4, uiOutput("datatype_flow")),
+               column(4, uiOutput("hb_flow"),
                       downloadButton(outputId = 'download_flow',
                                      label = 'Download data')),
-               column(4,
-                      selectInput("quarter_flow",
-                                  label = "Select the time period",
-                                  choices = data_cbf %>%
-                                    arrange(dmy(quarter_date)) %>%
-                                    distinct(quarter_name) %>%
-                                    pull(quarter_name),
-                                  selected = latest_quarter)),
+               column(4, uiOutput("quarter_flow")),
                checkboxInput("checkbox_flow",
                              label = "Include flows within same board?",
                              value = FALSE)),
@@ -496,11 +467,7 @@ ui_code <- tagList( #needed for shinyjs
                  class = "special-link"),
                "sections."),
              br(),
-             column(8,
-                    selectInput("filename_table",
-                                label = "Select the data file",
-                                choices = file_types,
-                                width = "95%")),
+             column(8, uiOutput("filename_table")),
              column(4,
                     downloadButton(outputId = 'download_table',
                                    label = 'Download data')),
