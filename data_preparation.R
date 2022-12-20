@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - data_preparation.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: James Fixter, November 2022
+## Latest Update: James Fixter, December 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -41,7 +41,7 @@
 source("Data-Explorer/functions.R")
 
 # 1.2 - Load required libraries
-# Note - dplyr, tidyr and stringi are loaded by sourcing the functions script
+# Note - dplyr, tidyr, lubridate and stringi are loaded by sourcing the functions script
 library(readr)
 library(zoo)
 library(janitor)
@@ -62,8 +62,14 @@ data_bed <- as_tibble(read_csv(paste0(
   base_filepath, "Beds-by-NHS-Board-of-Treatment-and-Specialty", pub_date,".csv")))
 
 data_bed <- data_bed %>%
-  select(-c(quarter_date, hb_code, loc_code)) %>%
-  mutate_at(c("asb", "aob", "p_occ"), list(~round_half_up(., 1)))
+    select(-c(quarter_date, hb_code, loc_code)) %>%
+    mutate_at(c("asb", "aob", "p_occ"), list(~round_half_up(., 1))) %>%
+    # Creating new quarter name variable for dropdowns and plots
+    mutate(quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                                 substr(quarter_name, 7, 9), " 20",
+                                 substr(quarter_name, 11, 12)
+                                 )
+           )
 
 # Save file
 saveRDS(data_bed, paste0(rds_filepath, "beds.rds"))
@@ -114,7 +120,14 @@ data_spec_op <- comb_outp(data_spec_op_treat,
 #       exclude 'Other' as there are duplicates from both files
 data_spec <- comb_all(data_spec_op,
                       data_spec_ip) %>%
-  filter(geo_type != "Other") 
+    filter(geo_type != "Other") %>%
+    # Creating new quarter end and name variables for dropdowns and plots
+    mutate(quarter_end = dmy(quarter_date),
+           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                                 substr(quarter_name, 7, 9), " ",
+                                 year(quarter_end)
+                                 )
+           )
 
 # Save file
 saveRDS(data_spec, paste0(rds_filepath, "spec.rds"))
@@ -173,13 +186,19 @@ data_simd_op <- comb_outp(data_simd_op_treat, data_simd_op_res)
 #       Exclude null values, and
 #       Recode to explain level of SIMD
 data_simd <- comb_all(data_simd_op, data_simd_ip) %>%
-  filter(loc_name != "Null") %>%
-  drop_na(simd) %>%
-  mutate(simd = recode(
-    as.character(simd),
-    "1" = "1 - Most deprived",
-    "5" = "5 - Least deprived"
-  ))
+    filter(loc_name != "Null") %>%
+    drop_na(simd) %>%
+    mutate(simd = recode(
+        as.character(simd),
+        "1" = "1 - Most deprived",
+        "5" = "5 - Least deprived"),
+        # Creating new quarter end and name variables for dropdowns and plots
+        quarter_end = dmy(quarter_date),
+        quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                              substr(quarter_name, 7, 9), " ",
+                              year(quarter_end)
+                              )
+        )
 
 # Save file
 saveRDS(data_simd, paste0(rds_filepath, "simd.rds"))
@@ -237,7 +256,26 @@ data_trend <- comb_all(data_trend_op, data_trend_ip) %>%
 # Create a new column representing the last month
 # in each financial quarter
 # This will be used as the x-axis in a shiny plot
-  mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y")) %>%
+    mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y"),
+           # Creating new quarter end and name variables for dropdowns and plots
+           quarter_end = dmy(quarter_date),
+           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                                 substr(quarter_name, 7, 9), " ",
+                                 year(quarter_end)),
+           # Adding in a fix for hospitals listed under multiple health boards in ISD(S)1.
+           # When 'Return' appointments are selected in the explorer, this causes
+           # each affected quarter to be plotted twice, which Plotly can't handle.
+           hb_name = case_when(loc_name %in% "Gilbert Bain Hospital" ~ "NHS Shetland",
+                               loc_name %in% "The Balfour" ~ "NHS Orkney",
+                               loc_name %in% "Glasgow Royal Infirmary" ~ "NHS Greater Glasgow & Clyde",
+                               loc_name %in% "Queen Margaret Hospital" ~ "NHS Fife",
+                               loc_name %in% "Raigmore Hospital" ~ "NHS Highland",
+                               TRUE ~ hb_name)
+           ) %>%
+    group_by(quarter_date, loc_name, measure, file) %>% 
+    mutate(count = sum(count)) %>% 
+    ungroup() %>%
+    distinct() %>%
 
 # Arrange by date for later plotting
   arrange(quarter_date_last)
@@ -310,11 +348,18 @@ data_pyramid_op <- comb_outp(data_pyramid_op_treat, data_pyramid_op_res)
 # 6.3 - Combine inpatient and outpatient files, and
 #       Exclude null values
 data_pyramid <- comb_all(data_pyramid_op, data_pyramid_ip) %>%
-  filter(loc_name != "Null") %>%
+    filter(loc_name != "Null") %>%
   
 # Create a new column representing the last month
 # in each financial quarter
-  mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y"))
+    mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y"),
+           # Creating new quarter end and name variables for dropdowns and plots
+           quarter_end = dmy(quarter_date),
+           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                                 substr(quarter_name, 7, 9), " ",
+                                 year(quarter_end)
+                                 )
+           )
 
 # Save file
 saveRDS(data_pyramid, paste0(rds_filepath, "pyramid.rds"))
@@ -431,7 +476,17 @@ data_cbf_op <-  read_csv(paste0(
             funs(stri_replace_first_fixed(., "NHS ", "")))
 
 # 8.3 - Combine inpatient and outpatient files
-data_cbf <- bind_rows(data_cbf_ip, data_cbf_op)
+data_cbf <- bind_rows(data_cbf_ip, data_cbf_op) %>% 
+    # Creating new quarter end and name variables for dropdowns and plots
+    mutate(quarter_end = dmy(quarter_date),
+           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+                                 substr(quarter_name, 7, 9), " ",
+                                 year(quarter_end)),
+           count.tooltip = paste0(hbres_name, " patients treated in ",
+                                  hbtreat_name, ": ",
+                                  prettyNum(count, big.mark = ",")
+                                  )
+           )
 
 # Save file
 saveRDS(data_cbf, paste0(rds_filepath, "cbf.rds"))
