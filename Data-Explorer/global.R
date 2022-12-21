@@ -1,7 +1,7 @@
 ############################################################
 ## Code name - global.R
 ## Data Release - Quarterly Data Explorer
-## Latest Update: James Fixter, November 2022
+## Latest Update: James Fixter, December 2022
 ##
 ## Written/run on - R Studio SERVER
 ## R version - 3.6.1
@@ -63,15 +63,13 @@ pub_url = paste0("https://publichealthscotland.scot/publications/",
 data_bed <- readRDS(paste0(rds_filepath, "beds.rds"))
 
 # Specialty data
-data_spec <- readRDS(paste0(rds_filepath, "spec.rds"))
-           
+data_spec <- readRDS(paste0(rds_filepath, "spec.rds"))  
+
 # SIMD data
 data_simd <- readRDS(paste0(rds_filepath, "simd.rds"))
 
 # Time Trend data
-data_trend <- readRDS(paste0(rds_filepath, "trend.rds")) %>%
-    mutate(quarter_middle = dmy(quarter_date) - ddays(45)
-           )
+data_trend <- readRDS(paste0(rds_filepath, "trend.rds")) 
 
 # Population Pyramid data
 data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds"))
@@ -81,11 +79,7 @@ data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds"))
 # data_map_op <- readRDS(paste0(rds_filepath, "map_op.rds"))
 
 # Cross-Boundary data
-data_cbf <- readRDS(paste0(rds_filepath, "cbf.rds")) %>% 
-    mutate(count.tooltip = paste0(hbres_name, " patients treated in ",
-                                  hbtreat_name, ": ", prettyNum(count, big.mark = ",")
-                                  )
-           )
+data_cbf <- readRDS(paste0(rds_filepath, "cbf.rds"))
 
 ############################################################
 ### Section 3: Other Values ----
@@ -179,6 +173,33 @@ opts <- paste0("{
                "}"
                )
 
+# 4.3 - Defining a vline function for Plotly to add a vertical dashed line
+# to time series charts indicating the start of the pandemic
+vline <- function(x = 0, color = "red") {
+    list(
+        type = "line",
+        y0 = 0,
+        y1 = 1,
+        yref = "paper",
+        x0 = x,
+        x1 = x,
+        line = list(color = color, dash= "dash")
+    )
+}
+
+# 4.4 - Defining an annotation about COVID-19 for time series charts
+covid_label = list(
+    x = "2020-04-10",
+    y = max("y"),
+    font = list(size = 14, color = "red"),
+    text = "Start of COVID-19 emergency \nmeasures in March 2020 \n---------->",
+    xref = "x",
+    yref = "paper",
+    xanchor = "left",
+    yanchor = "top",
+    align = "left",
+    showarrow = F
+)
 
 ############################################################
 

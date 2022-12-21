@@ -17,6 +17,7 @@
 library(dplyr)
 library(tidyr)
 library(stringi)
+library(lubridate)
 
 ############################################################
 ### Section 2: Functions ----
