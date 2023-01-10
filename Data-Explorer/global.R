@@ -200,7 +200,6 @@ covid_label = list(
     align = "left",
     showarrow = F
 )
-
 covid_arrow = list(
                    xref = "x",
                    yref = "paper",
