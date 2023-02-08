@@ -36,7 +36,7 @@ res <- function(df) {
       substr(loc_code, 1, 3) == "S12"
       ~ "Council area of residence",
       TRUE
-      ~ "NHS board of residence"
+      ~ "NHS Board of residence"
     ))
 }
 
@@ -48,7 +48,7 @@ treat <- function(df) {
     mutate(geo_type = case_when(
       substr(loc_code, 1, 3) == "S08" | loc_code %in% c("SB0801","SN0811")
       | hb_name %in% ("Unknown Health Board")
-        ~ "NHS board of treatment",
+        ~ "NHS Board of treatment",
       loc_code == "scot"
         ~ "Scotland",
       hb_name %in% c("Other", "Null") | loc_name == "Other"

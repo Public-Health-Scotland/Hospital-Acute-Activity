@@ -126,7 +126,7 @@ ui_code <- tagList( #needed for shinyjs
                               "provisional and subject to",
                               "change in future publications, as submissions",
                               "may be updated to reflect a more accurate and",
-                              "complete set of data from NHS boards"),
+                              "complete set of data from NHS Boards"),
                       tags$li("missing data points within graphs or missing",
                               "rows of data within the tables indicate ",
                               "‘no data’ or ‘no activity’"),
@@ -396,13 +396,13 @@ ui_code <- tagList( #needed for shinyjs
              h3("Cross-boundary flow"),
              p("This section shows where patients are treated.
            The top chart shows where patients living in each NHS
-           board are treated, while the bottom charts show data specific to
-           the NHS board selected in the ‘Select the board of interest’ dropdown menu.
-           The bottom left-hand chart shows where patients living in the NHS board
+           Board are treated, while the bottom charts show data specific to
+           the NHS Board selected in the ‘Select the board of interest’ dropdown menu.
+           The bottom left-hand chart shows where patients living in the NHS Board
            of interest are treated. The bottom right-hand chart shows where
-           patients treated in the NHS board of interest come from.
+           patients treated in the NHS Board of interest come from.
            Use the ‘Include flows within same board?’ tick box to include patients
-           treated in their own NHS board in the charts."),
+           treated in their own NHS Board in the charts."),
              p("Use the filters to select the data you are interested
            in. To view the data in a table, use the ‘Show/hide table’
            button. To download your data selection as a .csv file, use the
@@ -471,7 +471,7 @@ ui_code <- tagList( #needed for shinyjs
              column(4,
                     downloadButton(outputId = 'download_table',
                                    label = 'Download data')),
-             dataTableOutput("table_explorer", width = "95%"))))
+             DT::dataTableOutput("table_explorer", width = "95%"))))
 
 ############################################################
 ### Credentials ----

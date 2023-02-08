@@ -272,7 +272,7 @@ data_trend <- comb_all(data_trend_op, data_trend_ip) %>%
                                loc_name %in% "Raigmore Hospital" ~ "NHS Highland",
                                TRUE ~ hb_name)
            ) %>%
-    group_by(quarter_date, loc_name, measure, file) %>% 
+    group_by(quarter_date, loc_name, measure, geo_type, file) %>% 
     mutate(count = sum(count)) %>% 
     ungroup() %>%
     distinct() %>%
@@ -483,8 +483,8 @@ data_cbf <- bind_rows(data_cbf_ip, data_cbf_op) %>%
                                  substr(quarter_name, 7, 9), " ",
                                  year(quarter_end)),
            count.tooltip = paste0(hbres_name, " patients treated in ",
-                                  hbtreat_name, ": ",
-                                  prettyNum(count, big.mark = ",")
+                                  hbtreat_name, ": <b>",
+                                  prettyNum(count, big.mark = ","), "</b>"
                                   )
            )
 
