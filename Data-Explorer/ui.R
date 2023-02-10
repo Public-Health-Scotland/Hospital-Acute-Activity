@@ -94,9 +94,9 @@ ui_code <- tagList( #needed for shinyjs
                     p("When using the data explorer, please consider the",
                       "following:"),
                     tags$ul(
-                      tags$li("please note that this release includes Scotland going into emergency measures",
-                              "due to COVID-19, which is impacting on the volume",
-                              "of hospital activity and trends observed"),
+                      tags$li("please note that the volume of hospital activity", 
+                              "and trends observed continue to be impacted post-pandemic",
+                              "and during the recovery phase"),
                       tags$li("NHS Louisa Jordan hospital has been included within this publication: outpatient activity across",
                               "several specialties was undertaken from July 2020 and day case activity across several specialties",
                               "from January 2021 before NHS Louisa Jordan hospital closed at the end of March 2021"),
