@@ -82,8 +82,8 @@ output$locname_ui_trend <- renderUI({
                               ~ "Aberdeen City",
                               input$geotype_trend == "Hospital of treatment"
                               ~ "Aberdeen Royal Infirmary",
-                              input$geotype_trend %in% c("NHS board of residence",
-                                                         "NHS board of treatment")
+                              input$geotype_trend %in% c("NHS Board of residence",
+                                                         "NHS Board of treatment")
                               ~ "NHS Ayrshire & Arran"))})
 
 output$service_ui_trend <- renderUI({
@@ -264,8 +264,8 @@ output$locname_ui_trend_2 <- renderUI({
       ~ "Aberdeen City",
       input$geotype_trend == "Hospital of treatment"
       ~ "Aberdeen Royal Infirmary",
-      input$geotype_trend %in% c("NHS board of residence",
-                                 "NHS board of treatment")
+      input$geotype_trend %in% c("NHS Board of residence",
+                                 "NHS Board of treatment")
       ~ "NHS Ayrshire & Arran"))})
 
 output$service_ui_trend_2 <- renderUI({
@@ -848,7 +848,8 @@ output$sankey_all <- renderGvis({
                             'count',
                             'count.tooltip')],
              options = list(width = "automatic",
-                            sankey = opts)
+                            sankey = opts,
+                            tooltip = "{isHtml: 'true'}")
              )
   })
 
@@ -861,7 +862,8 @@ output$sankey_res <- renderGvis({
                options = list(width = "automatic",
                               # Change to chart for the html code
                               gvis.plot.tag = NULL,
-                              sankey = opts)
+                              sankey = opts,
+                              tooltip = "{isHtml: 'true'}")
                )
     })
 
@@ -875,7 +877,8 @@ output$sankey_treat <- renderGvis({
                options = list(width = "automatic",
                               # Change to chart for the html code
                               gvis.plot.tag = NULL,
-                              sankey = opts)
+                              sankey = opts,
+                              tooltip = "{isHtml: 'true'}")
                )
     })
 
@@ -951,196 +954,196 @@ data_table <- reactive({switch(
   
   # 7.1 - Beds Data
   "Beds" = data_bed %>%
-    # Create temporary year quarter variable to allow time period dropdown
-    # to be displayed chronologically
-    mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
-           quarter_name = forcats::fct_reorder(
-             quarter_name, quarter)) %>%
-    select(-quarter) %>%
-    rename(Geography_Level = hb_name,
-           Area_name = loc_name,
-           Specialty = spec_name,
-           Time_period = quarter_name,
-           Percentage_occupancy = p_occ,
-           Quarterly_available_staffed_bed_days = aasb,
-           Quarterly_occupied_bed_days = tobd,
-           Daily_average_available_staffed_beds = asb,
-           Daily_average_occupied_beds = aob) %>%
-    mutate_if(is.character, as.factor),
+      # Create temporary year quarter variable to allow time period dropdown
+      # to be displayed chronologically
+      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
+             quarter_name = forcats::fct_reorder(
+                 quarter_name, quarter)) %>%
+      select(-quarter) %>%
+      rename(Geography_Level = hb_name,
+             Area_name = loc_name,
+             Specialty = spec_name,
+             Time_period = quarter_name,
+             Percentage_occupancy = p_occ,
+             Quarterly_available_staffed_bed_days = aasb,
+             Quarterly_occupied_bed_days = tobd,
+             Daily_average_available_staffed_beds = asb,
+             Daily_average_occupied_beds = aob) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.2 - Specialty Data
   # 7.2.1 - Inpatient Data
   "Inpatients/day cases - Specialty" = data_spec %>%
-    filter(file == "Inpatients/day cases") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(geo_type, loc_name, measure, spec_name,
-           quarter_name, spells, los, avlos) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           Specialty = spec_name,
-           Time_period = quarter_name,
-           Spells = spells,
-           Total_length_stay = los,
-           Mean_length_stay = avlos) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Inpatients/day cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(geo_type, loc_name, measure, spec_name,
+             quarter_name, spells, los, avlos) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = spec_name,
+             Time_period = quarter_name,
+             Spells = spells,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.2.2 - Outpatient Data
   "Outpatients - Specialty" = data_spec %>%
-    filter(file == "Outpatients") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(geo_type, loc_name, measure, spec_name,
-           quarter_name, count, rate) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           Specialty = spec_name,
-           Time_period = quarter_name,
-           Appointments = count,
-           DNA_rate = rate) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(geo_type, loc_name, measure, spec_name,
+             quarter_name, count, rate) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Specialty = spec_name,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.3 - SIMD Data
   # 7.3.1 - Inpatient Data
   "Inpatients/day cases - Deprivation (SIMD)" = data_simd %>%
-    filter(file == "Inpatients/day cases") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(geo_type, loc_name, measure, simd,
-           quarter_name, count, los, avlos) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           SIMD_quintile = simd,
-           Time_period = quarter_name,
-           Stays = count,
-           Total_length_stay = los,
-           Mean_length_stay = avlos) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Inpatients/day cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, los, avlos) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.3.2 - Outpatient Data
   "Outpatients - Deprivation (SIMD)" = data_simd %>%
-    filter(file == "Outpatients") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(geo_type, loc_name, measure, simd,
-           quarter_name, count, rate) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           SIMD_quintile = simd,
-           Time_period = quarter_name,
-           Appointments = count,
-           DNA_rate = rate) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(geo_type, loc_name, measure, simd,
+             quarter_name, count, rate) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             SIMD_quintile = simd,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.4 - Time Trend Data
   # 7.4.1 - Inpatient Data
   "Inpatients/day cases - Time trend" = data_trend %>%
-    filter(file == "Inpatients/day cases") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, quarter_date_last)) %>%
-    select(geo_type, loc_name, measure,
-           quarter_name, count, los, avlos) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           Time_period = quarter_name,
-           Stays = count,
-           Total_length_stay = los,
-           Mean_length_stay = avlos) %>%
-    mutate_if(is.character, as.factor),
+      filter(file %in% "Inpatients/day cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, quarter_date_last)) %>%
+      select(geo_type, loc_name, measure,
+             quarter_name, count, los, avlos) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.4.2 - Outpatient Data
   "Outpatients - Time trend" = data_trend %>%
-    filter(file == "Outpatients") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, quarter_date_last)) %>%
-    select(geo_type,loc_name, quarter_name,
-           measure, count, rate) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Time_period = quarter_name,
-           Type_case = measure,
-           Appointments = count,
-           DNA_rate = rate) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, quarter_date_last)) %>%
+      select(geo_type,loc_name, quarter_name,
+             measure, count, rate) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Time_period = quarter_name,
+             Type_case = measure,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.5 - Population Pyramid Data
   # 7.5.1 - Inpatient Data
   "Inpatients/day cases - Age/sex" = data_pyramid %>%
-    filter(file == "Inpatients/day cases") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, quarter_date_last)) %>%
-    select(geo_type, loc_name, measure, sex, age,
-           quarter_name, count, los, avlos) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           Sex = sex,
-           Age_group = age,
-           Time_period = quarter_name,
-           Stays = count,
-           Total_length_stay = los,
-           Mean_length_stay = avlos) %>%
-    mutate(Stays = abs(Stays)) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Inpatients/day cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, quarter_date_last)) %>%
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, los, avlos) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Stays = count,
+             Total_length_stay = los,
+             Mean_length_stay = avlos) %>%
+      mutate(Stays = abs(Stays)) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.5.2 - Outpatient Data
   "Outpatients - Age/sex" = data_pyramid %>%
-    filter(file == "Outpatients") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, quarter_date_last)) %>%
-    select(geo_type, loc_name, measure, sex, age,
-           quarter_name, count, rate) %>%
-    rename(Geography_level = geo_type,
-           Area_name = loc_name,
-           Type_case = measure,
-           Sex = sex,
-           Age_group = age,
-           Time_period = quarter_name,
-           Appointments = count,
-           DNA_rate = rate) %>%
-    mutate(Appointments = abs(Appointments)) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, quarter_date_last)) %>%
+      select(geo_type, loc_name, measure, sex, age,
+             quarter_name, count, rate) %>%
+      rename(Geography_level = geo_type,
+             Area_name = loc_name,
+             Type_case = measure,
+             Sex = sex,
+             Age_group = age,
+             Time_period = quarter_name,
+             Appointments = count,
+             DNA_rate = rate) %>%
+      mutate(Appointments = abs(Appointments)) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.6 - Cross-Boundary Data
   # 7.6.1 - Inpatient Data
   "Inpatients/day cases - Cross-boundary flow" = data_cbf %>%
-    filter(file == "Inpatients/day cases") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(hbres_name, hbtreat_name,
-           quarter_name, count) %>%
-    arrange(quarter_name) %>%
-    rename(Health_board_residence = hbres_name,
-           Health_board_treatment = hbtreat_name,
-           Time_period = quarter_name,
-           Stays = count) %>%
-    mutate_if(is.character, as.factor),
+      filter(file == "Inpatients/day cases") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Stays = count) %>%
+      mutate_if(is.character, as.factor),
   
   # 7.6.2 - Outpatient Data
   "Outpatients - Cross-boundary flow" = data_cbf %>%
-    filter(file == "Outpatients") %>%
-    mutate(quarter_name = forcats::fct_reorder(
-      quarter_name, dmy(quarter_date))) %>%
-    select(hbres_name, hbtreat_name,
-           quarter_name, count) %>%
-    arrange(quarter_name) %>%
-    rename(Health_board_residence = hbres_name,
-           Health_board_treatment = hbtreat_name,
-           Time_period = quarter_name,
-           Appointments = count) %>%
-    mutate_if(is.character, as.factor))
+      filter(file == "Outpatients") %>%
+      mutate(quarter_name = forcats::fct_reorder(
+          quarter_name, dmy(quarter_date))) %>%
+      select(hbres_name, hbtreat_name,
+             quarter_name, count) %>%
+      arrange(quarter_name) %>%
+      rename(Health_board_residence = hbres_name,
+             Health_board_treatment = hbtreat_name,
+             Time_period = quarter_name,
+             Appointments = count) %>%
+      mutate_if(is.character, as.factor))
 })
 
 # Creating the table
-output$table_explorer <- renderDataTable({
+output$table_explorer <- DT::renderDataTable({
   # Remove the underscore from column names in the table
   table_colnames  <-  gsub("_", " ", colnames(data_table()))
-  datatable(data_table(),
+  DT::datatable(data_table(),
             style = 'bootstrap',
             class = 'table-bordered table-condensed',
             rownames = FALSE,

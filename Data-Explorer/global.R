@@ -13,18 +13,18 @@
 ### Section 1: Housekeeping ----
 
 # 1.1 - Load libraries (latest version used shown next to each package)
-library(shiny) # v. 1.7.3
-library(DT) # v. 0.26
+library(shiny) # v. 1.7.1
+library(DT) # v. 0.20
 library(googleVis) # v. 0.7.0
-library(htmltools) # v. 0.5.2
+library(htmltools) # v. 0.5.4
 library(plotly) # v. 4.10.0
 library(dplyr) # v. 1.0.9
 library(tidyr) # v. 1.2.0
 library(readr) # v. 2.1.2
 library(zoo) # v. 1.8-10
 library(lubridate) # v. 1.8.0
-library(shinyWidgets) # v. 0.7.0
-library(shinymanager) # v. 1.0.400
+library(shinyWidgets) # v. 0.6.2
+library(shinymanager) # v. 1.0.410
 
 ## Update each quarter
 data_up_to <- "30-september-2022"
@@ -48,7 +48,7 @@ credentials <- merge(credentials, read_csv(credential_filepath,
                                            col_types = cols()))
 
 # Uncomment this line to remove authentication:
- #credentials <- list(authorisation = "Public")
+# credentials <- list(authorisation = "Public")
 
 # Publication URL
 pub_url = paste0("https://publichealthscotland.scot/publications/",
@@ -192,7 +192,7 @@ covid_label = list(
     x = "2020-04-10",
     y = max("y"),
     font = list(size = 14, color = "red"),
-    text = "Start of COVID-19 emergency \nmeasures in March 2020",
+    text = "COVID-19 emergency measures \nMarch 2020",
     xref = "x",
     yref = "paper",
     xanchor = "left",
