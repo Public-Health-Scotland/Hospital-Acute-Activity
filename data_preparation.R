@@ -65,7 +65,7 @@ data_bed <- data_bed %>%
     select(-c(quarter_date, hb_code, loc_code)) %>%
     mutate_at(c("asb", "aob", "p_occ"), list(~round_half_up(., 1))) %>%
     # Creating new quarter name variable for dropdowns and plots
-    mutate(quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+    mutate(quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                                  substr(quarter_name, 7, 9), " 20",
                                  substr(quarter_name, 11, 12)
                                  )
@@ -123,7 +123,7 @@ data_spec <- comb_all(data_spec_op,
     filter(geo_type != "Other") %>%
     # Creating new quarter end and name variables for dropdowns and plots
     mutate(quarter_end = dmy(quarter_date),
-           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+           quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                                  substr(quarter_name, 7, 9), " ",
                                  year(quarter_end)
                                  )
@@ -194,7 +194,7 @@ data_simd <- comb_all(data_simd_op, data_simd_ip) %>%
         "5" = "5 - Least deprived"),
         # Creating new quarter end and name variables for dropdowns and plots
         quarter_end = dmy(quarter_date),
-        quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+        quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                               substr(quarter_name, 7, 9), " ",
                               year(quarter_end)
                               )
@@ -259,7 +259,7 @@ data_trend <- comb_all(data_trend_op, data_trend_ip) %>%
     mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y"),
            # Creating new quarter end and name variables for dropdowns and plots
            quarter_end = dmy(quarter_date),
-           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+           quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                                  substr(quarter_name, 7, 9), " ",
                                  year(quarter_end)),
            # Adding in a fix for hospitals listed under multiple health boards in ISD(S)1.
@@ -355,7 +355,7 @@ data_pyramid <- comb_all(data_pyramid_op, data_pyramid_ip) %>%
     mutate(quarter_date_last = as.yearmon(quarter_date, "%d/%m/%Y"),
            # Creating new quarter end and name variables for dropdowns and plots
            quarter_end = dmy(quarter_date),
-           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+           quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                                  substr(quarter_name, 7, 9), " ",
                                  year(quarter_end)
                                  )
@@ -479,7 +479,7 @@ data_cbf_op <-  read_csv(paste0(
 data_cbf <- bind_rows(data_cbf_ip, data_cbf_op) %>% 
     # Creating new quarter end and name variables for dropdowns and plots
     mutate(quarter_end = dmy(quarter_date),
-           quarter_name = paste0(substr(quarter_name, 1, 3), "–",
+           quarter_name = paste0(substr(quarter_name, 1, 3), "-",
                                  substr(quarter_name, 7, 9), " ",
                                  year(quarter_end)),
            count.tooltip = paste0(hbres_name, " patients treated in ",

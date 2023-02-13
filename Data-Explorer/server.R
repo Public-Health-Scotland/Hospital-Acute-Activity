@@ -125,7 +125,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Not specified – inpatients",
+             "Not specified - inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))
@@ -135,7 +135,7 @@ output$trend_plot <- renderPlotly({
     (input$measure_trend == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Not specified – inpatients",
+             "Not specified - inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend ))))))
@@ -313,7 +313,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Total length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Not specified – inpatients",
+             "Not specified - inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 ))
@@ -323,7 +323,7 @@ output$trend_plot_2 <- renderPlotly({
     (input$measure_trend_2 == "Mean length of stay (days)" &
      !(any(c("Elective inpatients",
              "Emergency inpatients",
-             "Not specified – inpatients",
+             "Not specified - inpatients",
              "All inpatients and day cases",
              "All inpatients",
              "All day cases") %in% input$service_trend_2 )))
@@ -544,7 +544,8 @@ output$pyramid_plot <- renderPlotly({
             color = ~sex,
             colors = trend_pal[2:1],
             text = tooltip_pyr,
-            hoverinfo = "text") %>%
+            textposition = 'inside',
+            hoverinfo = 'text') %>% 
       add_bars(orientation = 'h') %>%
       layout(bargap = 0.1,
              barmode = 'overlay',
@@ -956,7 +957,7 @@ data_table <- reactive({switch(
   "Beds" = data_bed %>%
       # Create temporary year quarter variable to allow time period dropdown
       # to be displayed chronologically
-      mutate(quarter = as.yearqtr(quarter_name, format = "%b - %b-%y"),
+      mutate(quarter = lubridate::my(substr(quarter_name, 5, 12)),
              quarter_name = forcats::fct_reorder(
                  quarter_name, quarter)) %>%
       select(-quarter) %>%

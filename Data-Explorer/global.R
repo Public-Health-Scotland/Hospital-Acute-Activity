@@ -134,7 +134,7 @@ geo_type_trend <- data_trend %>%
 # 3.5 - Time Trend services
 trend_service <- data_trend %>%
   distinct(measure) %>%
-  filter(measure != "Not specified – inpatients") %>%
+  filter(measure != "Not specified - inpatients") %>%
   pull(measure)
 
 # 3.6 - Time Trend measures
@@ -146,7 +146,7 @@ trend_measure <- c("Number of stays/appointments",
 # 3.7 - Pyramid services
 pyramid_service <- data_pyramid %>%
   distinct(measure) %>%
-  filter(measure != "Not specified – inpatients") %>%
+  filter(measure != "Not specified - inpatients") %>%
   pull(measure)
 
 

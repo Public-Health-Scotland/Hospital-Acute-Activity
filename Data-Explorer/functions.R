@@ -99,7 +99,7 @@ comb_all <- function(df_1, df_2) {
       "All Day cases" = "All day cases",
       "Emergency Inpatients" = "Emergency inpatients",
       "Elective Inpatients" = "Elective inpatients",
-      "Not Specified" = "Not specified – inpatients"
+      "Not Specified" = "Not specified - inpatients"
     ))
 }
 
