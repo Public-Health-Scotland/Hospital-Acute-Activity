@@ -485,9 +485,9 @@ data_cbf <- bind_rows(data_cbf_ip, data_cbf_op) %>%
            count.tooltip = paste0(hbres_name, " patients treated in ",
                                   hbtreat_name, ": <b>",
                                   prettyNum(count, big.mark = ","), "</b>"
-                                  )
-           )
-
+                                  )) %>% 
+            filter(count > 0)
+           
 # Save file
 saveRDS(data_cbf, paste0(rds_filepath, "cbf.rds"))
 
