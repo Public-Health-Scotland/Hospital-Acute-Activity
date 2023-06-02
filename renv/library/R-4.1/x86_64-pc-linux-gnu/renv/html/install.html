@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Install Packages</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for install {renv}"><tr><td>install {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Install Packages</h2>
+
+<h3>Description</h3>
+
+<p>Install one or more <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> packages, from a variety of remote sources.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+install(
+  packages = NULL,
+  ...,
+  library = NULL,
+  type = NULL,
+  rebuild = FALSE,
+  repos = NULL,
+  prompt = interactive(),
+  dependencies = NULL,
+  project = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>packages</code></td>
+<td>
+<p>A character vector of <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> packages to install. Required
+package dependencies (<code>Depends</code>, <code>Imports</code>, <code>LinkingTo</code>) will be installed
+as required.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Unused arguments, reserved for future expansion. If any arguments
+are matched to <code>...</code>, <code>renv</code> will signal an error.</p>
+</td></tr>
+<tr valign="top"><td><code>library</code></td>
+<td>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> library to be used. When <code>NULL</code>, the active project
+library will be used instead.</p>
+</td></tr>
+<tr valign="top"><td><code>type</code></td>
+<td>
+<p>The type of package to install (&quot;source&quot; or &quot;binary&quot;). Defaults
+to the value of <code>getOption("pkgType")</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>rebuild</code></td>
+<td>
+<p>Force packages to be rebuilt, thereby bypassing any installed
+versions of the package available in the cache? This can either be a
+boolean (indicating that all installed packages should be rebuilt), or a
+vector of package names indicating which packages should be rebuilt.</p>
+</td></tr>
+<tr valign="top"><td><code>repos</code></td>
+<td>
+<p>The repositories to use during restore, for packages installed
+from CRAN or another similar R package repository. When set, this will
+override any repositories declared in the lockfile. See also the
+<code>repos.override</code> option in <a href="../../renv/help/config.html">config</a> for an alternate way to provide a
+repository override.</p>
+</td></tr>
+<tr valign="top"><td><code>prompt</code></td>
+<td>
+<p>Boolean; prompt the user before taking any action? For backwards
+compatibility, <code>confirm</code> is accepted as an alias for <code>prompt</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>dependencies</code></td>
+<td>
+<p>A vector of DESCRIPTION field names that should be used
+for package dependency resolution. When <code>NULL</code> (the default), the value
+of <code>renv::settings$package.dependency.fields</code> is used. The aliases
+&quot;strong&quot;, &quot;most&quot;, and &quot;all&quot; are also supported.
+See <code><a href="../../tools/help/package_dependencies.html">tools::package_dependencies()</a></code> for more details.</p>
+</td></tr>
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>install()</code> uses the same machinery as <code><a href="../../renv/help/restore.html">restore()</a></code> when installing packages.
+In particular, this means that the local cache of package installations is
+used when possible. This helps to avoid re-downloading packages that have
+already been downloaded before, and re-compiling packages from source when
+a binary copy of that package is already available.
+</p>
+
+
+<h3>Value</h3>
+
+<p>A named list of package records which were installed by <code>renv</code>.
+</p>
+
+
+<h3>Project DESCRIPTION Files</h3>
+
+<p>If your project contains a <code>DESCRIPTION</code> file, then calling <code>install()</code>
+without any arguments will instruct <code>renv</code> to install the latest versions of
+all packages as declared within that <code>DESCRIPTION</code> file's <code>Depends</code>,
+<code>Imports</code> and <code>LinkingTo</code> fields; similar to how an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> package might declare
+its dependencies.
+</p>
+<p>If you have one or more packages that you'd like to install from a separate
+remote source, this can be accomplished by adding a <code style="white-space: pre;">Remotes:</code> field to the
+<code>DESCRIPTION</code> file. See <code>vignette("dependencies", package = "devtools")</code>
+for more details. Alternatively, view the vignette online at
+<a href="https://devtools.r-lib.org/articles/dependencies.html">https://devtools.r-lib.org/articles/dependencies.html</a>.
+</p>
+<p>Note that <code>install()</code> does not use the project's <code>renv.lock</code> when determining
+sources for packages to be installed. If you want to install packages using
+the sources declared in the lockfile, consider using <code>restore()</code> instead.
+Otherwise, you can declare the package sources in your <code>DESCRIPTION</code>'s
+<code style="white-space: pre;">Remotes:</code> field.
+</p>
+
+
+<h3>Remotes Syntax</h3>
+
+<p><code>renv</code> supports a subset of the <code>remotes</code> syntax used for package installation,
+as described in <a href="https://remotes.r-lib.org/articles/dependencies.html">https://remotes.r-lib.org/articles/dependencies.html</a>. See
+the examples below for more details.
+</p>
+<p>If you wish to install packages from an external source requiring authentication
+(e.g. a private GitHub repository), see the <strong>Authentication</strong> documentation
+online at <a href="https://rstudio.github.io/renv/articles/renv.html#authentication">https://rstudio.github.io/renv/articles/renv.html#authentication</a>,
+or view the documentation locally in the <strong>Getting Started</strong> vignette with
+<code>vignette("renv", package = "renv")</code>.
+</p>
+
+
+<h3>Bioconductor</h3>
+
+<p>Packages from Bioconductor can be installed by using the <code style="white-space: pre;">bioc::</code> prefix.
+For example,
+</p>
+<div class="sourceCode"><pre>renv::install("bioc::Biobase")
+</pre></div>
+<p>will install the latest-available version of <code>Biobase</code> from Bioconductor.
+</p>
+<p><code>renv</code> depends on <code>BiocManager</code> (or, for older versions of <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>, <code>BiocInstaller</code>)
+for the installation of packages from Bioconductor. If these packages are
+not available, <code>renv</code> will attempt to automatically install them before
+fulfilling the installation request.
+</p>
+
+
+<h3>Package Configuration</h3>
+
+<p>Many <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> packages have a <code>configure</code> script that needs to be run to prepare
+the package for installation. Arguments and environment variables can be
+passed through to those scripts in a manner similar to <a href="../../utils/html/install.packages.html">install.packages</a>.
+In particular, the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> options <code>configure.args</code> and <code>configure.vars</code> can be
+used to map package names to their appropriate configuration. For example:
+</p>
+<div class="sourceCode"><pre># installation of RNetCDF may require us to set include paths for netcdf
+configure.args = c(RNetCDF = "--with-netcdf-include=/usr/include/udunits2"))
+options(configure.args = configure.args)
+renv::install("RNetCDF")
+</pre></div>
+<p>This could also be specified as, for example,
+</p>
+<div class="sourceCode"><pre>options(
+  configure.args.RNetCDF = "--with-netcdf-include=/usr/include/udunits2"
+)
+renv::install("RNetCDF")
+</pre></div>
+<p>Similarly, additional flags that should be passed to <code style="white-space: pre;">R CMD INSTALL</code> can
+be set via the <code>install.opts</code> <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> option:
+</p>
+<div class="sourceCode"><pre># installation of R packages using the Windows Subsystem for Linux
+# may require the `--no-lock` flag to be set during install
+options(install.opts = "--no-lock")
+renv::install("xml2")
+
+# alternatively, you can set such options for specific packages with e.g.
+options(install.opts = list(xml2 = "--no-lock"))
+renv::install("xml2")
+</pre></div>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+
+# install the latest version of 'digest'
+renv::install("digest")
+
+# install an old version of 'digest' (using archives)
+renv::install("digest@0.6.18")
+
+# install 'digest' from GitHub (latest dev. version)
+renv::install("eddelbuettel/digest")
+
+# install a package from GitHub, using specific commit
+renv::install("eddelbuettel/digest@df55b00bff33e945246eff2586717452e635032f")
+
+# install a package from Bioconductor
+# (note: requires the BiocManager package)
+renv::install("bioc::Biobase")
+
+# install a package, specifying path explicitly
+renv::install("~/path/to/package")
+
+# install packages as declared in the project DESCRIPTION file
+renv::install()
+
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

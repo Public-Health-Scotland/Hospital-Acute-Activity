@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Clean a Project</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for clean {renv}"><tr><td>clean {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Clean a Project</h2>
+
+<h3>Description</h3>
+
+<p>Clean up a project and its associated <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> libraries.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+clean(project = NULL, ..., actions = NULL, prompt = interactive())
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Unused arguments, reserved for future expansion. If any arguments
+are matched to <code>...</code>, <code>renv</code> will signal an error.</p>
+</td></tr>
+<tr valign="top"><td><code>actions</code></td>
+<td>
+<p>The set of clean actions to take. See the documentation in
+<strong>Actions</strong> for a list of available actions, and the default actions
+taken when no actions are supplied.</p>
+</td></tr>
+<tr valign="top"><td><code>prompt</code></td>
+<td>
+<p>Boolean; prompt the user before taking any action? For backwards
+compatibility, <code>confirm</code> is accepted as an alias for <code>prompt</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>The project directory, invisibly. Note that this function is normally
+called for its side effects.
+</p>
+
+
+<h3>Actions</h3>
+
+<p>The following clean actions are available:
+</p>
+
+<dl>
+<dt><code>package.locks</code></dt><dd>
+<p>During package installation, <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> will create package locks in the
+library path, typically named <code style="white-space: pre;">00LOCK-&lt;package&gt;</code>. On occasion, if package
+installation fails or <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> is terminated while installing a package, these
+locks can be left behind and will inhibit future attempts to reinstall
+that package. Use this action to remove such left-over package locks.
+</p>
+</dd>
+<dt><code>library.tempdirs</code></dt><dd>
+<p>During package installation, <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> may create temporary directories with
+names of the form <code style="white-space: pre;">file\w{12}</code>, and on occasion those files can be
+left behind even after they are no longer in use. Use this action to
+remove such left-over directories.
+</p>
+</dd>
+<dt><code>system.library</code></dt><dd>
+<p>In general, it is recommended that only packages distributed with <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+are installed into the system library (the library path referred to
+by <code>.Library</code>). Use this action to remove any user-installed packages
+that have been installed to the system library.
+</p>
+<p>Because this action is destructive, it is by default never run &ndash; it
+must be explicitly requested by the user.
+</p>
+</dd>
+<dt><code>unused.packages</code></dt><dd>
+<p>Remove packages that are installed in the project library, but no longer
+appear to be used in the project sources.
+</p>
+<p>Because this action is destructive, it is by default only run in
+interactive sessions when prompting is enabled.
+</p>
+</dd>
+</dl>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+
+# clean the current project
+renv::clean()
+
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

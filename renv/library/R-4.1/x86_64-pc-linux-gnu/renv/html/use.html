@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Use a set of Packages</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for use {renv}"><tr><td>use {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Use a set of Packages</h2>
+
+<h3>Description</h3>
+
+<p>Given a set of <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> package requirements, install those packages into the
+library path requested via <code>library</code>, and then activate that library path.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+use(
+  ...,
+  lockfile = NULL,
+  library = NULL,
+  isolate = FALSE,
+  sandbox = TRUE,
+  attach = FALSE,
+  verbose = TRUE
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> packages to be used with this script. Ignored if <code>lockfile</code> is
+non-<code>NULL</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>lockfile</code></td>
+<td>
+<p>The lockfile to use. When supplied, <code>renv</code> will use the packages as
+declared in the lockfile.</p>
+</td></tr>
+<tr valign="top"><td><code>library</code></td>
+<td>
+<p>The library path into which the requested packages should be installed.
+When <code>NULL</code> (the default), a library path within the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> temporary
+directory will be generated and used. Note that this same library path
+will be re-used on future calls to <code>renv::use()</code>, allowing <code>renv::use()</code>
+to be used multiple times within a single script.</p>
+</td></tr>
+<tr valign="top"><td><code>isolate</code></td>
+<td>
+<p>Boolean; should the active library paths be included in the set of library
+paths activated for this script? Set this to <code>TRUE</code> if you only want the
+packages provided to <code>renv::use()</code> to be visible on the library paths.</p>
+</td></tr>
+<tr valign="top"><td><code>sandbox</code></td>
+<td>
+<p>Should the system library be sandboxed? See the sandbox documentation in
+<a href="../../renv/help/config.html">config</a> for more details. You can also provide an explicit sandbox
+path if you want to configure where <code>renv::use()</code> generates its sandbox.
+By default, the sandbox is generated within the <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> temporary directory.</p>
+</td></tr>
+<tr valign="top"><td><code>attach</code></td>
+<td>
+<p>Boolean; should the set of requested packages be automatically attached?
+If <code>TRUE</code>, packages will be loaded and attached via a call
+to <code><a href="../../base/html/library.html">library()</a></code> after install. Ignored if <code>lockfile</code> is non-<code>NULL</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+<p>Boolean; be verbose while installing packages?</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p><code>renv::use()</code> is intended to be used within standalone <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> scripts. It can
+be useful when you'd like to specify an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> script's dependencies directly
+within that script, and have those packages automatically installed and
+loaded when the associated script is run. In this way, an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> script can more
+easily be shared and re-run with the exact package versions requested via
+<code>use()</code>.
+</p>
+<p><code>renv::use()</code> is inspired in part by the <a href="https://groundhogr.com/">groundhog</a>
+package, which also allows one to specify a script's <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> package requirements
+within that same <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> script.
+</p>
+
+
+<h3>Value</h3>
+
+<p>This function is normally called for its side effects.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

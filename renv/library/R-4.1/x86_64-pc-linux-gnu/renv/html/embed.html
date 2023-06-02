@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Embed a Lockfile</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for embed {renv}"><tr><td>embed {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Embed a Lockfile</h2>
+
+<h3>Description</h3>
+
+<p>Use <code>embed()</code> to embed a compact representation of an <code>renv</code> lockfile
+directly within a file, using <code><a href="../../renv/help/use.html">use()</a></code> to automatically provision an
+<span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> library when that script is run.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+embed(path = NULL, ..., lockfile = NULL, project = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>path</code></td>
+<td>
+<p>The path to an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> or R Markdown script.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Unused arguments, reserved for future expansion. If any arguments
+are matched to <code>...</code>, <code>renv</code> will signal an error.</p>
+</td></tr>
+<tr valign="top"><td><code>lockfile</code></td>
+<td>
+<p>The path to an <code>renv</code> lockfile. When <code>NULL</code> (the default), the project
+lockfile will be read (if any); otherwise, a new lockfile will be generated
+from the current library paths.</p>
+</td></tr>
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Using <code>embed()</code> is useful if you'd like to be able to share &quot;reproducible&quot;
+R scripts &ndash; when these scripts are sourced, the generated call to
+<code>renv::use()</code> will ensure that an R library with the requested packages
+is automatically provisioned.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

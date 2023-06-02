@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Activate a Project</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for activate {renv}"><tr><td>activate {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Activate a Project</h2>
+
+<h3>Description</h3>
+
+<p>Activate a project, thereby loading it in the current session and also
+writing the infrastructure necessary to ensure the project is auto-loaded
+for newly-launched <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> sessions.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+activate(project = NULL, profile = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+<tr valign="top"><td><code>profile</code></td>
+<td>
+<p>The profile to be activated. When <code>NULL</code>, the default
+profile is activated instead. See <code>vignette("profiles", package = "renv")</code>
+for more information.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Using <code>activate()</code> will:
+</p>
+
+<ol>
+<li><p> Load the requested project via <code><a href="../../renv/help/load.html">load()</a></code>,
+</p>
+</li>
+<li><p> Add <code>source("renv/activate.R")</code> to the project <code>.Rprofile</code>, thereby
+instructing newly-launched <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> sessions to automatically load the
+current project.
+</p>
+</li></ol>
+
+<p>Normally, <code>activate()</code> is called as part of <code><a href="../../renv/help/init.html">init()</a></code> when a project
+is first initialized. However, <code>activate()</code> can be used to activate
+(or re-activate) an <code>renv</code> project &ndash; for example, if the project was shared
+without the auto-loader included in the project <code>.Rprofile</code>, or because
+that project was previously deactivated (via <code><a href="../../renv/help/deactivate.html">deactivate()</a></code>).
+</p>
+
+
+<h3>Value</h3>
+
+<p>The project directory, invisibly. Note that this function is normally
+called for its side effects.
+</p>
+
+
+<h3>See Also</h3>
+
+<p>Other renv: 
+<code><a href="../../renv/help/deactivate.html">deactivate</a>()</code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+
+# activate the current project
+renv::activate()
+
+# activate a separate project
+renv::activate("~/projects/analysis")
+
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

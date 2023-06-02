@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Vendor renv in an R Package</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for vendor {renv}"><tr><td>vendor {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Vendor renv in an R Package</h2>
+
+<h3>Description</h3>
+
+<p>Vendor a copy of <code>renv</code> in an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> package.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+vendor(
+  version = NULL,
+  repository = "https://github.com/rstudio/renv",
+  sources = NULL,
+  project = getwd()
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>version</code></td>
+<td>
+<p>The version of <code>renv</code> to vendor. If <code>NULL</code> (the default),
+the current version of <code>renv</code> will be used. Ignored if <code>sources</code>
+is non-<code>NULL</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>repository</code></td>
+<td>
+<p>The Git repository from which <code>renv</code> should be retrieved.
+<code>renv</code> will use <code style="white-space: pre;">git clone &lt;repository&gt; --branch &lt;version&gt;</code> to download
+the required <code>renv</code> sources. Ignored if <code>sources</code> is non-<code>NULL</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>sources</code></td>
+<td>
+<p>The path to local <code>renv</code> sources to be vendored.</p>
+</td></tr>
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project in which <code>renv</code> should be vendored.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Calling <code>renv::vendor()</code> will:
+</p>
+
+<ul>
+<li><p> Compile a vendored copy of <code>renv</code> to <code>inst/vendor/renv.R</code>,
+</p>
+</li>
+<li><p> Generate an <code>renv</code> auto-loader at <code>R/renv.R</code>.
+</p>
+</li></ul>
+
+<p>Using this, projects can take a dependency on <code>renv</code>, and use <code>renv</code>
+internals, in a CRAN-compliant way. After vendoring <code>renv</code>, you can
+use <code>renv</code> APIs in your package via the embedded <code>renv</code> environment;
+for example, you could call the <code><a href="../../renv/help/dependencies.html">dependencies()</a></code> function with:
+</p>
+<div class="sourceCode"><pre>renv$dependencies()
+</pre></div>
+<p>Be aware that <code>renv</code> internals might change in future releases, so if you
+need to rely on <code>renv</code> internal functions, we strongly recommend testing
+your usages of these functions to avoid potential breakage.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

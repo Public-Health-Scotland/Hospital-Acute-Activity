@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate renv Project Infrastructure</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for scaffold {renv}"><tr><td>scaffold {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generate renv Project Infrastructure</h2>
+
+<h3>Description</h3>
+
+<p>Write the <code>renv</code> project infrastructure for a project.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+scaffold(
+  project = NULL,
+  version = NULL,
+  repos = getOption("repos"),
+  settings = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+<tr valign="top"><td><code>version</code></td>
+<td>
+<p>The version of <code>renv</code> to associate with this project. By
+default, the version of <code>renv</code> currently installed is used.</p>
+</td></tr>
+<tr valign="top"><td><code>repos</code></td>
+<td>
+<p>The <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> repositories to associate with this project.</p>
+</td></tr>
+<tr valign="top"><td><code>settings</code></td>
+<td>
+<p>A list of <code>renv</code> settings, to be applied to the project
+after creation. These should map setting names to the desired values.
+See <a href="../../renv/help/settings.html">settings</a> for more details.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Invoking <code>renv::scaffold()</code> will:
+</p>
+
+<ul>
+<li><p> Install <code>renv</code> into the project library,
+</p>
+</li>
+<li><p> Update the project <code>.Rprofile</code> so that <code>renv</code> is automatically loaded
+for new <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> sessions launched in this project, and
+</p>
+</li>
+<li><p> Write a bare lockfile <code>renv.lock</code>.
+</p>
+</li></ul>
+
+
+
+<h3>Examples</h3>
+
+<pre>
+
+## Not run: 
+# create scaffolding with 'devtools' ignored
+renv::scaffold(settings = list(ignored.packages = "devtools"))
+
+## End(Not run)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

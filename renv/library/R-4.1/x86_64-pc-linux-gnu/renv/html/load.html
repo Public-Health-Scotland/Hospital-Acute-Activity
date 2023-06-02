@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Load a Project</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for load {renv}"><tr><td>load {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Load a Project</h2>
+
+<h3>Description</h3>
+
+<p>Load an <code>renv</code> project.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+load(project = NULL, quiet = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+<tr valign="top"><td><code>quiet</code></td>
+<td>
+<p>Boolean; be quiet during load?</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Calling <code>renv::load()</code> will set the session's library paths to use a
+project-local library, and perform some other work to ensure the project is
+properly isolated from other packages on the system.
+</p>
+<p>Normally, <code>renv::load()</code> is called automatically by the project auto-loader
+written to the project <code>.Rprofile</code> by <code><a href="../../renv/help/init.html">init()</a></code>. This allows <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> sessions
+launched from the root of an <code>renv</code> project directory to automatically load
+that project, without requiring explicit action from the user. However, if
+preferred or necessary, one can call <code>renv::load("&lt;project&gt;")</code> to explicitly
+load an <code>renv</code> project located at a particular path.
+</p>
+<p>Use <code><a href="../../renv/help/activate.html">activate()</a></code> to activate (or re-activate) an <code>renv</code> project, so
+that newly-launched <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> sessions can automatically load the associated
+project.
+</p>
+
+
+<h3>Value</h3>
+
+<p>The project directory, invisibly. Note that this function is normally
+called for its side effects.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+## Not run: 
+
+# load a project -- note that this is normally done automatically
+# by the project's auto-loader, but calling this explicitly to
+# load a particular project may be useful in some circumstances
+renv::load()
+
+
+## End(Not run)
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

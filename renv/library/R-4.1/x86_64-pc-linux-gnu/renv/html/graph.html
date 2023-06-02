@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate a Package Dependency Graph</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for graph {renv}"><tr><td>graph {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generate a Package Dependency Graph</h2>
+
+<h3>Description</h3>
+
+<p>Generate a package dependency graph.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+graph(
+  root = NULL,
+  leaf = NULL,
+  ...,
+  suggests = FALSE,
+  enhances = FALSE,
+  resolver = NULL,
+  renderer = c("DiagrammeR", "visNetwork"),
+  attributes = list(),
+  project = NULL
+)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>root</code></td>
+<td>
+<p>The top-most package dependencies of interest in the dependency graph.</p>
+</td></tr>
+<tr valign="top"><td><code>leaf</code></td>
+<td>
+<p>The bottom-most package dependencies of interest in the dependency graph.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Unused arguments, reserved for future expansion. If any arguments
+are matched to <code>...</code>, <code>renv</code> will signal an error.</p>
+</td></tr>
+<tr valign="top"><td><code>suggests</code></td>
+<td>
+<p>Should suggested packages be included within
+the dependency graph?</p>
+</td></tr>
+<tr valign="top"><td><code>enhances</code></td>
+<td>
+<p>Should enhanced packages be included within
+the dependency graph?</p>
+</td></tr>
+<tr valign="top"><td><code>resolver</code></td>
+<td>
+<p>An <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> function accepting a package name, and returning the
+contents of its <code>DESCRIPTION</code> file (as an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> <code>data.frame</code> or <code>list</code>).
+When <code>NULL</code> (the default), an internal resolver is used.</p>
+</td></tr>
+<tr valign="top"><td><code>renderer</code></td>
+<td>
+<p>Which package should be used to render the resulting graph?</p>
+</td></tr>
+<tr valign="top"><td><code>attributes</code></td>
+<td>
+<p>An <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span> list of graphViz attributes, mapping node names to
+attribute key-value pairs. For example, to ask graphViz to prefer orienting
+the graph from left to right, you can use
+<code>list(graph = c(rankdir = "LR"))</code>. See <a href="https://graphviz.org/doc/info/attrs.html">https://graphviz.org/doc/info/attrs.html</a>
+for a full list of the attributes supported by <code>graphViz</code>.</p>
+</td></tr>
+<tr valign="top"><td><code>project</code></td>
+<td>
+<p>The project directory. If <code>NULL</code>, then the active project will
+be used. If no project is currently active, then the current working
+directory is used instead.</p>
+</td></tr>
+</table>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+## Not run: 
+# graph the relationship between devtools and rlang
+graph(root = "devtools", leaf = "rlang")
+
+# figure out why a project depends on 'askpass'
+graph(leaf = "askpass")
+
+## End(Not run)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Generate 'renv.lock' from an RStudio Connect 'manifest.json'</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+
+<table width="100%" summary="page for renv_lockfile_from_manifest {renv}"><tr><td>renv_lockfile_from_manifest {renv}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>Generate <code>renv.lock</code> from an RStudio Connect <code>manifest.json</code></h2>
+
+<h3>Description</h3>
+
+<p>Use <code>renv_lockfile_from_manifest()</code> to convert a <code>manifest.json</code> file from
+an RStudio Connect content bundle into an <code>renv.lock</code> lockfile.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+renv_lockfile_from_manifest(manifest, lockfile = NA, project = NULL)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>manifest</code></td>
+<td>
+<p>The path to a <code>manifest.json</code> file.</p>
+</td></tr>
+<tr valign="top"><td><code>lockfile</code></td>
+<td>
+<p>The path to the lockfile to be generated and / or updated.
+When <code>NA</code> (the default), the generated lockfile is returned as an <span style="font-family: Courier New, Courier; color: #666666;"><b>R</b></span>
+object; otherwise, the lockfile will be written to the path specified by
+<code>lockfile</code>.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function can be useful when you need to recreate the package environment
+of a piece of content that is deployed to RStudio Connect. The content bundle
+contains a <code>manifest.json</code> file that is used to recreate the package
+environment. This function will let you convert that manifest file to an
+<code>renv.lock</code> file. Run <code>renv::restore()</code> after you've converted the file to
+restore the package environment.
+</p>
+<p>By default the <code>lockfile</code> argument is set to <code>NA</code>. This will not create a new
+<code>renv.lock</code> file. Rather, it will return a lockfile object (see <code>?lockfile</code>)
+that can be used to create a new <code>renv.lock</code> file. If <code>lockfile</code> is set to a
+character string, a new file will be created with that path &ndash; e.g.
+<code>renv.lock</code> &ndash; and the lockfile object will be returned.
+</p>
+
+
+<h3>Value</h3>
+
+<p>An <code>renv</code> lockfile.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>renv</em> version 0.17.0 <a href="00Index.html">Index</a>]</div>
+</div></body></html>
