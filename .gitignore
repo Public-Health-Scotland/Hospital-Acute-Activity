@@ -13,6 +13,9 @@ Data-Explorer/data/
 Data-Explorer/admin/
 Data-Explorer/rsconnect/
 
+# renv library folder #
+renv/library/
+
 # Common text files that may contain data #
 *.[cC][sS][vV]
 *.[tT][xX][tT]
