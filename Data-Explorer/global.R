@@ -27,7 +27,7 @@ library(shinyWidgets) # v. 0.6.2
 library(shinymanager) # v. 1.0.410
 
 ## Update each quarter
-data_up_to <- "31-december-2022"
+data_up_to <- "30-june-2023"
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
@@ -175,7 +175,7 @@ opts <- paste0("{
 
 # 4.3 - Defining a vline function for Plotly to add a vertical dashed line
 # to time series charts indicating the start of the pandemic
-vline <- function(x = 0, color = "red") {
+vline <- function(x = 0, color = "grey") {
     list(
         type = "line",
         y0 = 0,
@@ -189,32 +189,33 @@ vline <- function(x = 0, color = "red") {
 
 # 4.4 - Defining an annotation about COVID-19 for time series charts
 covid_label = list(
-    x = "2020-04-10",
-    y = max("y"),
-    font = list(size = 14, color = "red"),
-    text = "COVID-19 emergency measures \nMarch 2020",
-    xref = "x",
-    yref = "paper",
-    xanchor = "left",
-    yanchor = "top",
-    align = "left",
-    showarrow = F
+  x = "2020-04-10",
+  y = max("y"),
+  font = list(size = 14, color = "grey"),
+  text = "Start of COVID-19 \nemergency \nmeasures",
+  xref = "x",
+  yref = "paper",
+  xanchor = "left",
+  yanchor = "top",
+  align = "left",
+  showarrow = F
 )
-covid_arrow = list(
-                   xref = "x",
-                   yref = "paper",
-                   axref = 'x',                 
-                   ayref = 'paper',
-                   x = dmy("30-03-2021"),
-                   y = 0.9,
-                   ax = dmy("30-03-2020"),
-                   ay = 0.9,
-                   text = '',  
-                   font = list(size = 14, color = "red"),
-                   showarrow = TRUE,
-                   arrowhead = 2,
-                   arrowsize = 1.5,
-                   arrowcolor = 'red')
+
+covid_label_2 = list(
+  x = "2022-07-10",
+  y = max("y"),
+  font = list(size = 14, color = "grey"),
+  text = "End of COVID-19 \nemergency \nmeasures",
+  xref = "x",
+  yref = "paper",
+  xanchor = "left",
+  yanchor = "top",
+  align = "left",
+  showarrow = F
+)
+
+covid_lines = list(vline(x="2020-03-30"), vline(x="2022-06-30"))
+covid_labels = list(covid_label, covid_label_2)
 
 ############################################################
 

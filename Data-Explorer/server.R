@@ -196,8 +196,8 @@ output$trend_plot <- renderPlotly({
                           tickvals = data_trend_plot()$quarter_end,
                           tickmode = "array",
                           tickangle = -45),
-             shapes = list(vline(x=dmy("30-03-2020"))),
-             annotations = list(covid_label,covid_arrow)) %>%
+             shapes = covid_lines,
+             annotations = covid_annotations) %>%
       
       # Remove unnecessary buttons from the modebar.
       config(displayModeBar = TRUE,
@@ -389,8 +389,8 @@ output$trend_plot_2 <- renderPlotly({
                      tickvals = data_trend_plot_2()$quarter_end,
                      tickmode = "array",
                      tickangle = -45),
-        shapes = list(vline(x=dmy("30-03-2020"))),
-        annotations = list(covid_label,covid_arrow)) %>%
+        shapes = covid_lines,
+        annotations = covid_labels) %>%
       
       # Remove unnecessary buttons from the modebar.
       config(displayModeBar = TRUE,
