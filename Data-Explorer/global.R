@@ -27,7 +27,7 @@ library(shinyWidgets) # v. 0.6.2
 library(shinymanager) # v. 1.0.410
 
 ## Update each quarter
-data_up_to <- "30-june-2023"
+data_up_to <- "30-September-2023"
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
