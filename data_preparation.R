@@ -49,7 +49,7 @@ library(janitor)
 # 1.3 - Define filepaths - update pub_date each quarter.
 base_filepath <- "../../data/output/"
 rds_filepath <- "Data-Explorer/data/"
-pub_date <- ("-to-September-2023")
+pub_date <- ("-to-December-2023")
 
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
