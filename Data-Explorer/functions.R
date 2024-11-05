@@ -76,7 +76,7 @@ comb_outp <- function(df_1, df_2) {
   bind_rows(df_1, df_2) %>%
     rename(measure = appt_type) %>%
     mutate(file = "Outpatients",
-           rate = round(rate, 1))
+           dna_rate = round(dna_rate, 1))
 }
 
 # Section 2.5: Combining inpatient and outpatient files ----
