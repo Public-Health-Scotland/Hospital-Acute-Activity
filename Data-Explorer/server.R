@@ -755,7 +755,9 @@ selectInput("quarter_flow",
 
 # Reactive data
 # Creating dynamic selection of dataset.
-data_flow <- reactive({data_cbf %>%
+data_flow <- reactive({
+  req(input$datatype_flow)
+  data_cbf %>%
     subset(file == input$datatype_flow)})
 
 # For all HB
