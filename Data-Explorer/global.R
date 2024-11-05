@@ -27,7 +27,7 @@ library(shinyWidgets) # v. 0.6.2
 library(shinymanager) # v. 1.0.410
 
 ## Update each quarter
-data_up_to <- "31-december-2023"
+data_up_to <- "30-june-2024"
 
 # 1.2 - Define filepath
 # Note that this is the same folder as is specified in the data_preparation
@@ -46,9 +46,6 @@ credential_filepath = paste0(rds_filepath,"admin/credentials.csv")
 credentials <- list(authorisation = "Private")
 credentials <- merge(credentials, read_csv(credential_filepath,
                                            col_types = cols()))
-
-# Uncomment this line to remove authentication:
-# credentials <- list(authorisation = "Public")
 
 # Publication URL
 pub_url = paste0("https://publichealthscotland.scot/publications/",

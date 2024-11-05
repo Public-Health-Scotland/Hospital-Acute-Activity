@@ -493,13 +493,7 @@ ui_code <- tagList( #needed for shinyjs
 ############################################################
 ### Credentials ----
 
-if (credentials$authorisation=="Private"){
-  # Use secure_app if auth is private
-  secure_app(ui_code)
-} else if (credentials$authorisation=="Public"){
-  # Call ui with no credentials if auth is public
-  ui_code
-}
+secure_app(ui_code)
 
 ############################################################
 
