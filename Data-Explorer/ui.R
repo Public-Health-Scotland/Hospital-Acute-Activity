@@ -100,19 +100,7 @@ ui_code <- tagList( #needed for shinyjs
                       tags$li("NHS Louisa Jordan hospital has been included within this publication: outpatient activity across",
                               "several specialties was undertaken from July 2020 and day case activity across several specialties",
                               "from January 2021 before NHS Louisa Jordan hospital closed at the end of March 2021"),
-                      tags$li("this release does not include specific ",
-                              "COVID-19 information: visit our ",
-                              tags$a(
-                                href = paste0("https://www.publichealthscotland.scot/",
-                                              "our-areas-of-work/covid-19/covid-19-data-and-intelligence/"),
-                                "COVID-19 webpages",target = "_blank",class = "special-link"), 
-                              "for PHS COVID-19 information or the ",
-                              tags$a(
-                                href = paste0("https://www.gov.scot/coronavirus-covid-19/"),
-                                "Scottish Government website (external website)",target = "_blank",class = "special-link"),
-                              " for information on COVID-19 in Scotland"
-                              ),
-                      tags$li("this release includes the NHS Fife and NHS",
+                      tags$li("this release includes the NHS Fife, NHS Golden Jubilee (GJ), and NHS",
                               "Highland",
                               tags$a(href = paste0("https://www.gov.scot/policies/",
                                             "healthcare-standards/national-treatment-centres/"),
