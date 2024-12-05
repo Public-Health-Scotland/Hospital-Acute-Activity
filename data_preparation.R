@@ -181,7 +181,17 @@ data_simd_op_treat <- data_simd_op_treat %>%
 
 # 4.2.3 - Combine outpatient files
 data_simd_op <- comb_outp(data_simd_op_treat, data_simd_op_res) %>%
-  rename(count = attendances)
+  pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
+  mutate(measure = paste0(measure, "-", type),
+         measure = recode(measure,
+                          "All Appointments-attendances" = "All outpatient attendences",
+                          "All Appointments-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "New-attendances" = "New outpatient attendences",
+                          "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
+                          "Return-attendances" = "Return outpatient attendences",
+                          "Return-dna_count" = "Return outpatient Did Not Attend (DNAs)")) %>%
+  select(-type)
+
 
 # 4.3 - Combine inpatient and outpatient files, and
 #       Exclude null values, and
@@ -344,7 +354,16 @@ data_pyramid_op_treat <- read_csv(paste0(
 
 # 6.2.3 - Combine outpatient files
 data_pyramid_op <- comb_outp(data_pyramid_op_treat, data_pyramid_op_res) %>%
-  rename(count = attendances)
+  pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
+  mutate(measure = paste0(measure, "-", type),
+         measure = recode(measure,
+                          "All Appointments-attendances" = "All outpatient attendences",
+                          "All Appointments-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "New-attendances" = "New outpatient attendences",
+                          "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
+                          "Return-attendances" = "Return outpatient attendences",
+                          "Return-dna_count" = "Return outpatient Did Not Attend (DNAs)")) %>%
+  select(-type)
 
 # 6.3 - Combine inpatient and outpatient files, and
 #       Exclude null values

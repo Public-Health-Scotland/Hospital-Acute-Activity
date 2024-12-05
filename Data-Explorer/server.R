@@ -647,7 +647,7 @@ data_simd_plot <- reactive({data_simd %>%
 # Table data
 data_table_simd <- reactive({
   data_simd_plot() %>%
-    select(loc_name, quarter_name, measure, simd, count, dna_count, dna_rate, avlos)})
+    select(loc_name, quarter_name, measure, simd, count, dna_rate, avlos)})
 
 # Plotting simd bar chart
 output$simd_plot <- renderPlotly({
