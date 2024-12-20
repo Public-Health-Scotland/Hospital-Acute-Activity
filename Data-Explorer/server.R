@@ -1037,14 +1037,13 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, dmy(quarter_date))) %>%
       select(geo_type, loc_name, measure, simd,
-             quarter_name, count, dna_count, dna_rate) %>%
+             quarter_name, count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              SIMD_quintile = simd,
              Time_period = quarter_name,
-             Attendances = count,
-             DNA_count = dna_count,
+             Number = count,
              DNA_rate = dna_rate) %>%
       mutate_if(is.character, as.factor),
   
@@ -1107,17 +1106,16 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, quarter_date_last)) %>%
       select(geo_type, loc_name, measure, sex, age,
-             quarter_name, count, dna_count, dna_rate) %>%
+             quarter_name, count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Sex = sex,
              Age_group = age,
              Time_period = quarter_name,
-             Attendances = count,
-             DNA_count = dna_count,
+             Number = count,
              DNA_rate = dna_rate) %>%
-      mutate(Attendances = abs(Attendances)) %>%
+      mutate(Number = abs(Number)) %>%
       mutate_if(is.character, as.factor),
   
   # 7.6 - Cross-Boundary Data
