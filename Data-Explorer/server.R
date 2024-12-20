@@ -119,9 +119,9 @@ output$trend_plot <- renderPlotly({
     (is.data.frame(data_trend_plot()) &&
      nrow(data_trend_plot()) == 0) |
     (input$measure_trend %in% c("Did not attend appointments", "Did not attend rate (%)")&
-     !(any(c("All outpatient appointments",
-             "New outpatient appointments",
-             "Return outpatient appointments") %in% input$service_trend))
+     !(any(c("All outpatients",
+             "New outpatients",
+             "Return outpatients") %in% input$service_trend))
     )|
     (is.data.frame(data_trend_plot()) &&
      nrow(data_trend_plot()) == 0) |
@@ -230,7 +230,7 @@ output$table_trend <- renderDataTable({
             options = list(pageLength = 16,
                            dom = 'tip'),
             colnames = c("Location", "Quarter", "Type of activity",
-                         "Number", "DNA number", "DNA rate",
+                         "Stays/Attendances", "DNA number", "DNA rate",
                          "Total length of stay", "Mean length of stay"))})
 
 # Downloading data
@@ -239,7 +239,7 @@ output$download_trend <- downloadHandler(
   content = function(file) {
     write.table(table_trend_data(), file, row.names = FALSE,
                 col.names = c("Location", "Quarter", "Type of activity",
-                              "Number", "DNA number", "DNA rate",
+                              "Stays/Attendances", "DNA number", "DNA rate",
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
@@ -310,9 +310,9 @@ output$trend_plot_2 <- renderPlotly({
     (is.data.frame(data_trend_plot_2()) &&
      nrow(data_trend_plot_2()) == 0) |
     (input$measure_trend_2 %in% c("Did not attend appointments", "Did not attend rate (%)")&
-     !(any(c("All outpatient appointments",
-             "New outpatient appointments",
-             "Return outpatient appointments") %in% input$service_trend_2))
+     !(any(c("All outpatients",
+             "New outpatients",
+             "Return outpatients") %in% input$service_trend_2))
     )|
     (is.data.frame(data_trend_plot_2()) &&
      nrow(data_trend_plot_2()) == 0) |
@@ -429,7 +429,7 @@ output$table_trend_2 <- renderDataTable({
             options = list(pageLength = 16,
                            dom = 'tip'),
             colnames = c("Location", "Quarter", "Type of activity",
-                         "Number", "DNA number", "DNA rate",
+                         "Stays/Attendances", "DNA number", "DNA rate",
                          "Total length of stay", "Mean length of stay"))})
 
 # Downloading data
@@ -438,7 +438,7 @@ output$download_trend_2 <- downloadHandler(
   content = function(file) {
     write.table(table_trend_data_2(), file, row.names = FALSE,
                 col.names = c("Location", "Quarter", "Type of activity",
-                              "Number", "DNA number", "DNA rate",
+                              "Stays/Attendances", "DNA number", "DNA rate",
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
@@ -495,7 +495,7 @@ data_pyramid_plot <- reactive({data_pyramid %>%
 # Table data
 data_table_pyramid <- reactive({
   data_pyramid_plot() %>%
-    select(loc_name, quarter_name, measure, age, sex, count) %>%
+    select(loc_name, quarter_name, measure, age, sex, count, dna_rate, avlos) %>%
     # To go back to positive values
     mutate(count = abs(count))})
 
@@ -577,18 +577,22 @@ output$pyramid_plot <- renderPlotly({
 
 # Table
 output$table_pyramid <- renderDataTable({
-  datatable(data_table_pyramid(),
+  datatable(data_table_pyramid() %>%
+              select(-any_of(c(ifelse(!grepl("inpatient|day case", input$measure_pyramid),"avlos",""),
+                               ifelse(!grepl("DNA", input$measure_pyramid), "dna_rate", "")))) %>%
+              rename(any_of(c("Location" = "loc_name",
+                              "Quarter" = "quarter_name",
+                              "Type of activity" = "measure",
+                              "Age" = "age",
+                              "Sex" = "sex",
+                              "Number" = "count",
+                              "DNA rate" = "dna_rate",
+                              "Mean length of stay" = "avlos"))),
             style = 'bootstrap',
             class = 'table-bordered table-condensed',
             rownames = FALSE,
             options = list(pageLength = 20,
-                           dom = 'tip'),
-            colnames = c("Location",
-                         "Quarter",
-                         "Type of activity",
-                         "Age",
-                         "Sex",
-                         "Number"))})
+                           dom = 'tip'))})
 
 # Downloading data
 output$download_pyramid <- downloadHandler(
@@ -711,18 +715,20 @@ output$simd_plot <- renderPlotly({
 
 # Table
 output$table_simd <- renderDataTable({
-  datatable(data_table_simd(),
+  datatable(data_table_simd() %>%
+              select(-any_of(c(ifelse(!grepl("inpatient|day case", input$measure_simd),"avlos",""),
+                               ifelse(!grepl("DNA", input$measure_simd), "dna_rate", "")))) %>%
+              rename(any_of(c("Location" = "loc_name",
+                              "Quarter" = "quarter_name",
+                              "Type of activity" = "measure",
+                              "SIMD quintile" = "simd",
+                              "Number" = "count",
+                              "DNA rate" = "dna_rate",
+                              "Mean length of stay" = "avlos"))),
             style = 'bootstrap',
             class = 'table-bordered table-condensed',
             rownames = FALSE,
-            options = list(pageLength = 20, dom = 'tip'),
-            colnames = c("Location",
-                         "Quarter",
-                         "Type of activity",
-                         "SIMD quintile",
-                         "Number",
-                         "DNA rate",
-                         "Mean length of stay"))})
+            options = list(pageLength = 20, dom = 'tip'))})
 
 # Downloading data
 output$download_simd <- downloadHandler(
