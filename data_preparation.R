@@ -184,8 +184,8 @@ data_simd_op <- comb_outp(data_simd_op_treat, data_simd_op_res) %>%
   pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
   mutate(measure = paste0(measure, "-", type),
          measure = recode(measure,
-                          "All Appointments-attendances" = "All outpatient attendences",
-                          "All Appointments-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "All-attendances" = "All outpatient attendences",
+                          "All-dna_count" = "All outpatient Did Not Attend (DNAs)",
                           "New-attendances" = "New outpatient attendences",
                           "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
                           "Return-attendances" = "Return outpatient attendences",
@@ -357,8 +357,8 @@ data_pyramid_op <- comb_outp(data_pyramid_op_treat, data_pyramid_op_res) %>%
   pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
   mutate(measure = paste0(measure, "-", type),
          measure = recode(measure,
-                          "All Appointments-attendances" = "All outpatient attendences",
-                          "All Appointments-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "All-attendances" = "All outpatient attendences",
+                          "All-dna_count" = "All outpatient Did Not Attend (DNAs)",
                           "New-attendances" = "New outpatient attendences",
                           "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
                           "Return-attendances" = "Return outpatient attendences",
