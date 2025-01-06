@@ -96,7 +96,7 @@ output$measure_ui_trend <- renderUI({
   shinyWidgets::pickerInput("measure_trend",
                             label = "Select measure",
                             choices = trend_measure,
-                            selected = "Number of stays/appointments")})
+                            selected = "Number of stays/attendances")})
 
 # Reactive datasets
 # Reactive dataset for the trend plot
@@ -107,8 +107,9 @@ data_trend_plot <- reactive({
              geo_type %in% input$geotype_trend) %>%
     rename("Total length of stay (days)" = los,
            "Mean length of stay (days)" = avlos,
-           "Number of stays/appointments" = count,
-           "Did not attend rate (%)" = rate)})
+           "Number of stays/attendances" = count,
+           "Did not attend appointments" = dna_count,
+           "Did not attend rate (%)" = dna_rate)})
 
 # Plotting
 output$trend_plot <- renderPlotly({
@@ -117,8 +118,10 @@ output$trend_plot <- renderPlotly({
   if (!isTruthy(!(
     (is.data.frame(data_trend_plot()) &&
      nrow(data_trend_plot()) == 0) |
-    (input$measure_trend == "Did not attend rate (%)" &
-     !("Did not attend outpatient appointments" %in% input$service_trend)
+    (input$measure_trend %in% c("Did not attend appointments", "Did not attend rate (%)")&
+     !(any(c("All outpatients",
+             "New outpatients",
+             "Return outpatients") %in% input$service_trend))
     )|
     (is.data.frame(data_trend_plot()) &&
      nrow(data_trend_plot()) == 0) |
@@ -217,7 +220,7 @@ table_trend_data <- reactive({
     subset(loc_name %in% input$locname_trend &
              measure %in% input$service_trend &
              geo_type %in% input$geotype_trend) %>%
-    select(loc_name, quarter_name, measure, count, rate, los, avlos)})
+    select(loc_name, quarter_name, measure, count, dna_count, dna_rate, los, avlos)})
 
 output$table_trend <- renderDataTable({
   datatable(table_trend_data(),
@@ -227,7 +230,7 @@ output$table_trend <- renderDataTable({
             options = list(pageLength = 16,
                            dom = 'tip'),
             colnames = c("Location", "Quarter", "Type of activity",
-                         "Number", "DNA rate",
+                         "Stays/Attendances", "DNA number", "DNA rate",
                          "Total length of stay", "Mean length of stay"))})
 
 # Downloading data
@@ -236,7 +239,7 @@ output$download_trend <- downloadHandler(
   content = function(file) {
     write.table(table_trend_data(), file, row.names = FALSE,
                 col.names = c("Location", "Quarter", "Type of activity",
-                              "Number", "DNA rate",
+                              "Stays/Attendances", "DNA number", "DNA rate",
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
@@ -284,7 +287,7 @@ output$measure_ui_trend_2 <- renderUI({
     "measure_trend_2",
     label = "Select measure",
     choices = trend_measure,
-    selected = "Number of stays/appointments")})
+    selected = "Number of stays/attendances")})
 
 # Reactive datasets
 # Reactive dataset for the trend plot
@@ -295,8 +298,9 @@ data_trend_plot_2 <- reactive({
              geo_type %in% input$geotype_trend_2) %>%
     rename("Total length of stay (days)" = los,
            "Mean length of stay (days)" = avlos,
-           "Number of stays/appointments" = count,
-           "Did not attend rate (%)" = rate)})
+           "Number of stays/attendances" = count,
+           "Did not attend appointments" = dna_count,
+           "Did not attend rate (%)" = dna_rate)})
 
 # Plotting
 output$trend_plot_2 <- renderPlotly({
@@ -305,8 +309,10 @@ output$trend_plot_2 <- renderPlotly({
   if (!isTruthy(!(
     (is.data.frame(data_trend_plot_2()) &&
      nrow(data_trend_plot_2()) == 0) |
-    (input$measure_trend_2 == "Did not attend rate (%)" &
-     !("Did not attend outpatient appointments" %in% input$service_trend_2)
+    (input$measure_trend_2 %in% c("Did not attend appointments", "Did not attend rate (%)")&
+     !(any(c("All outpatients",
+             "New outpatients",
+             "Return outpatients") %in% input$service_trend_2))
     )|
     (is.data.frame(data_trend_plot_2()) &&
      nrow(data_trend_plot_2()) == 0) |
@@ -413,7 +419,7 @@ table_trend_data_2 <- reactive({
     subset(loc_name %in% input$locname_trend_2 &
              measure %in% input$service_trend_2 &
              geo_type %in% input$geotype_trend_2) %>%
-    select(loc_name, quarter_name, measure, count, rate, los, avlos)})
+    select(loc_name, quarter_name, measure, count, dna_count, dna_rate, los, avlos)})
 
 output$table_trend_2 <- renderDataTable({
   datatable(table_trend_data_2(),
@@ -423,7 +429,7 @@ output$table_trend_2 <- renderDataTable({
             options = list(pageLength = 16,
                            dom = 'tip'),
             colnames = c("Location", "Quarter", "Type of activity",
-                         "Number", "DNA rate",
+                         "Stays/Attendances", "DNA number", "DNA rate",
                          "Total length of stay", "Mean length of stay"))})
 
 # Downloading data
@@ -432,7 +438,7 @@ output$download_trend_2 <- downloadHandler(
   content = function(file) {
     write.table(table_trend_data_2(), file, row.names = FALSE,
                 col.names = c("Location", "Quarter", "Type of activity",
-                              "Number", "DNA rate",
+                              "Stays/Attendances", "DNA number", "DNA rate",
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
@@ -489,7 +495,7 @@ data_pyramid_plot <- reactive({data_pyramid %>%
 # Table data
 data_table_pyramid <- reactive({
   data_pyramid_plot() %>%
-    select(loc_name, quarter_name, measure, age, sex, count) %>%
+    select(loc_name, quarter_name, measure, age, sex, count, dna_rate, avlos) %>%
     # To go back to positive values
     mutate(count = abs(count))})
 
@@ -571,18 +577,22 @@ output$pyramid_plot <- renderPlotly({
 
 # Table
 output$table_pyramid <- renderDataTable({
-  datatable(data_table_pyramid(),
+  datatable(data_table_pyramid() %>%
+              select(-any_of(c(ifelse(!grepl("inpatient|day case", input$measure_pyramid),"avlos",""),
+                               ifelse(!grepl("DNA", input$measure_pyramid), "dna_rate", "")))) %>%
+              rename(any_of(c("Location" = "loc_name",
+                              "Quarter" = "quarter_name",
+                              "Type of activity" = "measure",
+                              "Age" = "age",
+                              "Sex" = "sex",
+                              "Number" = "count",
+                              "DNA rate" = "dna_rate",
+                              "Mean length of stay" = "avlos"))),
             style = 'bootstrap',
             class = 'table-bordered table-condensed',
             rownames = FALSE,
             options = list(pageLength = 20,
-                           dom = 'tip'),
-            colnames = c("Location",
-                         "Quarter",
-                         "Type of activity",
-                         "Age",
-                         "Sex",
-                         "Number"))})
+                           dom = 'tip'))})
 
 # Downloading data
 output$download_pyramid <- downloadHandler(
@@ -641,7 +651,7 @@ data_simd_plot <- reactive({data_simd %>%
 # Table data
 data_table_simd <- reactive({
   data_simd_plot() %>%
-    select(loc_name, quarter_name, measure, simd, count, rate, avlos)})
+    select(loc_name, quarter_name, measure, simd, count, dna_rate, avlos)})
 
 # Plotting simd bar chart
 output$simd_plot <- renderPlotly({
@@ -705,18 +715,20 @@ output$simd_plot <- renderPlotly({
 
 # Table
 output$table_simd <- renderDataTable({
-  datatable(data_table_simd(),
+  datatable(data_table_simd() %>%
+              select(-any_of(c(ifelse(!grepl("inpatient|day case", input$measure_simd),"avlos",""),
+                               ifelse(!grepl("DNA", input$measure_simd), "dna_rate", "")))) %>%
+              rename(any_of(c("Location" = "loc_name",
+                              "Quarter" = "quarter_name",
+                              "Type of activity" = "measure",
+                              "SIMD quintile" = "simd",
+                              "Number" = "count",
+                              "DNA rate" = "dna_rate",
+                              "Mean length of stay" = "avlos"))),
             style = 'bootstrap',
             class = 'table-bordered table-condensed',
             rownames = FALSE,
-            options = list(pageLength = 20, dom = 'tip'),
-            colnames = c("Location",
-                         "Quarter",
-                         "Type of activity",
-                         "SIMD quintile",
-                         "Number",
-                         "DNA rate",
-                         "Mean length of stay"))})
+            options = list(pageLength = 20, dom = 'tip'))})
 
 # Downloading data
 output$download_simd <- downloadHandler(
@@ -998,14 +1010,15 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, dmy(quarter_date))) %>%
       select(geo_type, loc_name, measure, spec_name,
-             quarter_name, count, rate) %>%
+             quarter_name, attendances, dna_count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Specialty = spec_name,
              Time_period = quarter_name,
-             Appointments = count,
-             DNA_rate = rate) %>%
+             Attendances = attendances,
+             DNA_count = dna_count,
+             DNA_rate = dna_rate) %>%
       mutate_if(is.character, as.factor),
   
   # 7.3 - SIMD Data
@@ -1032,14 +1045,14 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, dmy(quarter_date))) %>%
       select(geo_type, loc_name, measure, simd,
-             quarter_name, count, rate) %>%
+             quarter_name, count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              SIMD_quintile = simd,
              Time_period = quarter_name,
-             Appointments = count,
-             DNA_rate = rate) %>%
+             Number = count,
+             DNA_rate = dna_rate) %>%
       mutate_if(is.character, as.factor),
   
   # 7.4 - Time Trend Data
@@ -1065,13 +1078,14 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, quarter_date_last)) %>%
       select(geo_type,loc_name, quarter_name,
-             measure, count, rate) %>%
+             measure, count, dna_count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Time_period = quarter_name,
              Type_case = measure,
-             Appointments = count,
-             DNA_rate = rate) %>%
+             Attendances = count,
+             DNA_count = dna_count,
+             DNA_rate = dna_rate) %>%
       mutate_if(is.character, as.factor),
   
   # 7.5 - Population Pyramid Data
@@ -1100,16 +1114,16 @@ data_table <- reactive({switch(
       mutate(quarter_name = forcats::fct_reorder(
           quarter_name, quarter_date_last)) %>%
       select(geo_type, loc_name, measure, sex, age,
-             quarter_name, count, rate) %>%
+             quarter_name, count, dna_rate) %>%
       rename(Geography_level = geo_type,
              Area_name = loc_name,
              Type_case = measure,
              Sex = sex,
              Age_group = age,
              Time_period = quarter_name,
-             Appointments = count,
-             DNA_rate = rate) %>%
-      mutate(Appointments = abs(Appointments)) %>%
+             Number = count,
+             DNA_rate = dna_rate) %>%
+      mutate(Number = abs(Number)) %>%
       mutate_if(is.character, as.factor),
   
   # 7.6 - Cross-Boundary Data
@@ -1138,7 +1152,7 @@ data_table <- reactive({switch(
       rename(Health_board_residence = hbres_name,
              Health_board_treatment = hbtreat_name,
              Time_period = quarter_name,
-             Appointments = count) %>%
+             Attendances = count) %>%
       mutate_if(is.character, as.factor))
 })
 

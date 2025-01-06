@@ -177,10 +177,21 @@ data_simd_op_treat <- read_csv(paste0(
 # Exclude three location codes which have no name
 data_simd_op_treat <- data_simd_op_treat %>% 
   filter(!(loc_code %in% c('s217H', "s217v", "S127v"))) %>%
-  treat() 
+  treat()
 
 # 4.2.3 - Combine outpatient files
-data_simd_op <- comb_outp(data_simd_op_treat, data_simd_op_res)
+data_simd_op <- comb_outp(data_simd_op_treat, data_simd_op_res) %>%
+  pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
+  mutate(measure = paste0(measure, "-", type),
+         measure = recode(measure,
+                          "All-attendances" = "All outpatient attendences",
+                          "All-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "New-attendances" = "New outpatient attendences",
+                          "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
+                          "Return-attendances" = "Return outpatient attendences",
+                          "Return-dna_count" = "Return outpatient Did Not Attend (DNAs)")) %>%
+  select(-type)
+
 
 # 4.3 - Combine inpatient and outpatient files, and
 #       Exclude null values, and
@@ -236,7 +247,7 @@ data_trend_ip <- comb_inp(data_trend_ip_treat, data_trend_ip_res) %>%
 data_trend_op_res <- read_csv(paste0(
   base_filepath, 
   "Outpatients-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
-  res() 
+  res()
 
 # 5.2.2 - Treatment data
 data_trend_op_treat <- read_csv(paste0(
@@ -245,14 +256,14 @@ data_trend_op_treat <- read_csv(paste0(
   treat()
 
 # 5.2.3 - Combine outpatient files
-data_trend_op <- comb_outp(data_trend_op_treat, data_trend_op_res)
+data_trend_op <- comb_outp(data_trend_op_treat, data_trend_op_res) %>%
+  rename(count = attendances)
 
 # 5.3 - Combine inpatient and outpatient files, and 
 #       Exclude null values and non-aggregated 'Other' values
 data_trend <- comb_all(data_trend_op, data_trend_ip) %>%
   filter(!(loc_name %in% c("Null", "Other") &
              geo_type == "Other")) %>%
-  
 # Create a new column representing the last month
 # in each financial quarter
 # This will be used as the x-axis in a shiny plot
@@ -276,7 +287,6 @@ data_trend <- comb_all(data_trend_op, data_trend_ip) %>%
     mutate(count = sum(count)) %>% 
     ungroup() %>%
     distinct() %>%
-
 # Arrange by date for later plotting
   arrange(quarter_date_last)
 
@@ -343,7 +353,17 @@ data_pyramid_op_treat <- read_csv(paste0(
   select(-c(hb_code, hb_name, loc_code))
 
 # 6.2.3 - Combine outpatient files
-data_pyramid_op <- comb_outp(data_pyramid_op_treat, data_pyramid_op_res)
+data_pyramid_op <- comb_outp(data_pyramid_op_treat, data_pyramid_op_res) %>%
+  pivot_longer(cols = c(attendances, dna_count), names_to = "type", values_to = "count") %>%
+  mutate(measure = paste0(measure, "-", type),
+         measure = recode(measure,
+                          "All-attendances" = "All outpatient attendences",
+                          "All-dna_count" = "All outpatient Did Not Attend (DNAs)",
+                          "New-attendances" = "New outpatient attendences",
+                          "New-dna_count" = "New outpatient Did Not Attend (DNAs)",
+                          "Return-attendances" = "Return outpatient attendences",
+                          "Return-dna_count" = "Return outpatient Did Not Attend (DNAs)")) %>%
+  select(-type)
 
 # 6.3 - Combine inpatient and outpatient files, and
 #       Exclude null values
@@ -370,65 +390,65 @@ rm(data_pyramid_ip_res, data_pyramid_ip_treat,
    data_pyramid_op_treat, data_pyramid_op)
 
 
-############################################################
-### Section 7: Map Data ----
-
-# 7.1 - Inpatient data
-data_map_ipdc <- read_csv(paste0(
-  base_filepath, 
-  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
-  
-# Exclude Scotland, Golden Jubilee and non-territorial codes
-  filter(!(loc_name %in% c("Scotland", "Other") |
-            hb_name %in% c("Scotland", "Other"))) %>%
-  
-# Create a dummy variable for crude rate, and labels for the map tooltip
-  mutate(crude_rate = row_number(),
-         labs = paste0(
-           loc_name, '</br>', 'Admissions: ',
-           stays, '</br>', 'Crude rate: ',
-           crude_rate)) %>%
-  
-# Convert to long format to allow multiple selections in the map
-  gather("value_type", "value", c("stays", "crude_rate")) %>%
-  mutate(value_type = recode(
-    value_type,
-    "stays" = "Admissions",
-    "crude_rate" = "Crude rate"
-  ))
-
-# Save file
-saveRDS(data_map_ipdc, paste0(rds_filepath, "map_ipdc.rds"))
-
-# 7.2 - Outpatient data
-data_map_op <- read_csv(paste0(
-  base_filepath, 
-  "Outpatients-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
-  
-# Exclude Scotland, Golden Jubilee and non-territorial codes
-  filter(!(loc_name %in% c("Scotland", "Other") |
-            hb_name %in% c("Scotland", "Other"))) %>%
-  
-# Create a dummy variable for crude rate, and labels for the map tooltip
-  mutate(crude_rate = row_number(),
-         labs = paste0(
-           loc_name, '</br>', 'Appointments: ',
-           count, '</br>', 'Rate: ',
-           crude_rate)) %>%
-  
-# Convert to long format to allow multiple selections in the map
-  gather("value_type", "value", c("count", "rate", "crude_rate")) %>%
-  drop_na(value) %>%
-  mutate(value_type = recode(
-    value_type,
-    "count" = "Appointments",
-    "rate" = "DNA rate",
-    "crude_rate" = "Crude rate"
-  ))
-
-# Save file
-saveRDS(data_map_op, paste0(rds_filepath, "map_op.rds"))
-
+# ############################################################
+# ### Section 7: Map Data ----
+# 
+# # 7.1 - Inpatient data
+# data_map_ipdc <- read_csv(paste0(
+#   base_filepath, 
+#   "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
+#   
+# # Exclude Scotland, Golden Jubilee and non-territorial codes
+#   filter(!(loc_name %in% c("Scotland", "Other") |
+#             hb_name %in% c("Scotland", "Other"))) %>%
+#   
+# # Create a dummy variable for crude rate, and labels for the map tooltip
+#   mutate(crude_rate = row_number(),
+#          labs = paste0(
+#            loc_name, '</br>', 'Admissions: ',
+#            stays, '</br>', 'Crude rate: ',
+#            crude_rate)) %>%
+#   
+# # Convert to long format to allow multiple selections in the map
+#   gather("value_type", "value", c("stays", "crude_rate")) %>%
+#   mutate(value_type = recode(
+#     value_type,
+#     "stays" = "Admissions",
+#     "crude_rate" = "Crude rate"
+#   ))
+# 
+# # Save file
+# saveRDS(data_map_ipdc, paste0(rds_filepath, "map_ipdc.rds"))
+# 
+# # 7.2 - Outpatient data
+# data_map_op <- read_csv(paste0(
+#   base_filepath, 
+#   "Outpatients-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
+#   
+# # Exclude Scotland, Golden Jubilee and non-territorial codes
+#   filter(!(loc_name %in% c("Scotland", "Other") |
+#             hb_name %in% c("Scotland", "Other"))) %>%
+#   
+# # Create a dummy variable for crude rate, and labels for the map tooltip
+#   mutate(crude_rate = row_number(),
+#          labs = paste0(
+#            loc_name, '</br>', 'Appointments: ',
+#            count, '</br>', 'Rate: ',
+#            crude_rate)) %>%
+#   
+# # Convert to long format to allow multiple selections in the map
+#   gather("value_type", "value", c("count", "rate", "crude_rate")) %>%
+#   drop_na(value) %>%
+#   mutate(value_type = recode(
+#     value_type,
+#     "count" = "Appointments",
+#     "rate" = "DNA rate",
+#     "crude_rate" = "Crude rate"
+#   ))
+# 
+# # Save file
+# saveRDS(data_map_op, paste0(rds_filepath, "map_op.rds"))
+# 
 
 ############################################################
 ### Section 8: Cross-Boundary Data ----

@@ -138,9 +138,10 @@ trend_service <- data_trend %>%
   pull(measure)
 
 # 3.6 - Time Trend measures
-trend_measure <- c("Number of stays/appointments",
+trend_measure <- c("Number of stays/attendances",
                    "Total length of stay (days)",
                    "Mean length of stay (days)",
+                   "Did not attend appointments",
                    "Did not attend rate (%)")
 
 # 3.7 - Pyramid services
