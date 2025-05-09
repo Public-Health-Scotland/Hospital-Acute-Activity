@@ -100,7 +100,7 @@ ui_code <- tagList( #needed for shinyjs
                       tags$li("NHS Louisa Jordan hospital has been included within this publication: outpatient activity across",
                               "several specialties was undertaken from July 2020 and day case activity across several specialties",
                               "from January 2021 before NHS Louisa Jordan hospital closed at the end of March 2021"),
-                      tags$li("this release includes the NHS Fife, NHS Golden Jubilee (GJ), and NHS",
+                      tags$li("this release includes the NHS Fife, NHS Forth Valley, NHS Golden Jubilee (GJ), and NHS",
                               "Highland",
                               tags$a(href = paste0("https://www.gov.scot/policies/",
                                             "healthcare-standards/national-treatment-centres/"),
