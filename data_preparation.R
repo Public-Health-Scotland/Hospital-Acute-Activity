@@ -45,6 +45,7 @@ source("Data-Explorer/functions.R")
 library(readr)
 library(zoo)
 library(janitor)
+library(stringr)
 
 # 1.3 - Define filepaths - update pub_date each quarter.
 base_filepath <- "../../data/output/"
@@ -380,6 +381,8 @@ data_pyramid <- comb_all(data_pyramid_op, data_pyramid_ip) %>%
                                  year(quarter_end)
                                  )
            )
+
+data_pyramid$age <- str_replace_all(data_pyramid$age, "-", " to ")
 
 # Save file
 saveRDS(data_pyramid, paste0(rds_filepath, "pyramid.rds"))
