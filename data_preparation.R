@@ -50,7 +50,7 @@ library(stringr)
 # 1.3 - Define filepaths - update pub_date each quarter.
 base_filepath <- "../../data/output/"
 rds_filepath <- "Data-Explorer/data/"
-pub_date <- ("-to-June-2025")
+pub_date <- ("-to-September-2025")
 
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
