@@ -48,7 +48,7 @@ credentials <- merge(credentials, read_csv(credential_filepath,
                                            col_types = cols()))
 
 # Uncomment this line to remove authentication:
-credentials <- list(authorisation = "Public")
+# credentials <- list(authorisation = "Public")
 
 # Publication URL
 pub_url = paste0("https://publichealthscotland.scot/publications/",
