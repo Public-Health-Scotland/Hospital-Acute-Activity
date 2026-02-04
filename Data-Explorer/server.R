@@ -189,7 +189,8 @@ output$trend_plot <- renderPlotly({
              yaxis = list(
                fixedrange = FALSE,
                title = input$measure_trend,
-               rangemode = "tozero"),
+               rangemode = "tozero",
+               showline = TRUE),
              
              # Axis parameter
              xaxis = list(fixedrange = FALSE,
@@ -385,7 +386,8 @@ output$trend_plot_2 <- renderPlotly({
         showlegend = TRUE,
         yaxis = list(fixedrange = TRUE,
                      title = input$measure_trend_2,
-                     rangemode = "tozero"),
+                     rangemode = "tozero",
+                     showline = TRUE),
         
         # Axis parameter
         xaxis = list(fixedrange = FALSE,
