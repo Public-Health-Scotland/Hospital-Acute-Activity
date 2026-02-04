@@ -48,7 +48,7 @@ credentials <- merge(credentials, read_csv(credential_filepath,
                                            col_types = cols()))
 
 # Uncomment this line to remove authentication:
-# credentials <- list(authorisation = "Public")
+credentials <- list(authorisation = "Public")
 
 # Publication URL
 pub_url = paste0("https://publichealthscotland.scot/publications/",
@@ -215,8 +215,10 @@ covid_label_2 = list(
   showarrow = F
 )
 
-covid_lines = list(vline(x="2020-03-30"), vline(x="2022-06-30"))
-covid_labels = list(covid_label, covid_label_2)
+covid_lines = list(#vline(x="2020-03-30"), 
+                   vline(x="2022-06-30"))
+covid_labels = list(#covid_label, 
+                    covid_label_2)
 
 ############################################################
 
