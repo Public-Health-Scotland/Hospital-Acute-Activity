@@ -215,8 +215,10 @@ covid_label_2 = list(
   showarrow = F
 )
 
-covid_lines = list(vline(x="2020-03-30"), vline(x="2022-06-30"))
-covid_labels = list(covid_label, covid_label_2)
+covid_lines = list(#vline(x="2020-03-30"), 
+                   vline(x="2022-06-30"))
+covid_labels = list(#covid_label, 
+                    covid_label_2)
 
 ############################################################
 
