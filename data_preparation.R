@@ -50,7 +50,8 @@ library(stringr)
 # 1.3 - Define filepaths - update pub_date each quarter.
 base_filepath <- "../../data/output/"
 rds_filepath <- "Data-Explorer/data/"
-pub_date <- ("-to-December-2025")
+pub_date <- ("-to-June-2025")
+ipdc_pub_date <- ("-to-March-2026")
 
 # Create data folder
 dir.create(rds_filepath, showWarnings = FALSE)
@@ -85,14 +86,14 @@ saveRDS(data_bed, paste0(rds_filepath, "beds.rds"))
 data_spec_ip_res <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Spells-by-NHS-Board-of-Residence-",
-  "and-Specialty", pub_date,".csv")) %>%
+  "and-Specialty", ipdc_date,".csv")) %>%
   res()
 
 # 3.1.2 - Treatment data
 data_spec_ip_treat <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Spells-by-NHS-Board-of-Treatment-",
-  "and-Specialty", pub_date,".csv")) %>%
+  "and-Specialty", ipdc_date,".csv")) %>%
   treat()
 
 # 3.1.3 - Combine inpatient files
@@ -148,14 +149,14 @@ rm(data_spec_ip_res, data_spec_ip_treat,
 data_simd_ip_res <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence-",
-  "and-SIMD", pub_date,".csv")) %>%
+  "and-SIMD", ipdc_date,".csv")) %>%
   res()
 
 # 4.1.2 - Treatment data
 data_simd_ip_treat <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment-",
-  "and-SIMD", pub_date,".csv")) %>%
+  "and-SIMD",ipdc_date ,".csv")) %>%
   treat()
 
 # 4.1.3 - Combine inpatient files
@@ -229,13 +230,13 @@ rm(data_simd_ip_res, data_simd_ip_treat,
 # 5.1.1 - Residence data
 data_trend_ip_res <- read_csv(paste0(
   base_filepath, 
-  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", pub_date,".csv")) %>%
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence", ipdc_date,".csv")) %>%
   res()
 
 # 5.1.2 - Treatment data
 data_trend_ip_treat <- read_csv(paste0(
   base_filepath, 
-  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment", pub_date,".csv")) %>%
+  "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment", ipdc_date,".csv")) %>%
   treat()
 
 # 5.1.3 - Combine inpatient files
@@ -309,7 +310,7 @@ rm(data_trend_ip_res, data_trend_ip_treat,
 data_pyramid_ip_res <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Residence-",
-  "Age-and-Sex", pub_date,".csv")) %>%
+  "Age-and-Sex", ipdc_date,".csv")) %>%
   res() %>%
   
 # Split sex and age into two columns
@@ -320,7 +321,7 @@ data_pyramid_ip_res <- read_csv(paste0(
 data_pyramid_ip_treat <- read_csv(paste0(
   base_filepath, 
   "Inpatient-and-Daycase-Stays-by-NHS-Board-of-Treatment-",
-  "Age-and-Sex", pub_date,".csv")) %>%
+  "Age-and-Sex", ipdc_date,".csv")) %>%
   treat() %>%
   
 # Split sex and age into two columns
@@ -459,7 +460,7 @@ rm(data_pyramid_ip_res, data_pyramid_ip_treat,
 # 8.1 - Inpatient data
 data_cbf_ip <- read_csv(paste0(
   base_filepath, 
-  "Inpatient-and-Daycase-Cross-Boundary-Flow", pub_date,".csv")) %>%
+  "Inpatient-and-Daycase-Cross-Boundary-Flow", ipdc_date,".csv")) %>%
   mutate(file = "Inpatients/day cases") %>%
   
 # Select health boards only
