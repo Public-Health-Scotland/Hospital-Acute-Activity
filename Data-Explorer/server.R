@@ -466,15 +466,68 @@ output$locname_ui_pyramid <- renderUI({
               selectize = TRUE,
               selected = "Scotland")})
 
+# reactive for selecting latest ipdc quarter
+latest_quarter_pyramid <- reactive({
+  
+  if(input$measure_pyramid == "All inpatients and day cases"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_pyramid == "All inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_pyramid == "All day cases"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_pyramid == "Elective inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_pyramid == "Emergency inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else{
+    
+    latest_quarter
+  }
+  
+})
+
+qtr_selection_pyramid <- reactive({
+  
+  if(input$measure_pyramid == "All inpatients and day cases"|
+     input$measure_pyramid == "All inpatients"|
+     input$measure_pyramid == "All day cases"|
+     input$measure_pyramid == "Elective inpatients"|
+     input$measure_pyramid == "Emergency inpatients"){
+    
+    data_pyramid %>%
+      filter(file == "Inpatients/day cases") %>%
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }else{
+    
+    data_pyramid %>%
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }
+  
+})
+
 output$quarter_ui_pyramid <- renderUI({
   selectInput("quarter_pyramid",
               label = "Select the time period",
-              choices = data_pyramid %>%
-                  arrange(dmy(quarter_date)) %>%
-                  distinct(quarter_name) %>%
-                  pull(quarter_name),
-              selected = latest_quarter,
+              choices = qtr_selection_pyramid(),
+              selected = latest_quarter_pyramid(),
               width = "95%")})
+
 
 output$measure_ui_pyramid <- renderUI({
   selectInput("measure_pyramid",
@@ -484,6 +537,7 @@ output$measure_ui_pyramid <- renderUI({
               selected = "All inpatients and day cases")})
 
 # Reactive datasets
+
 data_pyramid_plot <- reactive({data_pyramid %>%
     subset(loc_name %in% input$locname_pyramid &
              measure %in% input$measure_pyramid &
@@ -625,15 +679,67 @@ output$locname_ui_simd <- renderUI({
               selectize = TRUE,
               selected = "Scotland")})
 
+# reactive for selecting latest ipdc quarter.
+latest_quarter_simd <- reactive({
+  
+  if(input$measure_simd == "All inpatients and day cases"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_simd == "All inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_simd == "All day cases"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_simd == "Elective inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else if(input$measure_simd == "Emergency inpatients"){
+    
+    latest_inpat_quarter
+    
+  }else{
+    
+    latest_quarter
+  }
+  
+})
+
+qtr_selection_simd <- reactive({
+  
+  if(input$measure_simd == "All inpatients and day cases"|
+     input$measure_simd == "All inpatients"|
+     input$measure_simd == "All day cases"|
+     input$measure_simd == "Elective inpatients"|
+     input$measure_simd == "Emergency inpatients"){
+    
+    data_simd %>%
+      filter(file == "Inpatients/day cases") %>%
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }else{
+    
+    data_simd %>%
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }
+  
+})
+
 output$quarter_simd <- renderUI({
-    selectInput("quarter_simd",
-            label = "Select the time period",
-            choices = data_simd %>%
-                arrange(dmy(quarter_date)) %>%
-                distinct(quarter_name) %>%
-                pull(quarter_name),
-            selected = latest_quarter,
-            width = "95%")})
+  selectInput("quarter_simd",
+              label = "Select the time period",
+              choices = qtr_selection_simd(),
+              selected = latest_quarter_simd(),
+              width = "95%")})
 
 output$measure_simd <- renderUI({
     selectInput("measure_simd",
@@ -758,14 +864,47 @@ output$hb_flow <- renderUI({
                 distinct(hbres_name) %>%
                 pull(hbres_name))})
 
+# reactives for ipdc data
+latest_quarter_cbf <- reactive({
+  
+  if(input$datatype_flow == "Inpatients/day cases"){
+    
+    latest_inpat_quarter
+    
+  }else{
+    
+    latest_quarter
+    
+  }
+  
+})
+
+qtr_selection_cbf <- reactive({
+  
+  if(input$datatype_flow == "Inpatients/day cases"){
+    
+    data_cbf %>%
+      filter(file == "Inpatients/day cases") %>% 
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }else{
+    
+    data_cbf %>%
+      arrange(dmy(quarter_date)) %>%
+      distinct(quarter_name) %>%
+      pull(quarter_name)
+    
+  }
+  
+})  
+
 output$quarter_flow <- renderUI({
-selectInput("quarter_flow",
-            label = "Select the time period",
-            choices = data_cbf %>%
-                arrange(dmy(quarter_date)) %>%
-                distinct(quarter_name) %>%
-                pull(quarter_name),
-            selected = latest_quarter)})
+  selectInput("quarter_flow",
+              label = "Select the time period",
+              choices = qtr_selection_cbf(),
+              selected = latest_quarter_cbf())})
 
 # Reactive data
 # Creating dynamic selection of dataset.
