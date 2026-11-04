@@ -108,8 +108,14 @@ latest_inpat_quarter <- data_trend %>%
   distinct(quarter_date_last, quarter_name) %>%
   pull(quarter_name)
 
-# measures for quarter selection reactive
-inpat_measures <- c("All inpatients and day cases", "All inpatients", "All day cases", "Elective inpatients", "Emergency inpatients")
+# Measures using inpatient/day-case quarters
+ipdc_measures <- c(
+  "All inpatients and day cases",
+  "All inpatients",
+  "All day cases",
+  "Elective inpatients",
+  "Emergency inpatients"
+)
 
 # 3.3 - Dropdown choices in 'Table' tab
 file_types <-  c("Beds",
