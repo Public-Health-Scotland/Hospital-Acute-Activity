@@ -115,6 +115,37 @@ convert_dates <- function(df) {
            ))
 }
 
+# Section 2.7: Loading files
+# Loads in files from output folder, regardless of date in filename.
+loading_files <- function(filepath, name) {
+  # get list of files 
+  files <- tibble(
+    file = list.files(filepath, full.names = TRUE),
+    value = list.files(filepath)
+  ) %>%
+    # clean file names using regex
+    mutate(
+      name = value %>%
+        str_remove("-to-(March|June|September|December)-\\d{4}\\.csv$") %>%
+        str_replace_all("-", " ")
+    )
+  # get full filepath for desired file
+  file_name <- files %>%
+    filter(name == .env$name) %>%
+    pull(file)
+  
+  # error handlers
+  if (length(file_name) == 0) {
+    stop("No matching file found for: ", name)
+  }
+  
+  if (length(file_name) > 1) {
+    stop("More than one matching file found for: ", name)
+  }
+  # read in csv file
+  read_csv(file_name)
+  
+}
 
 ############################################################
 
