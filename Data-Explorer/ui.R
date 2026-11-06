@@ -1,4 +1,4 @@
-############################################################
+############################################################.
 ## Code name - ui.R
 ## Data Release - Quarterly Data Explorer
 ## Latest Update: James Fixter, December 2022
@@ -9,7 +9,7 @@
 ## This script controls the way the dashboard looks, sets up
 ## the tabs etc.
 ##
-############################################################
+############################################################.
 ### Visual interface ----
 ui_code <- tagList( #needed for shinyjs
   navbarPage(
@@ -27,7 +27,7 @@ ui_code <- tagList( #needed for shinyjs
     # We are going to divide our UI into discrete sections, called tab panels
     # To do this, we need the layout "tabsetPanel()"
     
-############################################################
+############################################################.
 ### Tab 1: Introduction ----
     tabPanel("Introduction",
              icon = icon("info-circle"),
@@ -94,26 +94,25 @@ ui_code <- tagList( #needed for shinyjs
                     p("When using the data explorer, please consider the",
                       "following:"),
                     tags$ul(
-                      tags$li("please note that the volume of hospital activity", 
-                              "and trends observed continue to be impacted post-pandemic",
-                              "and during the recovery phase"),
+                      tags$li("please note that observed trends may be influenced by data submission completeness, 
+                              small numbers, seasonal variation, and wider contextual factors, including the lasting effects 
+                              of the COVID 19 pandemic on the volume and pattern of acute hospital activity"),
                       tags$li("NHS Louisa Jordan hospital has been included within this publication: outpatient activity across",
                               "several specialties was undertaken from July 2020 and day case activity across several specialties",
                               "from January 2021 before NHS Louisa Jordan hospital closed at the end of March 2021"),
-                      tags$li("this release includes the NHS Fife, NHS Forth Valley, NHS Golden Jubilee (GJ), and NHS",
-                              "Highland",
+                      tags$li("this dashboard includes data from the", 
                               tags$a(href = paste0("https://www.gov.scot/policies/",
-                                            "healthcare-standards/national-treatment-centres/"),
-                              "National Treatment Centre (NTC) (external website)",
-                              target = "_blank", class = "special-link"),
-                              "locations. As not all NTCs",
-                              "have a unique location code, and may be an",
-                              "expansion of an existing location, it is not",
-                              "currently possible to accurately differentiate",
-                              "between NTC activity and additional activity",
-                              "carried out within an NHS Board. Therefore, NTC",
-                              "figures reported may not be reflective of all",
-                              "NTC activity"),
+                                                   "healthcare-standards/national-treatment-centres/"),
+                                     "National Treatment Centre (NTC) (external website)",
+                                     target = "_blank", class = "special-link"),
+                              "locations submitted via the national data returns. 
+                              At present, it is not possible to accurately differentiate in national data returns 
+                              between NTC activity and the rest of the activity at NHS Golden Jubilee or NHS Forth Valley. 
+                              As such, the national data NTC figures reported in this dashboard may not be reflective of all activity. 
+                              Therefore, management information data submissions are received from the NHS Boards and are available in the",
+                              tags$a(href = paste0(pub_url, "data-files"), "Data files",
+                                     target = "_blank", class = "special-link"),
+                              "section."),
                       tags$li("there are issues with the quality of the data",
                               "presented, which are summarised in the",
                               tags$a(
@@ -151,7 +150,7 @@ ui_code <- tagList( #needed for shinyjs
     ),
     
     
-############################################################
+############################################################.
 ### Tab 2: Time trend for multiple location ----
     tabPanel("Time trend (location comparison)",
              icon = icon("line-chart"),
@@ -210,7 +209,7 @@ ui_code <- tagList( #needed for shinyjs
              )
     ),
     
-############################################################
+############################################################.
 ### Tab 3: Time trend for multiple activity ----
     tabPanel("Time trend (activity comparison)",
              icon = icon("line-chart"),
@@ -268,7 +267,7 @@ ui_code <- tagList( #needed for shinyjs
              )
     ),
     
-############################################################
+############################################################.
 ### Tab 4: Population pyramid ----
     tabPanel("Age/sex",
              icon = icon("bar-chart"),
@@ -329,7 +328,7 @@ ui_code <- tagList( #needed for shinyjs
                        HTML("</div>"))
     ),
     
-############################################################
+############################################################.
 ### Tab 5: Deprivation (SIMD) ----
     tabPanel("Deprivation",
              icon = icon("circle-user", lib = "font-awesome"),
@@ -394,7 +393,7 @@ ui_code <- tagList( #needed for shinyjs
                        HTML("</div>"))
     ),
     
-############################################################
+############################################################.
 ### Tab 6: Cross boundary ----
     tabPanel("Cross-boundary",
              icon = icon("exchange"),
@@ -449,7 +448,7 @@ ui_code <- tagList( #needed for shinyjs
              )
     ),
     
-############################################################
+############################################################.
 ### Tab 8: Table ----
     tabPanel("Table",
              icon = icon("table"),
@@ -478,7 +477,7 @@ ui_code <- tagList( #needed for shinyjs
                                    label = 'Download data')),
              DT::dataTableOutput("table_explorer", width = "95%"))))
 
-############################################################
+############################################################.
 ### Credentials ----
 
 if (any(credentials$authorisation=="Private")){
@@ -489,7 +488,7 @@ if (any(credentials$authorisation=="Private")){
   ui_code
 }
 
-############################################################
+############################################################.
 
 ### END OF SCRIPT ###
 
