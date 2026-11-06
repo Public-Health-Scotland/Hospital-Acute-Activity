@@ -1,4 +1,4 @@
-############################################################
+############################################################.
 ## Code name - global.R
 ## Data Release - Quarterly Data Explorer
 ## Latest Update: James Fixter, December 2022
@@ -9,7 +9,7 @@
 ## This script includes all packages, datasets and other
 ## values used by both the UI and server files
 ##
-############################################################
+############################################################.
 ### Section 1: Housekeeping ----
 
 # 1.1 - Load libraries (latest version used shown next to each package)
@@ -56,7 +56,7 @@ pub_url = paste0("https://publichealthscotland.scot/publications/",
                  "acute-hospital-activity-and-nhs-beds-information-quarterly-quarter-ending-",
                  data_up_to, "/")
 
-############################################################
+############################################################.
 ### Section 2: Loading Data ----
 
 # Beds data
@@ -81,7 +81,7 @@ data_pyramid <- readRDS(paste0(rds_filepath, "pyramid.rds"))
 # Cross-Boundary data
 data_cbf <- readRDS(paste0(rds_filepath, "cbf.rds"))
 
-############################################################
+############################################################.
 ### Section 3: Other Values ----
 
 # All of these values are used for dropdown selections in different
@@ -107,6 +107,13 @@ latest_inpat_quarter <- data_trend %>%
   filter(quarter_date_last == max(quarter_date_last)) %>%
   distinct(quarter_date_last, quarter_name) %>%
   pull(quarter_name)
+
+qtrs <- c(unique(data_trend$quarter_name))
+
+inpat_qtrs <- data_trend %>% 
+  filter(file == "Inpatients/day cases") %>% 
+  distinct(quarter_name) %>% 
+  pull()
 
 # Measures using inpatient/day-case quarters
 ipdc_measures <- c(
@@ -167,7 +174,7 @@ pyramid_service <- data_pyramid %>%
   pull(measure)
 
 
-############################################################
+############################################################.
 ### Section 4: Plot Parameters ----
 
 # 4.1 - Time Trend colour palette (updated to reflect PHS corporate colours)
@@ -236,6 +243,6 @@ covid_lines = list(#vline(x="2020-03-30"),
 covid_labels = list(#covid_label, 
                     covid_label_2)
 
-############################################################
+############################################################.
 
 ### END OF SCRIPT ###

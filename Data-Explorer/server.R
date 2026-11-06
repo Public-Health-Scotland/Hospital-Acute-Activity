@@ -1,4 +1,4 @@
-############################################################
+############################################################.
 ## Code name - server.R
 ## Data Release - Quarterly Data Explorer
 ## Latest Update: James Fixter, December 2022
@@ -14,7 +14,7 @@
 ## This is because filter struggles with the '$' operator
 ## Where possible, filter is still preferred
 ##
-############################################################
+############################################################.
 ### Server ----
 function(input, output, session) {
 
@@ -22,7 +22,7 @@ function(input, output, session) {
 res_auth <- secure_server(
     check_credentials = check_credentials(credentials))
 
-############################################################
+############################################################.
 ### Tab 1: Introduction ----
 
 # Add hyperlinks to each tab to the corresponding text on the introduction
@@ -57,7 +57,7 @@ observeEvent(input$tabpanel_table, {
                     "Panels",
                     selected = "Table")})
 
-############################################################
+############################################################.
 ### Tab 2: Time trend for multiple location ----
 
 # Reactive dropdowns for this tab
@@ -244,7 +244,7 @@ output$download_trend <- downloadHandler(
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
-############################################################
+############################################################.
 ### Tab 3: Time trend for multiple activity----
 
 # Reactive dropdowns for this tab
@@ -444,7 +444,7 @@ output$download_trend_2 <- downloadHandler(
                               "Total length of stay", "Mean length of stay"),
                 sep = ",")})
 
-############################################################
+############################################################.
 ### Tab 4: Population pyramid ----
 
 # Reactive dropdowns for this tab
@@ -637,7 +637,7 @@ output$download_pyramid <- downloadHandler(
     write_csv(data_pyramid_plot(),
               file)})
 
-############################################################
+############################################################.
 ### Tab 5: Deprivation (SIMD) ----
 
 # Reactive dropdowns for this tab
@@ -806,20 +806,20 @@ output$download_simd <- downloadHandler(
               file)})
 
 
-############################################################
+############################################################.
 ### Tab 6: Cross-boundary ----
 
 # Reactive dropdowns for this tab
 # They will provide a list of health boards and time periods
 output$datatype_flow <- renderUI({
-    selectInput("datatype_flow",
-                label = "Select the hospital service",
-                choices = data_type)})
+  selectInput("datatype_flow",
+              label = "Select the hospital service",
+              choices = data_type)})
 
 output$hb_flow <- renderUI({
-    selectInput("hb_flow",
-            label = "Select the board of interest",
-            choices = data_cbf %>%
+  selectInput("hb_flow",
+              label = "Select the board of interest",
+              choices = data_cbf %>%
                 arrange(hbres_name) %>%
                 distinct(hbres_name) %>%
                 pull(hbres_name))})
@@ -1010,7 +1010,7 @@ output$download_flow <- downloadHandler(
     write_csv(table_cbfdata(),
               file)})
 
-############################################################
+############################################################.
 ### Tab 7: Table----
 
 # Switch function is used to select correct dataset based on
@@ -1283,6 +1283,6 @@ output$download_table <-
                               file)})
 }
 
-############################################################
+############################################################.
 
 ### END OF SCRIPT ###
