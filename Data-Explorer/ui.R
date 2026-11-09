@@ -411,6 +411,7 @@ ui_code <- tagList( #needed for shinyjs
            in. To view the data in a table, use the ‘Show/hide table’
            button. To download your data selection as a .csv file, use the
            ‘Download data’ button."),
+             p(style = "color: red; font-weight: bold;", "Inpatient/day case data not available for Apr-Jun 2026."),
              wellPanel(
                column(4, uiOutput("datatype_flow")),
                column(4, uiOutput("hb_flow"),

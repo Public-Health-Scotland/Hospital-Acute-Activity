@@ -826,7 +826,7 @@ output$hb_flow <- renderUI({
 
 output$quarter_flow <- renderUI({
   selectInput("quarter_flow",
-              label = "Select the time period",
+              label = paste0("Select the time period"),
               choices = data_cbf %>%
                 arrange(dmy(quarter_date)) %>%
                 distinct(quarter_name) %>%
